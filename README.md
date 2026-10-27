@@ -39,3 +39,5 @@ com.example.delibuddy/
 - 데이터 코드는 `data/<기능>` 패키지에 두고 모델과 저장소 한다.
 - 화면 코드는 `ui/<화면>` 패키지에 두고 Fragment와 ViewModel을 함께 둔다.
 - 차후 변경될 수 있음.
+
+- 테스트용 주석 추가
