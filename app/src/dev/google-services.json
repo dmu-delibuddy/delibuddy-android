@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "773871706239",
+    "project_id": "dmu-delibuddy-dev",
+    "storage_bucket": "dmu-delibuddy-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:773871706239:android:85595969e3e7febbe09f4a",
+        "android_client_info": {
+          "package_name": "com.example.delibuddy.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbJaXVHnDabxMg_JqoLvRwBaxSrjo2DY0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
