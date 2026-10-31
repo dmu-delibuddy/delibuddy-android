@@ -16,6 +16,8 @@
         android:background="@drawable/nav_bg"
         app:itemTextColor="@color/black"
         app:itemIconSize="30dp"
+        app:itemBackground="@drawable/nav_item_background"
+        app:itemActiveIndicatorStyle="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
