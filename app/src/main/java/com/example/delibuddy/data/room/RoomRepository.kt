@@ -1,5 +1,6 @@
 package com.example.delibuddy.data.room
 
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -72,7 +73,16 @@ class RoomRepository (
                 close(error)
                 return@addSnapshotListener
             }
-            val list = snapshot?.toObjects(RoomModel::class.java).orEmpty()
+                // 문서를 하나씩 변환. 형식이 잘못된 문서는 로그만 남기고 건너뜀 (앱 사망 방지)
+                val list = snapshot?.documents.orEmpty()
+                    .mapNotNull { doc ->
+                        try {
+                            doc.toObject(RoomModel::class.java)
+                        } catch (e: RuntimeException) {
+                            Log.w("RoomRepo", "방 문서 변환 실패: ${doc.id}", e)
+                            null
+                        }
+                    }
                 .filterNot { it.isDeadLinePassed }
                 .sortedBy { it.deadline?.seconds ?: MAX_VALUE }
             trySend(list)
