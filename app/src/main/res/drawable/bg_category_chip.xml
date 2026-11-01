@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 카테고리 버튼: 선택 = 주황, 아니면 흰색 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 선택됨 -->
+    <item android:state_checked="true">
+        <layer-list>
+            <item android:left="3dp" android:top="3dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/black" />
+                </shape>
+            </item>
+            <item android:right="3dp" android:bottom="3dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/point_orange" />
+                    <stroke android:width="2dp" android:color="@color/black" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <!-- 선택 안 됨 -->
+    <item>
+        <layer-list>
+            <item android:left="3dp" android:top="3dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/black" />
+                </shape>
+            </item>
+            <item android:right="3dp" android:bottom="3dp">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/white" />
+                    <stroke android:width="2dp" android:color="@color/black" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>
