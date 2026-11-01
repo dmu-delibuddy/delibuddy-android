@@ -4,4 +4,17 @@
     <string name="chatting">채팅</string>
     <string name="location_recommendation">위치 추천</string>
     <string name="my_page">마이페이지</string>
+    <string name="home_logo">DELI-BUDDY</string>
+    <string name="mode_pickup">픽업 모드</string>
+    <string name="mode_meal_buddy">밥 친구 모드</string>
+    <string name="home_joinable_only">참여 가능한 방만 보기</string>
+    <string name="home_search_hint">위치, 메뉴, 가게 검색…</string>
+    <string name="category_all">전체</string>
+    <string name="category_kor">한식</string>
+    <string name="category_chn">중식</string>
+    <string name="category_jpn">일식</string>
+    <string name="category_west">양식</string>
+    <string name="category_etc">기타</string>
+    <string name="home_empty_rooms">아직 모집 중인 방이 없어요.\n첫 방을 만들어 보세요!</string>
+    <string name="home_create_room">+ 방 만들기</string>
 </resources>

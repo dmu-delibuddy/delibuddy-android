@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#FFF4CF</color>
     <color name="nav_selected">#FFD65A</color>
+    <color name="point_orange">#F5A33B</color>
+    <color name="mode_off">#FCE8A6</color>
+    <color name="button_red">#E0383E</color>
 </resources>
