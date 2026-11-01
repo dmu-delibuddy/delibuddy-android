@@ -1,23 +1,51 @@
 package com.example.delibuddy.ui.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import android.util.Log
 import androidx.lifecycle.asLiveData
+import com.example.delibuddy.data.room.FoodCategory
+import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
 
 class HomeViewModel(
     private val roomRepository: RoomRepository = RoomRepository()
 ) : ViewModel() {
 
-    // 홈 방 목록 (firebase 실시간 구독)
-    val rooms : LiveData<List<RoomModel>> = roomRepository.observeRooms()
+    // ---- 필터 상태 (화면 버튼이 바꿈) ----
+    private val mode = MutableStateFlow(RoomMode.PICKUP_ONLY)
+    private val category = MutableStateFlow<FoodCategory?>(null)
+    private val joinableOnly = MutableStateFlow(false)
+    private val query = MutableStateFlow("")
+
+    // Firebase 에서 받은 전체 목록 (모집 중 + 정원 마감)
+    private val allRooms = roomRepository.observeRooms()
         .onEach { Log.d(TAG, "rooms=${it.size}개") }
-        .catch { e -> Log.e(TAG, "observrRooms 실패", e) }
-        .asLiveData()
+        .catch { e -> Log.e(TAG, "observeRooms 실패", e) }
+
+    // 화면에 보여줄 목록
+    val rooms : LiveData<List<RoomModel>> =
+        combine(allRooms, mode, category, joinableOnly, query) { list, m, c, j, q ->
+            list.filter { it.mode == m }
+                .filter { c == null || it.category == c }
+                .filter { !j || it.isJoinable }
+                .filter {
+                    q.isBlank() ||
+                            it.title.contains(q, ignoreCase = true) ||
+                            it.restaurant.contains(q, ignoreCase = true)
+                }
+        }.asLiveData()
+
+    // 화면에서 필터를 바꿀 때 부르는 함수
+    fun setMode(value : RoomMode) { mode.value = value }
+    fun setCategory(value : FoodCategory?) { category.value = value }
+    fun setJoinableOnly(value : Boolean) { joinableOnly.value = value }
+    fun setQuery(value : String) { query.value = value }
 
     companion object {
         private const val TAG = "HOMEVM"
