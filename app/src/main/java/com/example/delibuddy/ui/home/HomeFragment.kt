@@ -5,9 +5,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.delibuddy.R
+import com.example.delibuddy.data.room.FoodCategory
+import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.databinding.FragmentHomeBinding
+
 
 class HomeFragment : Fragment() {
 
@@ -42,7 +47,41 @@ class HomeFragment : Fragment() {
             adapter.submitList(rooms)
             binding.textEmpty.visibility = if (rooms.isEmpty()) View.VISIBLE else View.GONE
         }
+
+        // ----------- 필터 --------------
+        // 모드 : 픽업 | 밥 친구
+        binding.groupMode.setOnCheckedChangeListener { _, checkedId ->
+            homeViewModel.setMode(
+                if (checkedId == R.id.radio_meal_buddy) RoomMode.MEAL_BUDDY else RoomMode.PICKUP_ONLY
+            )
+        }
+
+        // 카테고리 : 전체면 null
+        binding.groupCategory.setOnCheckedChangeListener { _, checkedId ->
+            homeViewModel.setCategory (
+                when (checkedId) {
+                    R.id.radio_cat_kor -> FoodCategory.KOR
+                    R.id.radio_cat_chn -> FoodCategory.CHN
+                    R.id.radio_cat_jpn -> FoodCategory.JPN
+                    R.id.radio_cat_west -> FoodCategory.WEST
+                    R.id.radio_cat_etc -> FoodCategory.ETC
+                    else -> null
+                }
+            )
+        }
+
+        // 참여 가능한 방만 보기
+        binding.switchJoinableOnly.setOnCheckedChangeListener { _, isChecked ->
+            homeViewModel.setJoinableOnly(isChecked)
+        }
+
+        // 검색 : 글자를 입력할 때마다
+        binding.editSearch.doAfterTextChanged { text ->
+            homeViewModel.setQuery(text?.toString().orEmpty()) // 어뎁터가 사라진 화면을 붙잡지 않게 함
+        }
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
