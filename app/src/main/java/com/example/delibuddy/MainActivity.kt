@@ -1,8 +1,13 @@
 package com.example.delibuddy
 
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -19,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        applySystemBarPadding()
+
         val navView: BottomNavigationView = binding.navView
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
@@ -34,5 +41,38 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         navView.itemIconTintList = null
-    }
+
+        showLogoInActionBar()
+           }
+
+        // 액션바의 "홈" 같은 제목 대신 DELI-BUDDY 로고를 가운데에 표시
+        private fun showLogoInActionBar() {
+                supportActionBar?.apply {
+                        setDisplayShowTitleEnabled(false)
+                        setDisplayShowCustomEnabled(true)
+                        setCustomView(
+                                layoutInflater.inflate(R.layout.actionbar_logo, null),
+                                ActionBar.LayoutParams(
+                                        ActionBar.LayoutParams.WRAP_CONTENT,
+                                        ActionBar.LayoutParams.WRAP_CONTENT,
+                                        Gravity.CENTER
+                                )
+                        )
+                }
+        }
+
+        // targetSdk 36 은 화면이 상태바 뒤부터 그려짐(edge-to-edge)
+        // -> 위쪽 여백 = 상태바 높이 + 액션바 높이
+        private fun applySystemBarPadding() {
+                val tv = TypedValue()
+                theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)
+                val actionBarSize = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+
+                ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+                        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                        v.setPadding(bars.left, bars.top, bars.right, 0)
+                        insets
+                }
+        }
 }
+
