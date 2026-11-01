@@ -4,4 +4,9 @@
     <string name="chatting">채팅</string>
     <string name="location_recommendation">위치 추천</string>
     <string name="my_page">마이페이지</string>
+    <string name="auth_tagline">함께 주문하고, 함께 나눠요</string>
+    <string name="auth_description">동네 친구들과 배달비는 가볍게, 한 끼는 든든하게</string>
+    <string name="auth_start">시작하기</string>
+    <string name="auth_signin">로그인</string>
+    <string name="auth_existing_account">이미 계정이 있다면 로그인해 주세요</string>
 </resources>
