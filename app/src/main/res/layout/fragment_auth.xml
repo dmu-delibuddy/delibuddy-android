@@ -7,42 +7,60 @@
     android:background="@drawable/app_bg"
     tools:context=".ui.auth.AuthFragment">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/content_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/content_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
+
     <ImageView
         android:id="@+id/image_auth_logo"
-        android:layout_width="190dp"
-        android:layout_height="190dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:contentDescription="@string/app_name"
         android:scaleType="fitCenter"
         android:src="@drawable/delibuddy_pizza_bubble_icon"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintBottom_toTopOf="@id/text_auth"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintTop_toTopOf="@id/content_top"
+        app:layout_constraintVertical_chainStyle="spread_inside" />
 
     <TextView
         android:id="@+id/text_auth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/pressstart_regular"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:gravity="center"
+        android:maxLines="1"
         android:textColor="@color/navy"
-        android:textSize="48sp"
         android:textStyle="bold"
+        app:fontFamily="@font/pressstart_regular"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMinTextSize="12sp"
+        app:autoSizeMaxTextSize="32sp"
+        app:autoSizeStepGranularity="1sp"
+        app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toTopOf="@id/text_auth_tagline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/image_auth_logo"
-        tools:text="DELI-BUDDY"
-        />
+        tools:text="DELI-BUDDY" />
 
     <TextView
         android:id="@+id/text_auth_tagline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="26dp"
-        android:fontFamily="@font/gugi"
         android:gravity="center"
         android:text="@string/auth_tagline"
         android:textColor="@color/navy"
@@ -90,7 +108,7 @@
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="3dp"
         android:layout_marginEnd="28dp"
         android:background="@drawable/auth_button_secondary"
         android:fontFamily="@font/gugi"
@@ -98,7 +116,7 @@
         android:textColor="@color/navy"
         android:textSize="20sp"
         app:backgroundTint="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/content_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_auth_start" />

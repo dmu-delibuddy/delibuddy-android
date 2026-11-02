@@ -19,13 +19,18 @@ class SignUpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSignupBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val viewModel = ViewModelProvider(this)[SignUpViewModel::class.java]
 
         viewModel.text.observe(viewLifecycleOwner) {
             binding.textSignup.text = it
         }
 
-        return binding.root
     }
 
     override fun onDestroyView() {
