@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentHomeBinding
 
 /*
@@ -29,7 +31,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonCreateRoom.setOnClickListener {
-            // TODO: 방 만들기 화면 연결
+            findNavController().navigate(R.id.action_home_to_create_room)
         }
     }
 
