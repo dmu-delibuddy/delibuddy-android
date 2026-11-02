@@ -12,31 +12,18 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlin.Long.Companion.MAX_VALUE
 
-class RoomException(val reason: Reason) : Exception(reason.message) {
-    enum class Reason(val message : String) {
-        NOT_LOGGED_IN("로그인이 필요합니다."),
-        NOT_FOUND("방을 찾을 수 없습니다."),
-        CLOSED("모집이 마감된 방입니다."),
-        FULL("정원이 가득 찼습니다."),
-        ALREADY_JOINED("이미 참여 중인 방입니다."),
-        NOT_HOST("방장만 할 수 있습니다."),
-        HOST_CANNOT_LEAVE("방장은 참여를 취소할 수 없습니다."),
 
-        INVALID_STATE("지금 상태에서는 할 수 없습니다."),
-    }
-}
-
-class RoomRepository (
-    private val db : FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth : FirebaseAuth = FirebaseAuth.getInstance(),
+class RoomRepository(
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
 ) {
     private val rooms = db.collection("rooms")
 
-    private fun requireUid() : String =
-        auth.currentUser?.uid?: throw RoomException(RoomException.Reason.NOT_LOGGED_IN)
+    private fun requireUid(): String =
+        auth.currentUser?.uid ?: throw RoomException(RoomException.Reason.NOT_LOGGED_IN)
 
     // -------------------- 방 생성 ---------------------
-    suspend fun createRoom(room : RoomModel) : String {
+    suspend fun createRoom(room: RoomModel): String {
         val uid = requireUid()
         val ref = rooms.document()
         val newRoom = room.copy(
@@ -55,12 +42,12 @@ class RoomRepository (
         * onlyJoinable = true 이면 모집 중 (RECRUITING)인 방만, false 이면 정원 마감도 함께 보여줌
     */
 
-    fun observeRooms (
-        onlyJoinable : Boolean = false,
+    fun observeRooms(
+        onlyJoinable: Boolean = false,
         mode: RoomMode? = null,
         category: FoodCategory? = null,
-    ) : Flow<List<RoomModel>> = callbackFlow {
-        var query : Query = if (onlyJoinable) {
+    ): Flow<List<RoomModel>> = callbackFlow {
+        var query: Query = if (onlyJoinable) {
             rooms.whereEqualTo("status", RoomStatus.RECRUITING.name)
         } else {
             rooms.whereIn("status", listOf(RoomStatus.RECRUITING.name, RoomStatus.FULL.name))
@@ -73,16 +60,16 @@ class RoomRepository (
                 close(error)
                 return@addSnapshotListener
             }
-                // 문서를 하나씩 변환. 형식이 잘못된 문서는 로그만 남기고 건너뜀 (앱 사망 방지)
-                val list = snapshot?.documents.orEmpty()
-                    .mapNotNull { doc ->
-                        try {
-                            doc.toObject(RoomModel::class.java)
-                        } catch (e: RuntimeException) {
-                            Log.w("RoomRepo", "방 문서 변환 실패: ${doc.id}", e)
-                            null
-                        }
+            // 문서를 하나씩 변환. 형식이 잘못된 문서는 로그만 남기고 건너뜀 (앱 사망 방지)
+            val list = snapshot?.documents.orEmpty()
+                .mapNotNull { doc ->
+                    try {
+                        doc.toObject(RoomModel::class.java)
+                    } catch (e: RuntimeException) {
+                        Log.w("RoomRepo", "방 문서 변환 실패: ${doc.id}", e)
+                        null
                     }
+                }
                 .filterNot { it.isDeadLinePassed }
                 .sortedBy { it.deadline?.seconds ?: MAX_VALUE }
             trySend(list)
@@ -119,15 +106,18 @@ class RoomRepository (
                 room.isParticipant(uid) -> throw RoomException(RoomException.Reason.ALREADY_JOINED)
                 room.status == RoomStatus.FULL || room.currentCount >= room.maxParticipants ->
                     throw RoomException(RoomException.Reason.FULL)
+
                 room.status != RoomStatus.RECRUITING || room.isDeadLinePassed ->
                     throw RoomException(RoomException.Reason.CLOSED)
             }
             val nextStatus =
                 if (room.currentCount + 1 >= room.maxParticipants) RoomStatus.FULL else RoomStatus.RECRUITING
-            tx.update(ref, mapOf(
-                "participantIds" to FieldValue.arrayUnion(uid),
-                "status" to nextStatus.name,
-            ))
+            tx.update(
+                ref, mapOf(
+                    "participantIds" to FieldValue.arrayUnion(uid),
+                    "status" to nextStatus.name,
+                )
+            )
         }.await()
     }
 
@@ -142,10 +132,12 @@ class RoomRepository (
             if (!room.isParticipant(uid)) return@runTransaction
             if (room.status != RoomStatus.RECRUITING && room.status != RoomStatus.FULL)
                 throw RoomException(RoomException.Reason.CLOSED)   // 모집 마감 후에는 취소 불가
-            tx.update(ref, mapOf(
-                "participantIds" to FieldValue.arrayRemove(uid),
-                "status" to RoomStatus.RECRUITING.name,
-            ))
+            tx.update(
+                ref, mapOf(
+                    "participantIds" to FieldValue.arrayRemove(uid),
+                    "status" to RoomStatus.RECRUITING.name,
+                )
+            )
         }.await()
     }
 
