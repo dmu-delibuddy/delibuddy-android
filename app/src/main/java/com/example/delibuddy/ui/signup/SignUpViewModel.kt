@@ -1,11 +1,14 @@
 package com.example.delibuddy.ui.signup
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 
-class SignUpViewModel : ViewModel() {
+class SignUpViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    private val _text = MutableLiveData("회원가입")
-    val text: LiveData<String> = _text
+    val email: LiveData<String> = savedStateHandle.getLiveData("email", "")
+
+    fun setEmail(value: String) {
+        savedStateHandle["email"] = value
+    }
 }

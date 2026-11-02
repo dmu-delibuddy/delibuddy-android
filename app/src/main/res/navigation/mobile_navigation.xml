@@ -24,11 +24,16 @@
             app:destination="@id/navigation_signin" />
     </fragment>
 
-    <fragment
+    <navigation
         android:id="@+id/navigation_signup"
-        android:name="com.example.delibuddy.ui.signup.SignUpFragment"
         android:label="@string/auth_start"
-        tools:layout="@layout/fragment_signup" />
+        app:startDestination="@id/navigation_email">
+        <fragment
+            android:id="@+id/navigation_email"
+            android:name="com.example.delibuddy.ui.signup.EmailFragment"
+            android:label="@string/signup_email_title"
+            tools:layout="@layout/fragment_email" />
+    </navigation>
 
     <fragment
         android:id="@+id/navigation_signin"

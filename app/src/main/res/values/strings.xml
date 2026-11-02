@@ -22,4 +22,9 @@
     <string name="category_etc">기타</string>
     <string name="home_empty_rooms">아직 모집 중인 방이 없어요.\n첫 방을 만들어 보세요!</string>
     <string name="home_create_room">+ 방 만들기</string>
+    <string name="signup_email_title">메일을 입력해주세요</string>
+    <string name="signup_email_hint">학교 이메일</string>
+    <string name="signup_email_domain">\@dongyang.ac.kr</string>
+    <string name="signup_verify_email">인증 하기</string>
+    <string name="signup_verification_complete">인증 완료</string>
 </resources>
