@@ -56,4 +56,10 @@
     <string name="create_step3_sub">모일 장소와 마감 시간을 정해주세요</string>
     <string name="create_step4_heading">금액을 정해요</string>
     <string name="create_step4_sub">주문 금액과 정산 방법을 정해주세요</string>
+    <string name="create_title_label">1. 방 제목</string>
+    <string name="create_title_hint">예) 맘스터치 싸이버거 드실 분</string>
+    <string name="create_participants_label">2. 최대 참가자 수 (방장 포함)</string>
+    <string name="create_mode_label">3. 모드 선택</string>
+    <string name="create_mode_pickup">픽업 모드\n음식만 같이 받아요</string>
+    <string name="create_mode_meal_buddy">밥 친구 모드\n같이 모여서 먹어요</string>
 </resources>

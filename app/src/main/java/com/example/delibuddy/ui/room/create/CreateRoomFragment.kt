@@ -12,6 +12,8 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.core.widget.doAfterTextChanged
+import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentCreateRoomBinding
 
@@ -24,7 +26,7 @@ import com.example.delibuddy.databinding.FragmentCreateRoomBinding
 
 class CreateRoomFragment : Fragment() {
 
-    private var _binding : FragmentCreateRoomBinding? = null
+    private var _binding: FragmentCreateRoomBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -41,8 +43,10 @@ class CreateRoomFragment : Fragment() {
 
         val viewModel = ViewModelProvider(this)[CreateRoomViewModel::class.java]
 
-        val progress = listOf(binding.progress1, binding.progress2, binding.progress3, binding.progress4)
-        val steps = listOf(binding.step1.root, binding.step2.root, binding.step3.root, binding.step4.root)
+        val progress =
+            listOf(binding.progress1, binding.progress2, binding.progress3, binding.progress4)
+        val steps =
+            listOf(binding.step1.root, binding.step2.root, binding.step3.root, binding.step4.root)
 
         // 시스템 뒤로가기 : 2단계 이상이면 이전 단계로 (1단계에서는 꺼져 있어서 화면 종료)
         val backCallback = requireActivity().onBackPressedDispatcher
@@ -73,6 +77,34 @@ class CreateRoomFragment : Fragment() {
             } else {
                 viewModel.next()
             }
+        }
+
+        // 1단계 : 방 정보
+        val step1 = binding.step1
+
+        // 방 제목 : 입력할 때마다 저장 + 글자 수 표시
+        step1.editTitle.doAfterTextChanged { text ->
+            val value = text?.toString().orEmpty()
+            viewModel.setTitle(value)
+            step1.textTitleCount.text = "${value.length}/${CreateRoomViewModel.TITLE_MAX}"
+        }
+
+        // 최대 참가자 수 : - / + (2 ~ 6명)
+        step1.buttonMinus.setOnClickListener { viewModel.decreaseParticipants() }
+        step1.buttonPlus.setOnClickListener { viewModel.increaseParticipants() }
+        viewModel.maxParticipants.observe(viewLifecycleOwner) { n ->
+            step1.textParticipants.text = "${n}명"
+            step1.buttonMinus.isEnabled = n > CreateRoomViewModel.MIN_PARTICIPANTS
+            step1.buttonPlus.isEnabled = n < CreateRoomViewModel.MAX_PARTICIPANTS
+            step1.buttonMinus.alpha = if (step1.buttonMinus.isEnabled) 1f else 0.3f
+            step1.buttonPlus.alpha = if (step1.buttonPlus.isEnabled) 1f else 0.3f
+        }
+
+        // 모드 선택
+        step1.groupCreateMode.setOnCheckedChangeListener { _, checkedId ->
+            viewModel.setMode(
+                if (checkedId == R.id.radio_create_meal_buddy) RoomMode.MEAL_BUDDY else RoomMode.PICKUP_ONLY
+            )
         }
 
         // 하단 탭이 없는 화면이라 버튼이 제스처 바에 가리지 않게 아래 여백 추가
