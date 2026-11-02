@@ -1,6 +1,7 @@
 package com.example.delibuddy.ui.home
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -10,12 +11,11 @@ import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.ItemRoomBinding
-import com.google.rpc.Status
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 /*
-    * 홈 화면 방 목록 어댑터.
+    * 홈 화면 방 목록 어댑터. (카드 : item_room.xml)
     * DB 의 enum 은 영어 그대로 두고 화면에 보일 때만 한글로 변환
     * 카드를 누르면 onClick 으로 roomId 를 넘김
 */
@@ -38,15 +38,22 @@ class RoomAdapter (
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(room : RoomModel) = with(binding) {
-            textTitle.text = room.title
-            textStatus.text = statusLabel(room.status)
-            textRestaurant.text = room.restaurant
-            textTags.text = "${modeLabel(room.mode)} | ${categoryLabel(room.category)}"
-            textParticipants.text = "${room.currentCount}/${room.maxParticipants}명"
-            textDeliveryFee.text = "1인당 %,d원".format(room.deliveryFeePerPerson)
+            // 모집 배지 = 상태 + 인원 / 마감 시간
+            textStatus.text = "${statusLabel(room.status)} ${room.currentCount}/${room.maxParticipants}명"
             textDeadline.text = room.deadline
                 ?.let { "${TIME_FORMAT.format(it.toDate())} 마감" }
                 ?: "시간 제한 없음"
+
+            // 배달비
+            textDeliveryFee.text = "배달비 1인당 %,d원".format(room.deliveryFeePerPerson)
+
+            // 제목
+            textTitle.text = room.title
+
+            // 메뉴 태그 , 장소 태그 / 모드 배지
+            textMenu.text = "메뉴: ${room.restaurant}"
+            textPlace.visibility = View.GONE // 장소 필드가 정해지면 표시로 바꿀 예정
+            textMode.text = "${modeLabel(room.mode)} 모드"
 
             root.setOnClickListener { onClick(room.id) }
         }
