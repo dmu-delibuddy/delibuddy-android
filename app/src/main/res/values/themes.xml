@@ -19,4 +19,17 @@
     <style name="Theme.Delibuddy.ActionBar" parent="Widget.MaterialComponents.ActionBar.Solid">
         <item name="background">@color/background</item>
     </style>
+
+    <!-- 홈 화면 카테고리 버튼 -->
+    <style name="CategoryChip">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:background">@drawable/bg_category_chip</item>
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">13sp</item>
+    </style>
 </resources>
