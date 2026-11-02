@@ -1,25 +1,19 @@
 package com.example.delibuddy.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.example.delibuddy.R
-import com.example.delibuddy.data.room.FoodCategory
-import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.databinding.FragmentHomeBinding
 
-
+/*
+    * 홈 화면. 방 목록·필터는 RoomListFragment 가 담당 (fragment_home.xml 의 container_room_list)
+    * 홈은 방 만들기 버튼과, 나중에 붙일 섹션(내 주문 상태 등)만 가진다
+*/
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -34,61 +28,13 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-
-        // 카드 클릭 : 지금은 roomId 로그인 (나중에 상세 화면 이동으로 교체)
-        val adapter = RoomAdapter { roomId ->
-            Log.d(TAG, "방 클릭 : roomdId=$roomId")
-        }
-        binding.recyclerRooms.adapter = adapter
-
-        // 방 목록이 뜰 때마다 화면 갱신
-        homeViewModel.rooms.observe(viewLifecycleOwner) { rooms ->
-            adapter.submitList(rooms)
-            binding.textEmpty.visibility = if (rooms.isEmpty()) View.VISIBLE else View.GONE
-        }
-
-        // ----------- 필터 --------------
-        // 모드 : 픽업 | 밥 친구
-        binding.groupMode.setOnCheckedChangeListener { _, checkedId ->
-            homeViewModel.setMode(
-                if (checkedId == R.id.radio_meal_buddy) RoomMode.MEAL_BUDDY else RoomMode.PICKUP_ONLY
-            )
-        }
-
-        // 카테고리 : 전체면 null
-        binding.groupCategory.setOnCheckedChangeListener { _, checkedId ->
-            homeViewModel.setCategory (
-                when (checkedId) {
-                    R.id.radio_cat_kor -> FoodCategory.KOR
-                    R.id.radio_cat_chn -> FoodCategory.CHN
-                    R.id.radio_cat_jpn -> FoodCategory.JPN
-                    R.id.radio_cat_west -> FoodCategory.WEST
-                    R.id.radio_cat_etc -> FoodCategory.ETC
-                    else -> null
-                }
-            )
-        }
-
-        // 참여 가능한 방만 보기
-        binding.switchJoinableOnly.setOnCheckedChangeListener { _, isChecked ->
-            homeViewModel.setJoinableOnly(isChecked)
-        }
-
-        // 검색 : 글자를 입력할 때마다
-        binding.editSearch.doAfterTextChanged { text ->
-            homeViewModel.setQuery(text?.toString().orEmpty()) // 어뎁터가 사라진 화면을 붙잡지 않게 함
+        binding.buttonCreateRoom.setOnClickListener {
+            // TODO: 방 만들기 화면 연결
         }
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        private const val TAG = "HomeFragment"
     }
 }

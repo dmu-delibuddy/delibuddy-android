@@ -1,4 +1,4 @@
-package com.example.delibuddy.ui.home
+package com.example.delibuddy.ui.room
 
 import android.view.LayoutInflater
 import android.view.View
@@ -22,14 +22,14 @@ import java.util.Locale
 
 class RoomAdapter (
     private val onClick : (roomId : String) -> Unit
-) : ListAdapter <RoomModel, RoomAdapter.RoomViewHolder>(DIFF) {
+) : ListAdapter<RoomModel, RoomAdapter.RoomViewHolder>(DIFF) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomAdapter.RoomViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomViewHolder {
         val binding = ItemRoomBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return RoomViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: RoomAdapter.RoomViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RoomViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 

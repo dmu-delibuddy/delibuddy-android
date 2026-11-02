@@ -1,4 +1,4 @@
-package com.example.delibuddy.ui.home
+package com.example.delibuddy.ui.room
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
 
-class HomeViewModel(
+class RoomListViewModel(
     private val roomRepository: RoomRepository = RoomRepository()
 ) : ViewModel() {
 
@@ -48,6 +48,6 @@ class HomeViewModel(
     fun setQuery(value : String) { query.value = value }
 
     companion object {
-        private const val TAG = "HOMEVM"
+        private const val TAG = "RoomListVM" // Logcat
     }
 }
