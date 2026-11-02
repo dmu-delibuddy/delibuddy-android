@@ -43,4 +43,17 @@
     <string name="signup_email_already_used">이미 가입된 이메일입니다. 로그인해 주세요.</string>
     <string name="signup_password_weak">비밀번호가 보안 정책에 맞지 않습니다. 더 강한 비밀번호를 입력해 주세요.</string>
     <string name="signup_verification_failed">인증 메일을 보내지 못했습니다. 네트워크와 입력 정보를 확인하고 다시 시도해 주세요.</string>
+    <string name="create_room_title">방 만들기</string>
+    <string name="create_room_back">뒤로가기</string>
+    <string name="create_room_prev">이전</string>
+    <string name="create_room_next">다음</string>
+    <string name="create_room_submit">방 개설하기</string>
+    <string name="create_step1_heading">방 정보를 입력해요</string>
+    <string name="create_step1_sub">제목, 인원, 모드를 정해주세요</string>
+    <string name="create_step2_heading">무엇을 시킬까요?</string>
+    <string name="create_step2_sub">카테고리와 음식점을 입력해주세요</string>
+    <string name="create_step3_heading">어디서, 언제까지 모일까요?</string>
+    <string name="create_step3_sub">모일 장소와 마감 시간을 정해주세요</string>
+    <string name="create_step4_heading">금액을 정해요</string>
+    <string name="create_step4_sub">주문 금액과 정산 방법을 정해주세요</string>
 </resources>
