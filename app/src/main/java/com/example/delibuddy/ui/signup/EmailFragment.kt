@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.navGraphViewModels
+import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentEmailBinding
 
@@ -27,6 +28,10 @@ class EmailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.buttonNext.setOnClickListener {
+            findNavController().navigate(R.id.action_email_to_password)
+        }
 
         binding.editEmail.doAfterTextChanged { text ->
             viewModel.setEmail(text?.toString().orEmpty())

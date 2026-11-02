@@ -88,12 +88,12 @@
             android:layout_weight="1" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_verification_complete"
+            android:id="@+id/button_next"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/auth_button_primary"
-            android:text="@string/signup_verification_complete"
+            android:text="@string/signup_next"
             android:textColor="@color/navy"
             android:textSize="18sp"
             app:backgroundTint="@null" />

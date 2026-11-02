@@ -26,5 +26,10 @@
     <string name="signup_email_hint">학교 이메일</string>
     <string name="signup_email_domain">\@dongyang.ac.kr</string>
     <string name="signup_verify_email">인증 하기</string>
+    <string name="signup_next">다음</string>
+    <string name="signup_password_title">비밀번호를 입력해주세요</string>
+    <string name="signup_password_hint">비밀번호</string>
+    <string name="signup_password_confirm_hint">비밀번호 확인</string>
+    <string name="signup_previous">이전</string>
     <string name="signup_verification_complete">인증 완료</string>
 </resources>
