@@ -3,7 +3,10 @@ package com.example.delibuddy
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        applySystemBarInsets()
 
         applySystemBarPadding()
 
@@ -46,6 +50,7 @@ class MainActivity : AppCompatActivity() {
             navView.isVisible = destination.id !in setOf(
                 R.id.navigation_auth,
                 R.id.navigation_signup,
+                R.id.navigation_email,
                 R.id.navigation_signin,
             )
         }
@@ -55,10 +60,26 @@ class MainActivity : AppCompatActivity() {
         showLogoInActionBar()
     }
 
+    private fun applySystemBarInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(
+                left = bars.left,
+                top = bars.top,
+                right = bars.right,
+                bottom = bars.bottom,
+            )
+            // 자식 뷰에서 시스템 바 여백을 중복 적용하지 않도록 처리
+            WindowInsetsCompat.CONSUMED
+        }
+        ViewCompat.requestApplyInsets(binding.root)
+    }
+
     private fun updateActionBarVisibility(destinationId: Int) {
         when (destinationId) {
             R.id.navigation_auth,
             R.id.navigation_signin,
+            R.id.navigation_email,
             R.id.navigation_signup -> supportActionBar?.hide()
             else -> supportActionBar?.show()
         }
