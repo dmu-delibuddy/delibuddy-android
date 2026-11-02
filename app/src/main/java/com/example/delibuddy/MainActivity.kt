@@ -1,6 +1,7 @@
 package com.example.delibuddy
 
 import android.os.Bundle
+import androidx.core.view.isVisible
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -33,6 +34,24 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            updateActionBarVisibility(destination.id)
+            navView.isVisible = destination.id !in setOf(
+                R.id.navigation_auth,
+                R.id.navigation_signup,
+                R.id.navigation_signin,
+            )
+        }
+
         navView.itemIconTintList = null
+    }
+
+    private fun updateActionBarVisibility(destinationId: Int) {
+        when (destinationId) {
+            R.id.navigation_auth,
+            R.id.navigation_signin,
+            R.id.navigation_signup -> supportActionBar?.hide()
+            else -> supportActionBar?.show()
+        }
     }
 }

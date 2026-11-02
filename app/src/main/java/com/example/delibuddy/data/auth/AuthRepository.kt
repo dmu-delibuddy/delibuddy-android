@@ -11,6 +11,8 @@ class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
     private val userRepository = UserRepository()
 
+    fun isLoggedIn(): Boolean = auth.currentUser != null
+
     fun signIn(email: String, password: String): Task<AuthResult> =
         auth.signInWithEmailAndPassword(email, password)
 
