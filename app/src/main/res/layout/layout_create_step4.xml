@@ -21,5 +21,148 @@
         android:textColor="@color/black"
         android:textSize="13sp" />
 
-    <!-- 입력 칸은 다음 단계에서 추가 -->
+    <!-- 1. 최소 주문 금액 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/create_min_order_label"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_pixel_box"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="18dp">
+
+        <EditText
+            android:id="@+id/edit_min_order"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="@string/create_min_order_hint"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="7"
+            android:maxLines="1"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_won"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- 2. 예상 배달비 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/create_delivery_fee_label"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_pixel_box"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="18dp">
+
+        <EditText
+            android:id="@+id/edit_delivery_fee"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="@string/create_delivery_fee_hint"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="7"
+            android:maxLines="1"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_won"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- 1인당 예상 배달비 안내 (코드에서 채움) -->
+    <TextView
+        android:id="@+id/text_fee_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:alpha="0.7"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
+    <!-- 3. 음식값 정산 방법 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/create_food_split_label"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <RadioGroup
+        android:id="@+id/group_food_split"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <RadioButton android:id="@+id/radio_food_host"    style="@style/SplitChip" android:text="@string/split_host" />
+        <RadioButton android:id="@+id/radio_food_equal"   style="@style/SplitChip" android:text="@string/split_equal" />
+        <RadioButton android:id="@+id/radio_food_by_menu" style="@style/SplitChip" android:text="@string/split_by_menu" android:checked="true" />
+        <RadioButton android:id="@+id/radio_food_custom"  style="@style/SplitChip" android:text="@string/split_custom" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/text_food_split_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:alpha="0.7"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
+    <!-- 4. 배달비 정산 방법 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/create_delivery_split_label"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <RadioGroup
+        android:id="@+id/group_delivery_split"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="8dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <RadioButton android:id="@+id/radio_delivery_host"   style="@style/SplitChip" android:text="@string/split_host" />
+        <RadioButton android:id="@+id/radio_delivery_equal"  style="@style/SplitChip" android:text="@string/split_equal" android:checked="true" />
+        <RadioButton android:id="@+id/radio_delivery_custom" style="@style/SplitChip" android:text="@string/split_custom" />
+    </RadioGroup>
 </LinearLayout>

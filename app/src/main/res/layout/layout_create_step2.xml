@@ -21,5 +21,62 @@
         android:textColor="@color/black"
         android:textSize="13sp" />
 
-    <!-- 입력 칸은 다음 단계에서 추가 -->
+    <!-- 1. 카테고리 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/create_category_label"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="6dp">
+
+        <Spinner
+            android:id="@+id/spinner_category"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_pixel_box"
+            android:paddingStart="4dp"
+            android:paddingEnd="36dp"
+            android:spinnerMode="dropdown" />
+
+        <!-- 드롭다운 화살표 (Spinner 배경을 바꾸면 기본 화살표가 사라져서 직접 표시) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="16dp"
+            android:importantForAccessibility="no"
+            android:text="▼"
+            android:textColor="@color/black"
+            android:textSize="12sp" />
+    </FrameLayout>
+
+    <!-- 2. 음식점 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/create_restaurant_label"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/edit_restaurant"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_pixel_box"
+        android:hint="@string/create_restaurant_hint"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:maxLength="30"
+        android:maxLines="1"
+        android:paddingStart="12dp"
+        android:paddingEnd="15dp"
+        android:textSize="14sp" />
 </LinearLayout>
