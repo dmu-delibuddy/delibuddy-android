@@ -33,9 +33,14 @@ class AuthFragment : Fragment() {
             binding.textAuth.text = it
         }
 
-        viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
+        viewModel.isChecking.observe(viewLifecycleOwner) { isChecking ->
+            binding.buttonAuthStart.isEnabled = !isChecking
+            binding.buttonAuthSignin.isEnabled = !isChecking
+        }
+
+        viewModel.isLoggedIn.observe(viewLifecycleOwner) { canEnterHome ->
             val navController = findNavController()
-            if (isLoggedIn && navController.currentDestination?.id == R.id.navigation_auth) {
+            if (canEnterHome && navController.currentDestination?.id == R.id.navigation_auth) {
                 navController.navigate(R.id.action_auth_to_home)
             }
         }

@@ -6,12 +6,35 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.example.delibuddy.data.user.UserModel
 import com.example.delibuddy.data.user.UserRepository
+import kotlinx.coroutines.tasks.await
 
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
     private val userRepository = UserRepository()
 
-    fun isLoggedIn(): Boolean = auth.currentUser != null
+    suspend fun isLoggedIn(): Boolean {
+        val user = auth.currentUser ?: return false
+        user.reload().await()
+        if (!user.isEmailVerified) return false
+
+        // 인증 직후에도 Firestore가 최신 이메일 인증 상태를 확인하도록 토큰 갱신
+        user.getIdToken(true).await()
+        val hasProfile = userRepository.exists(user.uid)
+
+        return hasProfile && auth.currentUser?.uid == user.uid
+    }
+
+    suspend fun sendSignUpVerification(email: String, password: String) {
+        val currentUser = auth.currentUser
+        if (currentUser?.email.equals(email, ignoreCase = true)) {
+            // 계정 생성 후 발송에 실패했거나 재발송하는 경우 비밀번호를 확인하고 재시도
+            val user = signIn(email, password).await().user
+                ?: error("사용자를 찾을 수 없습니다.")
+            user.sendEmailVerification().await()
+        } else {
+            signUp(email, password).await()
+        }
+    }
 
     fun signIn(email: String, password: String): Task<AuthResult> =
         auth.signInWithEmailAndPassword(email, password)

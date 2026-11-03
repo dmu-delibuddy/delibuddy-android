@@ -32,6 +32,18 @@ class PasswordFragment : Fragment() {
         binding.buttonPrevious.setOnClickListener {
             findNavController().popBackStack()
         }
+        binding.buttonVerifyEmail.setOnClickListener {
+            viewModel.sendVerificationEmail()
+        }
+        viewModel.isSendingVerification.observe(viewLifecycleOwner) { isSending ->
+            binding.buttonVerifyEmail.isEnabled = !isSending
+            binding.buttonPrevious.isEnabled = !isSending
+            binding.editPassword.isEnabled = !isSending
+            binding.editPasswordConfirm.isEnabled = !isSending
+        }
+        viewModel.verificationMessage.observe(viewLifecycleOwner) { message ->
+            binding.textVerificationStatus.text = message?.let { getString(it) }.orEmpty()
+        }
 
         binding.editPassword.setText(viewModel.password.value)
         binding.editPasswordConfirm.setText(viewModel.passwordConfirm.value)
