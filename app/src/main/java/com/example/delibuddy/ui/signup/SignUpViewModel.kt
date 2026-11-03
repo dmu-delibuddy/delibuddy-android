@@ -7,10 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
 import com.example.delibuddy.data.auth.AuthRepository
+import com.example.delibuddy.data.user.UserModel
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class SignUpViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
@@ -19,6 +21,10 @@ class SignUpViewModel(private val savedStateHandle: SavedStateHandle) : ViewMode
     val isSendingVerification: LiveData<Boolean> = _isSendingVerification
     private val _verificationMessage = MutableLiveData<Int?>()
     val verificationMessage: LiveData<Int?> = _verificationMessage
+    private val _isCompletingSignUp = MutableLiveData(false)
+    val isCompletingSignUp: LiveData<Boolean> = _isCompletingSignUp
+    private val _isLoggedIn = MutableLiveData(false)
+    val isLoggedIn: LiveData<Boolean> = _isLoggedIn
 
     val email: LiveData<String> = savedStateHandle.getLiveData("email", "")
 
@@ -39,8 +45,35 @@ class SignUpViewModel(private val savedStateHandle: SavedStateHandle) : ViewMode
         savedStateHandle["email"] = value
     }
 
+    fun completeSignUp() {
+        if (_isCompletingSignUp.value == true || _isSendingVerification.value == true) return
+
+        _isCompletingSignUp.value = true
+        _verificationMessage.value = null
+        viewModelScope.launch {
+            try {
+                authRepository.completeSignUp(
+                    UserModel(
+                        univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
+                        birthDate = null,
+                    )
+                ).await()
+                _isLoggedIn.value = authRepository.isLoggedIn()
+                if (_isLoggedIn.value != true) {
+                    _verificationMessage.value = R.string.signup_completion_failed
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _verificationMessage.value = R.string.signup_completion_failed
+            } finally {
+                _isCompletingSignUp.value = false
+            }
+        }
+    }
+
     fun sendVerificationEmail() {
-        if (_isSendingVerification.value == true) return
+        if (_isSendingVerification.value == true || _isCompletingSignUp.value == true) return
 
         val emailId = email.value.orEmpty().trim()
         val passwordValue = password.value.orEmpty()

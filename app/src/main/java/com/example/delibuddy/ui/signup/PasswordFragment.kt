@@ -35,11 +35,20 @@ class PasswordFragment : Fragment() {
         binding.buttonVerifyEmail.setOnClickListener {
             viewModel.sendVerificationEmail()
         }
-        viewModel.isSendingVerification.observe(viewLifecycleOwner) { isSending ->
-            binding.buttonVerifyEmail.isEnabled = !isSending
-            binding.buttonPrevious.isEnabled = !isSending
-            binding.editPassword.isEnabled = !isSending
-            binding.editPasswordConfirm.isEnabled = !isSending
+        binding.buttonVerificationComplete.setOnClickListener {
+            viewModel.completeSignUp()
+        }
+        viewModel.isCompletingSignUp.observe(viewLifecycleOwner) {
+            updateLoadingState()
+        }
+        viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
+            val navController = findNavController()
+            if (isLoggedIn && navController.currentDestination?.id == R.id.navigation_password) {
+                navController.navigate(R.id.action_password_to_home)
+            }
+        }
+        viewModel.isSendingVerification.observe(viewLifecycleOwner) {
+            updateLoadingState()
         }
         viewModel.verificationMessage.observe(viewLifecycleOwner) { message ->
             binding.textVerificationStatus.text = message?.let { getString(it) }.orEmpty()
@@ -54,6 +63,16 @@ class PasswordFragment : Fragment() {
         binding.editPasswordConfirm.doAfterTextChanged { text ->
             viewModel.setPasswordConfirm(text?.toString().orEmpty())
         }
+    }
+
+    private fun updateLoadingState() {
+        val isBusy = viewModel.isSendingVerification.value == true ||
+            viewModel.isCompletingSignUp.value == true
+        binding.buttonVerificationComplete.isEnabled = !isBusy
+        binding.buttonVerifyEmail.isEnabled = !isBusy
+        binding.buttonPrevious.isEnabled = !isBusy
+        binding.editPassword.isEnabled = !isBusy
+        binding.editPasswordConfirm.isEnabled = !isBusy
     }
 
     override fun onDestroyView() {

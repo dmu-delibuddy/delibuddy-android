@@ -41,7 +41,14 @@
             android:id="@+id/navigation_password"
             android:name="com.example.delibuddy.ui.signup.PasswordFragment"
             android:label="@string/signup_password_title"
-            tools:layout="@layout/fragment_password" />
+            tools:layout="@layout/fragment_password">
+            <action
+                android:id="@+id/action_password_to_home"
+                app:destination="@id/navigation_home"
+                app:popUpTo="@id/navigation_auth"
+                app:popUpToInclusive="true"
+                app:launchSingleTop="true" />
+        </fragment>
     </navigation>
 
     <fragment
