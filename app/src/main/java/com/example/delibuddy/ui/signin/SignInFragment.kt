@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentSigninBinding
@@ -14,6 +14,7 @@ class SignInFragment : Fragment() {
 
     private var _binding: FragmentSigninBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: SignInViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,29 +28,42 @@ class SignInFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel = ViewModelProvider(this)[SignInViewModel::class.java]
+        setUpSignInButton()
+        observeSignInState()
+        observeMessages()
+        observeLoginSuccess()
+    }
 
+    private fun setUpSignInButton() {
         binding.buttonSignin.setOnClickListener {
             viewModel.signIn(
                 binding.editEmail.text?.toString().orEmpty(),
                 binding.editPassword.text?.toString().orEmpty(),
             )
         }
+    }
+
+    private fun observeSignInState() {
         viewModel.isSigningIn.observe(viewLifecycleOwner) { isSigningIn ->
             binding.buttonSignin.isEnabled = !isSigningIn
             binding.editEmail.isEnabled = !isSigningIn
             binding.editPassword.isEnabled = !isSigningIn
         }
+    }
+
+    private fun observeMessages() {
         viewModel.message.observe(viewLifecycleOwner) { message ->
             binding.textSigninStatus.text = message?.let { getString(it) }.orEmpty()
         }
+    }
+
+    private fun observeLoginSuccess() {
         viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             val navController = findNavController()
             if (isLoggedIn && navController.currentDestination?.id == R.id.navigation_signin) {
                 navController.navigate(R.id.action_signin_to_home)
             }
         }
-
     }
 
     override fun onDestroyView() {

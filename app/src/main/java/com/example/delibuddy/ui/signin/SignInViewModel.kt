@@ -13,34 +13,39 @@ import kotlinx.coroutines.tasks.await
 class SignInViewModel : ViewModel() {
 
     private val authRepository = AuthRepository()
+
     private val _isSigningIn = MutableLiveData(false)
     val isSigningIn: LiveData<Boolean> = _isSigningIn
+
     private val _isLoggedIn = MutableLiveData(false)
     val isLoggedIn: LiveData<Boolean> = _isLoggedIn
+
     private val _message = MutableLiveData<Int?>()
     val message: LiveData<Int?> = _message
 
     fun signIn(emailId: String, password: String) {
-        if (_isSigningIn.value == true) return
+        if (isSigningIn.value == true) return
+
         val id = emailId.trim()
-        val email = "$id@dongyang.ac.kr"
-        if (id.isBlank() || '@' in id ||
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        ) {
+        if (!isValidEmailId(id)) {
             _message.value = R.string.signup_invalid_email
             return
         }
-        if (password.isEmpty()) {
+
+        if (!isValidPassword(password)) {
             _message.value = R.string.signin_password_required
             return
         }
+
         _isSigningIn.value = true
         _message.value = null
+
+        val email = "$id@dongyang.ac.kr"
         viewModelScope.launch {
             try {
                 authRepository.signIn(email, password).await()
                 _isLoggedIn.value = authRepository.isLoggedIn()
-                if (_isLoggedIn.value != true) {
+                if (isLoggedIn.value != true) {
                     _message.value = R.string.signin_signup_incomplete
                 }
             } catch (e: CancellationException) {
@@ -51,5 +56,16 @@ class SignInViewModel : ViewModel() {
                 _isSigningIn.value = false
             }
         }
+    }
+
+    private fun isValidEmailId(emailId: String): Boolean {
+        val email = "$emailId@dongyang.ac.kr"
+        return emailId.isNotBlank() &&
+                '@' !in emailId &&
+                android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        return password.isNotEmpty()
     }
 }
