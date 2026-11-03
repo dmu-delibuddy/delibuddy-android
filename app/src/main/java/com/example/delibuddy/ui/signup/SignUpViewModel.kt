@@ -2,7 +2,6 @@ package com.example.delibuddy.ui.signup
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
@@ -14,22 +13,28 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class SignUpViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+class SignUpViewModel : ViewModel() {
 
     private val authRepository = AuthRepository()
+
     private val _isSendingVerification = MutableLiveData(false)
     val isSendingVerification: LiveData<Boolean> = _isSendingVerification
+
     private val _verificationMessage = MutableLiveData<Int?>()
     val verificationMessage: LiveData<Int?> = _verificationMessage
+
     private val _isCompletingSignUp = MutableLiveData(false)
     val isCompletingSignUp: LiveData<Boolean> = _isCompletingSignUp
+
     private val _isLoggedIn = MutableLiveData(false)
     val isLoggedIn: LiveData<Boolean> = _isLoggedIn
 
-    val email: LiveData<String> = savedStateHandle.getLiveData("email", "")
+    private val _email = MutableLiveData("")
+    val email: LiveData<String> = _email
 
     private val _password = MutableLiveData("")
     val password: LiveData<String> = _password
+
     private val _passwordConfirm = MutableLiveData("")
     val passwordConfirm: LiveData<String> = _passwordConfirm
 
@@ -42,7 +47,7 @@ class SignUpViewModel(private val savedStateHandle: SavedStateHandle) : ViewMode
     }
 
     fun setEmail(value: String) {
-        savedStateHandle["email"] = value
+        _email.value = value
     }
 
     fun completeSignUp() {

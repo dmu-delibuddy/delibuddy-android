@@ -29,15 +29,32 @@ class PasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpPreviousButton()
+        setUpVerifyEmailButton()
+        setUpVerificationCompleteButton()
+        observeSignUpState()
+        setUpPasswordInputs()
+    }
+
+    private fun setUpPreviousButton() {
         binding.buttonPrevious.setOnClickListener {
             findNavController().popBackStack()
         }
+    }
+
+    private fun setUpVerifyEmailButton() {
         binding.buttonVerifyEmail.setOnClickListener {
             viewModel.sendVerificationEmail()
         }
+    }
+
+    private fun setUpVerificationCompleteButton() {
         binding.buttonVerificationComplete.setOnClickListener {
             viewModel.completeSignUp()
         }
+    }
+
+    private fun observeSignUpState() {
         viewModel.isCompletingSignUp.observe(viewLifecycleOwner) {
             updateLoadingState()
         }
@@ -53,7 +70,9 @@ class PasswordFragment : Fragment() {
         viewModel.verificationMessage.observe(viewLifecycleOwner) { message ->
             binding.textVerificationStatus.text = message?.let { getString(it) }.orEmpty()
         }
+    }
 
+    private fun setUpPasswordInputs() {
         binding.editPassword.setText(viewModel.password.value)
         binding.editPasswordConfirm.setText(viewModel.passwordConfirm.value)
 
