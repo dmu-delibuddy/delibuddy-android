@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentSigninBinding
 
 class SignInFragment : Fragment() {
@@ -27,8 +29,25 @@ class SignInFragment : Fragment() {
 
         val viewModel = ViewModelProvider(this)[SignInViewModel::class.java]
 
-        viewModel.text.observe(viewLifecycleOwner) {
-            binding.textSignin.text = it
+        binding.buttonSignin.setOnClickListener {
+            viewModel.signIn(
+                binding.editEmail.text?.toString().orEmpty(),
+                binding.editPassword.text?.toString().orEmpty(),
+            )
+        }
+        viewModel.isSigningIn.observe(viewLifecycleOwner) { isSigningIn ->
+            binding.buttonSignin.isEnabled = !isSigningIn
+            binding.editEmail.isEnabled = !isSigningIn
+            binding.editPassword.isEnabled = !isSigningIn
+        }
+        viewModel.message.observe(viewLifecycleOwner) { message ->
+            binding.textSigninStatus.text = message?.let { getString(it) }.orEmpty()
+        }
+        viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
+            val navController = findNavController()
+            if (isLoggedIn && navController.currentDestination?.id == R.id.navigation_signin) {
+                navController.navigate(R.id.action_signin_to_home)
+            }
         }
 
     }
