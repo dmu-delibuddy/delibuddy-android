@@ -21,6 +21,24 @@ feat: 채팅 화면 추가
 refactor: 방 상태 관리 구조 변경
 ```
 
+브랜치명은 `<type>/<작업 내용>` 형식으로 작성한다.
+작업 내용은 케밥케이스를 사용한다.
+
+- `feat/`: 새로운 기능 추가
+- `fix/`: 버그 수정
+- `refactor/`: 기능 변경 없이 코드 구조 개선
+- `chore/`: 빌드 설정, 의존성 등 기타 작업
+- `docs/`: 문서 변경
+
+```text
+// 예시
+feat/signup-ui
+fix/system-bar-padding
+refactor/auth-repository
+chore/update-dependencies
+docs/branch-convention
+```
+
 ### architecture
 
 ```text
