@@ -8,9 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -223,14 +220,6 @@ class CreateRoomFragment : Fragment() {
         viewModel.deliveryFee.observe(viewLifecycleOwner) { updateFeeNote() }
         viewModel.maxParticipants.observe(viewLifecycleOwner) { updateFeeNote() }
         viewModel.deliveryFeeSplit.observe(viewLifecycleOwner) { updateFeeNote() }
-
-        // 하단 탭이 없는 화면이라 버튼이 제스처 바에 가리지 않게 아래 여백 추가
-        val baseBottom = binding.layoutBottom.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(binding.layoutBottom) { v, insets ->
-            val navBar = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-            v.updatePadding(bottom = baseBottom + navBar)
-            insets
-        }
     }
 
     override fun onDestroyView() {
