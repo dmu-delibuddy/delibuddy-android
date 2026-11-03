@@ -2,9 +2,14 @@ package com.example.delibuddy.data.user
 
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
+import kotlinx.coroutines.tasks.await
 
 class UserRepository {
     private val users = FirebaseFirestore.getInstance().collection("users")
+
+    suspend fun exists(userId: String): Boolean =
+        users.document(userId).get(Source.SERVER).await().exists()
 
     fun create(userId: String, user: UserModel): Task<Void> =
         users.document(userId).set(user)

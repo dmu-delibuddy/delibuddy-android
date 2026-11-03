@@ -24,11 +24,32 @@
             app:destination="@id/navigation_signin" />
     </fragment>
 
-    <fragment
+    <navigation
         android:id="@+id/navigation_signup"
-        android:name="com.example.delibuddy.ui.signup.SignUpFragment"
         android:label="@string/auth_start"
-        tools:layout="@layout/fragment_signup" />
+        app:startDestination="@id/navigation_email">
+        <fragment
+            android:id="@+id/navigation_email"
+            android:name="com.example.delibuddy.ui.signup.EmailFragment"
+            android:label="@string/signup_email_title"
+            tools:layout="@layout/fragment_email">
+            <action
+                android:id="@+id/action_email_to_password"
+                app:destination="@id/navigation_password" />
+        </fragment>
+        <fragment
+            android:id="@+id/navigation_password"
+            android:name="com.example.delibuddy.ui.signup.PasswordFragment"
+            android:label="@string/signup_password_title"
+            tools:layout="@layout/fragment_password">
+            <action
+                android:id="@+id/action_password_to_home"
+                app:destination="@id/navigation_home"
+                app:popUpTo="@id/navigation_auth"
+                app:popUpToInclusive="true"
+                app:launchSingleTop="true" />
+        </fragment>
+    </navigation>
 
     <fragment
         android:id="@+id/navigation_signin"

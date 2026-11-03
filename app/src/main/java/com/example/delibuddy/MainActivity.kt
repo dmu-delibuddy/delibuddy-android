@@ -1,14 +1,14 @@
 package com.example.delibuddy
 
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.Gravity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -24,8 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        applySystemBarPadding()
+        applySystemBarInsets()
 
         val navView: BottomNavigationView = binding.navView
 
@@ -46,6 +45,8 @@ class MainActivity : AppCompatActivity() {
             navView.isVisible = destination.id !in setOf(
                 R.id.navigation_auth,
                 R.id.navigation_signup,
+                R.id.navigation_email,
+                R.id.navigation_password,
                 R.id.navigation_signin,
             )
         }
@@ -55,10 +56,27 @@ class MainActivity : AppCompatActivity() {
         showLogoInActionBar()
     }
 
+    private fun applySystemBarInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(
+                left = bars.left,
+                top = bars.top,
+                right = bars.right,
+                bottom = bars.bottom,
+            )
+            // 자식 뷰에서 시스템 바 여백을 중복 적용하지 않도록 처리
+            WindowInsetsCompat.CONSUMED
+        }
+        ViewCompat.requestApplyInsets(binding.root)
+    }
+
     private fun updateActionBarVisibility(destinationId: Int) {
         when (destinationId) {
             R.id.navigation_auth,
             R.id.navigation_signin,
+            R.id.navigation_email,
+            R.id.navigation_password,
             R.id.navigation_signup -> supportActionBar?.hide()
             else -> supportActionBar?.show()
         }
@@ -80,19 +98,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // targetSdk 36 은 화면이 상태바 뒤부터 그려짐(edge-to-edge)
-    // -> 위쪽 여백 = 상태바 높이 + 액션바 높이
-    private fun applySystemBarPadding() {
-        val tv = TypedValue()
-        theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)
-        val actionBarSize =
-            TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(bars.left, bars.top, bars.right, 0)
-            insets
-        }
-    }
 }
 

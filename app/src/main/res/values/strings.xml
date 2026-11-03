@@ -22,4 +22,22 @@
     <string name="category_etc">기타</string>
     <string name="home_empty_rooms">아직 모집 중인 방이 없어요.\n첫 방을 만들어 보세요!</string>
     <string name="home_create_room">+ 방 만들기</string>
+    <string name="signup_email_title">메일을 입력해주세요</string>
+    <string name="signup_email_hint">학교 이메일</string>
+    <string name="signup_email_domain">\@dongyang.ac.kr</string>
+    <string name="signup_verify_email">인증 하기</string>
+    <string name="signup_next">다음</string>
+    <string name="signup_password_title">비밀번호를 입력해주세요</string>
+    <string name="signup_password_hint">비밀번호</string>
+    <string name="signup_password_confirm_hint">비밀번호 확인</string>
+    <string name="signup_previous">이전</string>
+    <string name="signup_verification_complete">인증 완료</string>
+    <string name="signup_completion_failed">회원가입을 완료하지 못했습니다. 이메일 인증과 네트워크 상태를 확인하고 다시 시도해 주세요.</string>
+    <string name="signup_invalid_email">학교 이메일의 @ 앞부분을 올바르게 입력해 주세요.</string>
+    <string name="signup_password_too_short">비밀번호를 6자 이상 입력해 주세요.</string>
+    <string name="signup_password_mismatch">비밀번호가 일치하지 않습니다.</string>
+    <string name="signup_verification_sent">인증 메일을 보냈습니다. 학교 메일함을 확인해 주세요.</string>
+    <string name="signup_email_already_used">이미 가입된 이메일입니다. 로그인해 주세요.</string>
+    <string name="signup_password_weak">비밀번호가 보안 정책에 맞지 않습니다. 더 강한 비밀번호를 입력해 주세요.</string>
+    <string name="signup_verification_failed">인증 메일을 보내지 못했습니다. 네트워크와 입력 정보를 확인하고 다시 시도해 주세요.</string>
 </resources>
