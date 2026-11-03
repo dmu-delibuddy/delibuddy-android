@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             updateActionBarVisibility(destination.id)
             navView.isVisible = destination.id !in setOf(
-                R.id.navigation_auth,
+                R.id.navigation_auth_entry,
                 R.id.navigation_signup,
                 R.id.navigation_email,
                 R.id.navigation_password,
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateActionBarVisibility(destinationId: Int) {
         when (destinationId) {
-            R.id.navigation_auth,
+            R.id.navigation_auth_entry,
             R.id.navigation_signin,
             R.id.navigation_email,
             R.id.navigation_password,

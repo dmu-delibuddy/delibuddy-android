@@ -1,12 +1,14 @@
 <resources>
-    <string name="app_name">딜리버디</string>
+    <string name="app_name">딜리버디 (Deli-Buddy)</string>
+    <string name="app_name_kr">딜리버디</string>
+    <string name="app_name_en">DELI-BUDDY</string>
     <string name="home">홈</string>
     <string name="chatting">채팅</string>
     <string name="location_recommendation">위치 추천</string>
     <string name="my_page">마이페이지</string>
-    <string name="auth_tagline">함께 주문하고, 함께 나눠요</string>
-    <string name="auth_description">동네 친구들과 배달비는 가볍게, 한 끼는 든든하게</string>
-    <string name="auth_start">시작하기</string>
+    <string name="auth_entry_tagline">함께 주문하고, 함께 나눠요</string>
+    <string name="auth_entry_description">동네 친구들과 배달비는 가볍게, 한 끼는 든든하게</string>
+    <string name="auth_entry_start">시작하기</string>
     <string name="auth_signin">로그인</string>
     <string name="signin_password_required">비밀번호를 입력해 주세요.</string>
     <string name="signin_signup_incomplete">이메일 인증과 회원가입을 먼저 완료해 주세요.</string>
