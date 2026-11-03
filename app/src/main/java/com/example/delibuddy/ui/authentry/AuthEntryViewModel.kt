@@ -12,9 +12,6 @@ class AuthEntryViewModel(
     private val authRepository: AuthRepository = AuthRepository(),
 ) : ViewModel() {
 
-    private val _text = MutableLiveData("DELI-BUDDY")
-    val text: LiveData<String> = _text
-
     private val _isLoggedIn = MutableLiveData(false)
     val isLoggedIn: LiveData<Boolean> = _isLoggedIn
 

@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">딜리버디</string>
+    <string name="app_name">딜리버디 (Deli-Buddy)</string>
+    <string name="app_name_kr">딜리버디</string>
+    <string name="app_name_en">DELI-BUDDY</string>
     <string name="home">홈</string>
     <string name="chatting">채팅</string>
     <string name="location_recommendation">위치 추천</string>
