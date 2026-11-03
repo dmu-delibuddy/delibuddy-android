@@ -29,27 +29,35 @@ class AuthEntryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel = ViewModelProvider(this)[AuthEntryViewModel::class.java]
+        observeLoginChecking()
+        observeLoginStatus()
+        setUpSignUpButton()
+        setUpSignInButton()
+    }
 
-        viewModel.text.observe(viewLifecycleOwner) {
-            binding.textAuthEntry.text = it
-        }
-
+    private fun observeLoginChecking() {
         viewModel.isChecking.observe(viewLifecycleOwner) { isChecking ->
             binding.buttonAuthEntryStart.isEnabled = !isChecking
             binding.buttonAuthEntrySignin.isEnabled = !isChecking
         }
+    }
 
+    private fun observeLoginStatus() {
         viewModel.isLoggedIn.observe(viewLifecycleOwner) { canEnterHome ->
             val navController = findNavController()
             if (canEnterHome && navController.currentDestination?.id == R.id.navigation_auth_entry) {
                 navController.navigate(R.id.action_auth_entry_to_home)
             }
         }
+    }
 
+    private fun setUpSignUpButton() {
         binding.buttonAuthEntryStart.setOnClickListener {
             findNavController().navigate(R.id.action_auth_entry_to_signup)
         }
+    }
+
+    private fun setUpSignInButton() {
         binding.buttonAuthEntrySignin.setOnClickListener {
             findNavController().navigate(R.id.action_auth_entry_to_signin)
         }
