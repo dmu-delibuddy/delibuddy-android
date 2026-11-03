@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentAuthEntryBinding
@@ -14,6 +14,8 @@ class AuthEntryFragment : Fragment() {
 
     private var _binding: FragmentAuthEntryBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: AuthEntryViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,7 +57,7 @@ class AuthEntryFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        ViewModelProvider(this)[AuthEntryViewModel::class.java].checkLoginStatus()
+        viewModel.checkLoginStatus()
     }
 
     override fun onDestroyView() {
