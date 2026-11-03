@@ -1,4 +1,4 @@
-package com.example.delibuddy.ui.auth
+package com.example.delibuddy.ui.authentry
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,11 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
-import com.example.delibuddy.databinding.FragmentAuthBinding
+import com.example.delibuddy.databinding.FragmentAuthEntryBinding
 
-class AuthFragment : Fragment() {
+class AuthEntryFragment : Fragment() {
 
-    private var _binding: FragmentAuthBinding? = null
+    private var _binding: FragmentAuthEntryBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -20,42 +20,42 @@ class AuthFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAuthBinding.inflate(inflater, container, false)
+        _binding = FragmentAuthEntryBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        val viewModel = ViewModelProvider(this)[AuthEntryViewModel::class.java]
 
         viewModel.text.observe(viewLifecycleOwner) {
-            binding.textAuth.text = it
+            binding.textAuthEntry.text = it
         }
 
         viewModel.isChecking.observe(viewLifecycleOwner) { isChecking ->
-            binding.buttonAuthStart.isEnabled = !isChecking
-            binding.buttonAuthSignin.isEnabled = !isChecking
+            binding.buttonAuthEntryStart.isEnabled = !isChecking
+            binding.buttonAuthEntrySignin.isEnabled = !isChecking
         }
 
         viewModel.isLoggedIn.observe(viewLifecycleOwner) { canEnterHome ->
             val navController = findNavController()
-            if (canEnterHome && navController.currentDestination?.id == R.id.navigation_auth) {
-                navController.navigate(R.id.action_auth_to_home)
+            if (canEnterHome && navController.currentDestination?.id == R.id.navigation_auth_entry) {
+                navController.navigate(R.id.action_auth_entry_to_home)
             }
         }
 
-        binding.buttonAuthStart.setOnClickListener {
-            findNavController().navigate(R.id.action_auth_to_signup)
+        binding.buttonAuthEntryStart.setOnClickListener {
+            findNavController().navigate(R.id.action_auth_entry_to_signup)
         }
-        binding.buttonAuthSignin.setOnClickListener {
-            findNavController().navigate(R.id.action_auth_to_signin)
+        binding.buttonAuthEntrySignin.setOnClickListener {
+            findNavController().navigate(R.id.action_auth_entry_to_signin)
         }
     }
 
     override fun onStart() {
         super.onStart()
-        ViewModelProvider(this)[AuthViewModel::class.java].checkLoginStatus()
+        ViewModelProvider(this)[AuthEntryViewModel::class.java].checkLoginStatus()
     }
 
     override fun onDestroyView() {

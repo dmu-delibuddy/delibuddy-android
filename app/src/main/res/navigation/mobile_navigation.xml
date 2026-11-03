@@ -3,30 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_auth">
+    app:startDestination="@+id/navigation_auth_entry">
 
     <fragment
-        android:id="@+id/navigation_auth"
-        android:name="com.example.delibuddy.ui.auth.AuthFragment"
+        android:id="@+id/navigation_auth_entry"
+        android:name="com.example.delibuddy.ui.authentry.AuthEntryFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/fragment_auth">
+        tools:layout="@layout/fragment_auth_entry">
         <action
-            android:id="@+id/action_auth_to_home"
+            android:id="@+id/action_auth_entry_to_home"
             app:destination="@id/navigation_home"
-            app:popUpTo="@id/navigation_auth"
+            app:popUpTo="@id/navigation_auth_entry"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />
         <action
-            android:id="@+id/action_auth_to_signup"
+            android:id="@+id/action_auth_entry_to_signup"
             app:destination="@id/navigation_signup" />
         <action
-            android:id="@+id/action_auth_to_signin"
+            android:id="@+id/action_auth_entry_to_signin"
             app:destination="@id/navigation_signin" />
     </fragment>
 
     <navigation
         android:id="@+id/navigation_signup"
-        android:label="@string/auth_start"
+        android:label="@string/auth_entry_start"
         app:startDestination="@id/navigation_email">
         <fragment
             android:id="@+id/navigation_email"
@@ -45,7 +45,7 @@
             <action
                 android:id="@+id/action_password_to_home"
                 app:destination="@id/navigation_home"
-                app:popUpTo="@id/navigation_auth"
+                app:popUpTo="@id/navigation_auth_entry"
                 app:popUpToInclusive="true"
                 app:launchSingleTop="true" />
         </fragment>
@@ -59,7 +59,7 @@
         <action
             android:id="@+id/action_signin_to_home"
             app:destination="@id/navigation_home"
-            app:popUpTo="@id/navigation_auth"
+            app:popUpTo="@id/navigation_auth_entry"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />
     </fragment>

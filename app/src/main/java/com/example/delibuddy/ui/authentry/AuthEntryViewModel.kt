@@ -1,4 +1,4 @@
-package com.example.delibuddy.ui.auth
+package com.example.delibuddy.ui.authentry
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +8,7 @@ import com.example.delibuddy.data.auth.AuthRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
-class AuthViewModel(
+class AuthEntryViewModel(
     private val authRepository: AuthRepository = AuthRepository(),
 ) : ViewModel() {
 
