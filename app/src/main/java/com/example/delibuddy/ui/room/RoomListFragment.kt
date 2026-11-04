@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import com.example.delibuddy.R
 import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.RoomMode
@@ -31,34 +31,45 @@ class RoomListFragment : Fragment() {
         return binding.root
     }
 
+    private val viewModel: RoomListViewModel by viewModels()
+    private lateinit var roomAdapter: RoomAdapter
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel = ViewModelProvider(this)[RoomListViewModel::class.java]
+        setUpRoomList()
+        observeRooms()
 
-        // 카드 클릭 : 지금은 roomId 로그만 (나중에 상세 화면 이동으로 교체)
-        val adapter = RoomAdapter { roomId ->
-            Log.d(TAG, "방 클릭 : roomId=$roomId")
-        }
-        binding.recyclerRooms.adapter = adapter
+        setUpModeFilter()
+        setUpCategoryFilter()
+        setUpJoinableOnlySwitch()
+        setUpSearchInput()
+    }
 
-        // 방 목록이 올 때마다 화면 갱신
+    // 카드 클릭 : 지금은 roomId 로그만
+    private fun setUpRoomList() {
+        roomAdapter = RoomAdapter { roomId -> Log.d(TAG, "방 클릭 : roomId=$roomId") }
+        binding.recyclerRooms.adapter = roomAdapter
+    }
+
+    private fun observeRooms() {
         viewModel.rooms.observe(viewLifecycleOwner) { rooms ->
-            adapter.submitList(rooms)
+            roomAdapter.submitList(rooms)
             binding.textEmpty.visibility = if (rooms.isEmpty()) View.VISIBLE else View.GONE
         }
+    }
 
-        // ----------- 필터 --------------
-        // 모드 : 픽업 | 밥 친구
+    private fun setUpModeFilter() {
         binding.groupMode.setOnCheckedChangeListener { _, checkedId ->
-            viewModel.setMode(
+            viewModel.setMode (
                 if (checkedId == R.id.radio_meal_buddy) RoomMode.MEAL_BUDDY else RoomMode.PICKUP_ONLY
             )
         }
+    }
 
-        // 카테고리 : 전체면 null
+    private fun setUpCategoryFilter() {
         binding.groupCategory.setOnCheckedChangeListener { _, checkedId ->
-            viewModel.setCategory(
+            viewModel.setCategory (
                 when (checkedId) {
                     R.id.radio_cat_kor -> FoodCategory.KOR
                     R.id.radio_cat_chn -> FoodCategory.CHN
@@ -69,13 +80,15 @@ class RoomListFragment : Fragment() {
                 }
             )
         }
+    }
 
-        // 참여 가능한 방만 보기
+    private fun setUpJoinableOnlySwitch() {
         binding.switchJoinableOnly.setOnCheckedChangeListener { _, isChecked ->
             viewModel.setJoinableOnly(isChecked)
         }
+    }
 
-        // 검색 : 글자를 입력할 때마다
+    private fun setUpSearchInput() {
         binding.editSearch.doAfterTextChanged { text ->
             viewModel.setQuery(text?.toString().orEmpty())
         }

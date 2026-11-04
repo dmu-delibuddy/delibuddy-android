@@ -30,6 +30,10 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpCreateRoomButton()
+    }
+
+    private fun setUpCreateRoomButton() {
         binding.buttonCreateRoom.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_create_room)
         }
