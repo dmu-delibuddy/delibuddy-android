@@ -1,7 +1,6 @@
 package com.example.delibuddy.ui.room.create
-
 import android.app.TimePickerDialog
-import android.icu.util.Calendar
+import java.util.Calendar
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +10,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.annotation.StringRes
 import androidx.core.widget.doAfterTextChanged
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.R
@@ -21,6 +21,7 @@ import androidx.fragment.app.viewModels
 import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.FoodCostSplitMethod
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
+import com.example.delibuddy.ui.room.create.CreateRoomViewModel.SubmitState
 
 
 
@@ -78,6 +79,9 @@ class CreateRoomFragment : Fragment() {
         observeFoodSplit()
         setUpDeliverySplitSelect()
         observeFeeNote()
+
+        // 개설
+        observeSubmitState()
     }
 
     private fun setUpBackPress() {
@@ -89,16 +93,90 @@ class CreateRoomFragment : Fragment() {
         binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
     }
 
+    // 하단 이전 / 다음(개설) 버튼 클릭 연결
     private fun setUpBottomButtons() {
-        binding.buttonPrev.setOnClickListener { viewModel.prev() }
-        binding.buttonNext.setOnClickListener {
-            if (viewModel.step.value == CreateRoomViewModel.LAST_STEP) {
-                // TODO : 입력 검사 + createRoom 연결
-                Toast.makeText(requireContext(), "방 개설은 다음 작업에서 연결", Toast.LENGTH_SHORT).show()
-            } else {
-                viewModel.next()
-            }
+        binding.buttonPrev.setOnClickListener {
+            viewModel.prev()
         }
+        binding.buttonNext.setOnClickListener {
+            onNextClick()
+        }
+    }
+
+    // 다음 버튼: 마지막 단계면 개설, 아니면 검사 후 다음 단계
+    private fun onNextClick() {
+        val step = viewModel.step.value ?: 1
+        if (step == CreateRoomViewModel.LAST_STEP) {
+            viewModel.submit()
+        } else {
+            goNextIfValid(step)
+        }
+    }
+
+    // 현재 단계 입력 검사. 문제 있으면 토스트, 없으면 다음 단계
+    private fun goNextIfValid(step: Int) {
+        val error = viewModel.validateStep(step)
+        if (error != null) showToast(error)
+        else viewModel.next()
+    }
+
+    // 개설 상태가 바뀔 때마다 버튼 모양 + 결과 처리
+    private fun observeSubmitState() {
+        viewModel.submitState
+            .observe(viewLifecycleOwner) { state ->
+                renderSubmitButtons(state)
+                handleSubmitResult(state)
+            }
+    }
+
+    // 저장 중엔 이전 / 다음 버튼 잠그고 "개설 중…" 표시
+    private fun renderSubmitButtons(
+        state: SubmitState
+    ) {
+        val loading = state is SubmitState.Loading
+        binding.buttonNext.isEnabled = !loading
+        binding.buttonPrev.isEnabled = !loading
+        binding.buttonNext.setText(
+            if (loading) R.string.create_submitting
+            else nextButtonText()
+        )
+    }
+
+    // 현재 단계에 맞는 다음 버튼 글자 (마지막 단계만 "개설하기")
+    private fun nextButtonText(): Int {
+        val step = viewModel.step.value ?: 1
+        val last = CreateRoomViewModel.LAST_STEP
+        return if (step == last) {
+            R.string.create_room_submit
+        } else {
+            R.string.create_room_next
+        }
+    }
+
+    // 성공: 토스트 후 홈으로 / 실패: 안내 토스트 후 상태 초기화
+    private fun handleSubmitResult(
+        state: SubmitState
+    ) {
+        when (state) {
+            is SubmitState.Success -> {
+                showToast(R.string.create_success)
+                findNavController().popBackStack()
+            }
+            is SubmitState.Error -> {
+                showToast(state.message)
+                viewModel.clearSubmitError()
+            }
+            else -> Unit
+        }
+    }
+
+    // 문자열 리소스로 짧은 토스트 띄우기
+    private fun showToast(@StringRes message: Int) {
+        Toast.makeText(
+            requireContext(),
+            message,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun observeStep() {
