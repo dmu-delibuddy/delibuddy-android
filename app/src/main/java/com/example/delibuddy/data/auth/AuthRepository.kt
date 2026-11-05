@@ -8,6 +8,9 @@ import com.example.delibuddy.data.user.UserModel
 import com.example.delibuddy.data.user.UserRepository
 import kotlinx.coroutines.tasks.await
 
+class SignUpSessionMissingException : IllegalStateException()
+class EmailNotVerifiedException : IllegalStateException()
+
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
     private val userRepository = UserRepository()
@@ -54,13 +57,13 @@ class AuthRepository {
 
     fun completeSignUp(userData: UserModel): Task<Void> {
         val user = auth.currentUser
-            ?: return Tasks.forException(IllegalStateException("로그인된 사용자가 없습니다."))
+            ?: return Tasks.forException(SignUpSessionMissingException())
 
         return user.reload().continueWithTask { reloadTask ->
             reloadTask.getResult(Exception::class.java)
             if (!user.isEmailVerified) {
                 return@continueWithTask Tasks.forException(
-                    IllegalStateException("학교 이메일 인증을 먼저 완료해주세요.")
+                    EmailNotVerifiedException()
                 )
             }
 

@@ -6,6 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
 import com.example.delibuddy.data.auth.AuthRepository
+import com.example.delibuddy.data.auth.EmailNotVerifiedException
+import com.example.delibuddy.data.auth.SignUpSessionMissingException
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.example.delibuddy.data.user.UserModel
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
@@ -22,6 +26,9 @@ class SignUpViewModel : ViewModel() {
 
     private val _verificationMessage = MutableLiveData<Int?>()
     val verificationMessage: LiveData<Int?> = _verificationMessage
+
+    private val _isVerificationEmailSent = MutableLiveData(false)
+    val isVerificationEmailSent: LiveData<Boolean> = _isVerificationEmailSent
 
     private val _isCompletingSignUp = MutableLiveData(false)
     val isCompletingSignUp: LiveData<Boolean> = _isCompletingSignUp
@@ -47,6 +54,10 @@ class SignUpViewModel : ViewModel() {
     }
 
     fun setEmail(value: String) {
+        if (_email.value != value) {
+            _isVerificationEmailSent.value = false
+            _verificationMessage.value = null
+        }
         _email.value = value
     }
 
@@ -70,7 +81,13 @@ class SignUpViewModel : ViewModel() {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _verificationMessage.value = R.string.signup_completion_failed
+                _verificationMessage.value = when (e) {
+                    is EmailNotVerifiedException -> R.string.signup_email_not_verified
+                    is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
+                    is SignUpSessionMissingException,
+                    is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+                    else -> R.string.signup_completion_failed
+                }
             } finally {
                 _isCompletingSignUp.value = false
             }
@@ -102,7 +119,7 @@ class SignUpViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 authRepository.sendSignUpVerification(fullEmail, passwordValue)
-                _verificationMessage.value = R.string.signup_verification_sent
+                _isVerificationEmailSent.value = true
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
