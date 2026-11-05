@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <ImageView
+        android:id="@+id/loading_pizza"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="28dp"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        android:src="@drawable/delibuddy_pizza_bubble_icon" />
+
+    <View
+        android:id="@+id/loading_shadow"
+        android:layout_width="80dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_loading_shadow"
+        android:importantForAccessibility="no" />
+
+    <TextView
+        android:id="@+id/loading_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:accessibilityLiveRegion="polite"
+        android:fontFamily="@font/gugi"
+        android:gravity="center"
+        android:text="@string/global_loading_message"
+        android:textColor="#FFF9E6"
+        android:textSize="18sp" />
+</LinearLayout>
