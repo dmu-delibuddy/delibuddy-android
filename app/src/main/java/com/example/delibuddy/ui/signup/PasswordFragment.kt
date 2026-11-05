@@ -60,16 +60,8 @@ class PasswordFragment : Fragment() {
         viewModel.isCompletingSignUp.observe(viewLifecycleOwner) {
             updateLoadingState()
         }
-        viewModel.isSendingVerification.observe(viewLifecycleOwner) { isSending ->
+        viewModel.isSendingVerification.observe(viewLifecycleOwner) {
             updateLoadingState()
-            if (isSending) {
-                GlobalLoadingDialog.show(
-                    childFragmentManager,
-                    getString(R.string.signup_sending_verification_email),
-                )
-            } else {
-                GlobalLoadingDialog.hide(childFragmentManager)
-            }
         }
         viewModel.verificationMessage.observe(viewLifecycleOwner) { message ->
             binding.textVerificationStatus.text = message?.let { getString(it) }.orEmpty()
@@ -100,6 +92,17 @@ class PasswordFragment : Fragment() {
         binding.buttonPrevious.isEnabled = !isBusy
         binding.editPassword.isEnabled = !isBusy
         binding.editPasswordConfirm.isEnabled = !isBusy
+
+        val loadingMessage = when {
+            viewModel.isCompletingSignUp.value == true -> R.string.signup_checking_verification
+            viewModel.isSendingVerification.value == true -> R.string.signup_sending_verification_email
+            else -> null
+        }
+        if (loadingMessage != null) {
+            GlobalLoadingDialog.show(childFragmentManager, getString(loadingMessage))
+        } else {
+            GlobalLoadingDialog.hide(childFragmentManager)
+        }
     }
 
     override fun onDestroyView() {

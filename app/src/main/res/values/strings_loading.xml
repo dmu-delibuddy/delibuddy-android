@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="signup_checking_verification">인증 정보를 확인 중이에요...</string>
     <string name="signup_sending_verification_email">인증 메일을 보내는 중이에요...</string>
-    <string name="global_loading_message">잠시만 기다려 주세요…</string>
+    <string name="global_loading_message">잠시만 기다려 주세요...</string>
 </resources>
