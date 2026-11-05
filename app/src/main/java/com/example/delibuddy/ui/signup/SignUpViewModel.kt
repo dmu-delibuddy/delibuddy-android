@@ -56,6 +56,71 @@ class SignUpViewModel : ViewModel() {
         _birthDate.value = value
     }
 
+    private val _bankName = MutableLiveData("")
+    val bankName: LiveData<String> = _bankName
+
+    private val _account = MutableLiveData("")
+    val account: LiveData<String> = _account
+
+    fun setBankName(value: String) {
+        _bankName.value = value
+    }
+
+    fun setAccount(value: String) {
+        _account.value = value
+    }
+
+    private val _isSavingProfile = MutableLiveData(false)
+    val isSavingProfile: LiveData<Boolean> = _isSavingProfile
+
+    private val _isRegistrationComplete = MutableLiveData(false)
+    val isRegistrationComplete: LiveData<Boolean> = _isRegistrationComplete
+
+    private val _profileError = MutableLiveData<Int?>()
+    val profileError: LiveData<Int?> = _profileError
+
+    fun finishRegistration(skipAccount: Boolean) {
+        if (_isSavingProfile.value == true || _isRegistrationComplete.value == true) return
+        val bank = bankName.value.orEmpty().trim()
+        val number = account.value.orEmpty().trim()
+        _profileError.value = when {
+            !skipAccount && (bank.isBlank() || number.isBlank()) -> R.string.signup_account_required
+            !skipAccount && number.any { it !in '0'..'9' } -> R.string.signup_account_invalid
+            else -> null
+        }
+        if (_profileError.value != null) return
+
+        val profile = UserModel(
+            univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
+            birthDate = birthDate.value,
+            bankName = if (skipAccount) null else bank,
+            account = if (skipAccount) null else number,
+        )
+        _isSavingProfile.value = true
+        viewModelScope.launch {
+            try {
+                authRepository.completeSignUp(profile).await()
+                if (skipAccount) {
+                    _bankName.value = ""
+                    _account.value = ""
+                }
+                _isRegistrationComplete.value = true
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _profileError.value = when (e) {
+                    is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
+                    is SignUpSessionMissingException,
+                    is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+                    is EmailNotVerifiedException -> R.string.signup_email_not_verified
+                    else -> R.string.signup_completion_failed
+                }
+            } finally {
+                _isSavingProfile.value = false
+            }
+        }
+    }
+
     fun setPassword(value: String) {
         _password.value = value
     }

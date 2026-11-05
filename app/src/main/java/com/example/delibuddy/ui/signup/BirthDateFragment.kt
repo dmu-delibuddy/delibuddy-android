@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentBirthDateBinding
@@ -31,8 +32,21 @@ class BirthDateFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.buttonBirthDate.setOnClickListener { showDatePicker() }
+        binding.buttonSkip.setOnClickListener {
+            viewModel.setBirthDate(null)
+            navigateToAccountInfo()
+        }
+        binding.buttonNext.setOnClickListener { navigateToAccountInfo() }
         viewModel.birthDate.observe(viewLifecycleOwner) { date ->
             binding.buttonBirthDate.text = date ?: getString(R.string.signup_birth_date_hint)
+            binding.buttonNext.isEnabled = date != null
+        }
+    }
+
+    private fun navigateToAccountInfo() {
+        val navController = findNavController()
+        if (navController.currentDestination?.id == R.id.navigation_birth_date) {
+            navController.navigate(R.id.action_birth_date_to_account_info)
         }
     }
 

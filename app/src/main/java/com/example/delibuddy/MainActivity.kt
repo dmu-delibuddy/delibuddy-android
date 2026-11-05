@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_email,
                 R.id.navigation_password,
                 R.id.navigation_birth_date,
+                R.id.navigation_account_info,
                 R.id.navigation_signin,
                 R.id.navigation_create_room,
             )
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             R.id.navigation_email,
             R.id.navigation_password,
             R.id.navigation_birth_date,
+            R.id.navigation_account_info,
             R.id.navigation_signup,
             R.id.navigation_create_room -> supportActionBar?.hide()
             else -> supportActionBar?.show()

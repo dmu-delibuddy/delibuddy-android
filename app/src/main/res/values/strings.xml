@@ -1,4 +1,13 @@
 <resources>
+    <string name="signup_account_info_description">배달비와 음식값 정산에 사용될 계좌예요.</string>
+    <string name="signup_finish">회원가입 완료</string>
+    <string name="signup_account_required">은행명과 계좌번호를 입력해 주세요. 등록하지 않으려면 건너뛰기를 눌러 주세요.</string>
+    <string name="signup_account_invalid">계좌번호는 숫자로 입력해 주세요.</string>
+    <string name="signup_saving_profile">회원가입을 완료하는 중이에요...</string>
+    <string name="signup_skip">건너뛰기</string>
+    <string name="signup_account_info_title">계좌정보를 입력해주세요</string>
+    <string name="signup_bank_name_hint">은행명</string>
+    <string name="signup_account_hint">계좌번호</string>
     <string name="signup_birth_date_title">생년월일을 입력해주세요</string>
     <string name="signup_birth_date_hint">생년월일 선택</string>
     <string name="app_name">딜리버디 (Deli-Buddy)</string>

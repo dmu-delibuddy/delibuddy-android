@@ -56,7 +56,23 @@
             android:id="@+id/navigation_birth_date"
             android:name="com.example.delibuddy.ui.signup.BirthDateFragment"
             android:label="@string/signup_birth_date_title"
-            tools:layout="@layout/fragment_birth_date" />
+            tools:layout="@layout/fragment_birth_date">
+            <action
+                android:id="@+id/action_birth_date_to_account_info"
+                app:destination="@id/navigation_account_info" />
+        </fragment>
+        <fragment
+            android:id="@+id/navigation_account_info"
+            android:name="com.example.delibuddy.ui.signup.AccountInfoFragment"
+            android:label="@string/signup_account_info_title"
+            tools:layout="@layout/fragment_account_info">
+            <action
+                android:id="@+id/action_account_info_to_home"
+                app:destination="@id/navigation_home"
+                app:popUpTo="@id/navigation_signup"
+                app:popUpToInclusive="true"
+                app:launchSingleTop="true" />
+        </fragment>
     </navigation>
 
     <fragment
