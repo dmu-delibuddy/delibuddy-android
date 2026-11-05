@@ -5,13 +5,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.databinding.FragmentRoomListBinding
+import com.example.delibuddy.ui.room.detail.RoomDetailViewModel
 
 /*
     * 방 목록 + 필터 (모드 / 카테고리 / 참여 가능 / 검색)
@@ -46,9 +49,14 @@ class RoomListFragment : Fragment() {
         setUpSearchInput()
     }
 
-    // 카드 클릭 : 지금은 roomId 로그만
+    // 카드 클릭 : 방 상세로 이동
     private fun setUpRoomList() {
-        roomAdapter = RoomAdapter { roomId -> Log.d(TAG, "방 클릭 : roomId=$roomId") }
+        roomAdapter = RoomAdapter { roomId ->
+            findNavController().navigate (
+                R.id.action_home_to_room_detail,
+                bundleOf(RoomDetailViewModel.ARG_ROOM_ID to roomId)
+            )
+        }
         binding.recyclerRooms.adapter = roomAdapter
     }
 

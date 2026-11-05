@@ -116,6 +116,11 @@
         <action
             android:id="@+id/action_home_to_create_room"
             app:destination="@+id/navigation_create_room" />
+
+        <action
+            android:id="@+id/action_home_to_room_detail"
+            app:destination="@+id/navigation_room_detail" />
+
     </fragment>
 
     <fragment
@@ -123,6 +128,16 @@
         android:name="com.example.delibuddy.ui.room.create.CreateRoomFragment"
         android:label="방 만들기"
         tools:layout="@layout/fragment_create_room" />
+
+    <fragment
+        android:id="@+id/navigation_room_detail"
+        android:name="com.example.delibuddy.ui.room.detail.RoomDetailFragment"
+        android:label="@string/detail_title"
+        tools:layout="@layout/fragment_room_detail">
+        <argument
+            android:name="roomId"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_recommendation"
