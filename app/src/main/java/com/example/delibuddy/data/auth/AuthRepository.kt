@@ -67,10 +67,14 @@ class AuthRepository {
                 )
             }
 
-            userRepository.create(
-                user.uid,
-                userData.copy(univEmail = user.email ?: userData.univEmail)
-            )
+            // reload는 사용자 정보만 갱신하므로, 보안 규칙에 전달할 인증 토큰도 갱신한다.
+            user.getIdToken(true).continueWithTask { tokenTask ->
+                tokenTask.getResult(Exception::class.java)
+                userRepository.create(
+                    user.uid,
+                    userData.copy(univEmail = user.email ?: userData.univEmail)
+                )
+            }
         }
     }
 }
