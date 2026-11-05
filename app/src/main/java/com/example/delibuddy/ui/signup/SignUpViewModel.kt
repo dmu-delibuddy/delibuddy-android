@@ -33,8 +33,12 @@ class SignUpViewModel : ViewModel() {
     private val _isCompletingSignUp = MutableLiveData(false)
     val isCompletingSignUp: LiveData<Boolean> = _isCompletingSignUp
 
-    private val _isLoggedIn = MutableLiveData(false)
-    val isLoggedIn: LiveData<Boolean> = _isLoggedIn
+    private val _isReadyForBirthDate = MutableLiveData(false)
+    val isReadyForBirthDate: LiveData<Boolean> = _isReadyForBirthDate
+
+    fun onBirthDateNavigated() {
+        _isReadyForBirthDate.value = false
+    }
 
     private val _email = MutableLiveData("")
     val email: LiveData<String> = _email
@@ -44,6 +48,13 @@ class SignUpViewModel : ViewModel() {
 
     private val _passwordConfirm = MutableLiveData("")
     val passwordConfirm: LiveData<String> = _passwordConfirm
+
+    private val _birthDate = MutableLiveData<String?>()
+    val birthDate: LiveData<String?> = _birthDate
+
+    fun setBirthDate(value: String?) {
+        _birthDate.value = value
+    }
 
     fun setPassword(value: String) {
         _password.value = value
@@ -74,8 +85,9 @@ class SignUpViewModel : ViewModel() {
                         birthDate = null,
                     )
                 ).await()
-                _isLoggedIn.value = authRepository.isLoggedIn()
-                if (_isLoggedIn.value != true) {
+                if (authRepository.isLoggedIn()) {
+                    _isReadyForBirthDate.value = true
+                } else {
                     _verificationMessage.value = R.string.signup_completion_failed
                 }
             } catch (e: CancellationException) {

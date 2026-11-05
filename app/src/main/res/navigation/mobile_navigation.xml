@@ -43,12 +43,20 @@
             android:label="@string/signup_password_title"
             tools:layout="@layout/fragment_password">
             <action
+                android:id="@+id/action_password_to_birth_date"
+                app:destination="@id/navigation_birth_date" />
+            <action
                 android:id="@+id/action_password_to_home"
                 app:destination="@id/navigation_home"
                 app:popUpTo="@id/navigation_auth_entry"
                 app:popUpToInclusive="true"
                 app:launchSingleTop="true" />
         </fragment>
+        <fragment
+            android:id="@+id/navigation_birth_date"
+            android:name="com.example.delibuddy.ui.signup.BirthDateFragment"
+            android:label="@string/signup_birth_date_title"
+            tools:layout="@layout/fragment_birth_date" />
     </navigation>
 
     <fragment

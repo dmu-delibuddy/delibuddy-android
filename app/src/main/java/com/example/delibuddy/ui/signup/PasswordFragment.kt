@@ -35,6 +35,7 @@ class PasswordFragment : Fragment() {
         setUpVerifyEmailButton()
         setUpVerificationCompleteButton()
         observeSignUpState()
+        observeVerificationCompletion()
         setUpPasswordInputs()
     }
 
@@ -69,6 +70,17 @@ class PasswordFragment : Fragment() {
         }
         viewModel.isVerificationEmailSent.observe(viewLifecycleOwner) { sent ->
             binding.textVerificationGuide.isVisible = sent
+        }
+    }
+
+    private fun observeVerificationCompletion() {
+        viewModel.isReadyForBirthDate.observe(viewLifecycleOwner) { isReady ->
+            val navController = findNavController()
+            if (isReady && navController.currentDestination?.id == R.id.navigation_password) {
+                GlobalLoadingDialog.hide(childFragmentManager)
+                navController.navigate(R.id.action_password_to_birth_date)
+                viewModel.onBirthDateNavigated()
+            }
         }
     }
 
