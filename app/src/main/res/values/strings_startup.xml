@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="startup_checking_login">로그인 정보를 확인 중이에요...</string>
+    <string name="startup_check_failed">로그인 정보를 확인하지 못했어요.\n인터넷 연결을 확인하고 다시 시도해 주세요.</string>
+    <string name="startup_retry">다시 시도</string>
+    <string name="startup_go_to_login">로그인 화면으로</string>
+</resources>

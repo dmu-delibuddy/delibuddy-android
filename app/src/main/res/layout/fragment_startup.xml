@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="28dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pressstart_regular"
+            android:gravity="center"
+            android:text="@string/app_name_en"
+            android:textColor="@color/navy"
+            android:textSize="22sp" />
+
+        <include
+            android:id="@+id/loading_content"
+            layout="@layout/dialog_global_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_retry"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/auth_button_primary"
+            android:text="@string/startup_retry"
+            android:textColor="@color/navy"
+            android:visibility="gone"
+            app:backgroundTint="@null" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_login"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/auth_button_secondary"
+            android:text="@string/startup_go_to_login"
+            android:textColor="@color/navy"
+            android:visibility="gone"
+            app:backgroundTint="@null" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
