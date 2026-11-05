@@ -1,5 +1,6 @@
 package com.example.delibuddy.ui.room.create
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +11,7 @@ import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
 import com.example.delibuddy.data.room.FoodCostSplitMethod
+import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
 import com.google.firebase.Timestamp
@@ -132,19 +134,13 @@ class CreateRoomViewModel (
         else -> null
     }
 
-    // 개설 버튼: 전체 검사 → 마감 시각 확인 → 저장
+    // 개설 버튼: 전체 검사 → 저장
     fun submit() {
         if (_submitState.value == SubmitState.Loading) {
             return  // 중복 클릭 방지
         }
         if (failOnInvalidStep()) return
-
-        val deadline = buildDeadline()
-        if (needsDeadline() && deadline == null) {
-            fail(3, R.string.create_error_deadline_passed)
-            return
-        }
-        save(buildRoom(deadline))
+        save(buildRoom(buildDeadline()))
     }
 
     // 1~4단계를 차례로 검사해서
@@ -176,25 +172,27 @@ class CreateRoomViewModel (
                 val id = roomRepository.createRoom(room)
                 SubmitState.Success(id)
             } catch (e: Exception) {
+                Log.w("CreateRoom", "createRoom 실패", e)
+                val notLoggedIn = e is RoomException &&
+                    e.reason == RoomException.Reason.NOT_LOGGED_IN
                 SubmitState.Error(
-                    R.string.create_error_unknown
+                    if (notLoggedIn) R.string.create_error_not_logged_in
+                    else R.string.create_error_unknown
                 )
             }
         }
     }
 
-    // 오늘 날짜 + 고른 시각 → Timestamp
-    // 시각을 안 골랐거나 이미 지난 시각이면 null
+    // 고른 시각 → Timestamp. 오늘 그 시각이 이미 지났으면 다음 날 (23:30 에 00:30 고르면 내일 00:30)
+    // 시각을 안 골랐으면 null
     private fun buildDeadline(): Timestamp? {
         val minutes = _deadlineMinutes.value
             ?: return null
         val cal = todayAt(minutes)
-        val now = System.currentTimeMillis()
-        return if (cal.timeInMillis > now) {
-            Timestamp(cal.time)
-        } else {
-            null
+        if (cal.timeInMillis <= System.currentTimeMillis()) {
+            cal.add(Calendar.DAY_OF_MONTH, 1)
         }
+        return Timestamp(cal.time)
     }
 
     // 하루 중 몇 분째(18:30 → 1110)를 오늘 그 시각의 Calendar 로

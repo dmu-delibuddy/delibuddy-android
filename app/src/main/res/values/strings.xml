@@ -103,9 +103,9 @@
     <string name="create_error_category">카테고리를 선택해 주세요</string>
     <string name="create_error_restaurant">음식점을 입력해 주세요</string>
     <string name="create_error_deadline">마감 시간을 선택하거나 \'시간 제한 없음\'을 체크해 주세요</string>
-    <string name="create_error_deadline_passed">마감 시간이 이미 지났어요. 다시 선택해 주세요</string>
     <string name="create_error_min_order">최소 주문 금액을 입력해 주세요</string>
     <string name="create_error_delivery_fee">예상 배달비를 입력해 주세요</string>
+    <string name="create_error_not_logged_in">로그인이 풀렸어요. 다시 로그인해 주세요</string>
     <string name="create_error_unknown">방을 만들지 못했어요. 네트워크를 확인하고 다시 시도해 주세요</string>
     <string name="create_submitting">개설 중…</string>
     <string name="create_success">방을 만들었어요</string>
