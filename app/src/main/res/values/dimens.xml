@@ -2,4 +2,11 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- 픽셀 그림자: 오른쪽 아래 오프셋 / 테두리 두께 -->
+    <dimen name="pixel_shadow">3dp</dimen>
+    <dimen name="pixel_stroke">2dp</dimen>
+    <!-- 작은 배지용 픽셀 그림자 -->
+    <dimen name="pixel_shadow_small">2dp</dimen>
+    <dimen name="pixel_stroke_small">1.5dp</dimen>
 </resources>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 그림자 -->
-    <item android:left="2dp" android:top="2dp">
+    <item android:left="@dimen/pixel_shadow_small" android:top="@dimen/pixel_shadow_small">
         <shape android:shape="rectangle">
             <solid android:color="@color/black" />
         </shape>
     </item>
     <!-- 본체 -->
-    <item android:right="2dp" android:bottom="2dp">
+    <item android:right="@dimen/pixel_shadow_small" android:bottom="@dimen/pixel_shadow_small">
         <shape android:shape="rectangle">
             <solid android:color="@color/point_orange" />
-            <stroke android:width="1.5dp" android:color="@color/black" />
+            <stroke android:width="@dimen/pixel_stroke_small" android:color="@color/black" />
         </shape>
     </item>
 </layer-list>

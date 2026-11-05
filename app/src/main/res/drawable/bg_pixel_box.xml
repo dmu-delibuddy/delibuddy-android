@@ -2,16 +2,16 @@
 <!-- 흰 바탕 + 검은 테두리 + 오른쪽 아래 픽셀 그림자 (검색창 등) -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 그림자 -->
-    <item android:left="3dp" android:top="3dp">
+    <item android:left="@dimen/pixel_shadow" android:top="@dimen/pixel_shadow">
         <shape android:shape="rectangle">
             <solid android:color="@color/black" />
         </shape>
     </item>
     <!-- 본체 -->
-    <item android:right="3dp" android:bottom="3dp">
+    <item android:right="@dimen/pixel_shadow" android:bottom="@dimen/pixel_shadow">
         <shape android:shape="rectangle">
             <solid android:color="@color/white" />
-            <stroke android:width="2dp" android:color="@color/black" />
+            <stroke android:width="@dimen/pixel_stroke" android:color="@color/black" />
         </shape>
     </item>
 </layer-list>
