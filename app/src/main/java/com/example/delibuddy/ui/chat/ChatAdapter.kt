@@ -3,6 +3,8 @@ package com.example.delibuddy.ui.chat
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -11,6 +13,8 @@ import com.example.delibuddy.R
 import com.example.delibuddy.databinding.ItemChatMineBinding
 import com.example.delibuddy.databinding.ItemChatOtherBinding
 import com.example.delibuddy.databinding.ItemChatSystemBinding
+import com.example.delibuddy.ui.common.loadImage
+import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -18,9 +22,11 @@ import java.util.Locale
     * 채팅 목록 어댑터
     * 말풍선 3종류 : 나(오른쪽) / 상대(왼쪽) / 시스템(가운데)
     * 실패한 내 메시지의 "다시 보내기"를 누르면 onRetryClick 으로 id 를 넘김
+    * 사진을 누르면 onImageClick 으로 주소를 넘김 (크게 보기)
 */
 class ChatAdapter(
     private val onRetryClick: (messageId: String) -> Unit,
+    private val onImageClick: (imageUrl: String) -> Unit,
 ) : ListAdapter<ChatItem, RecyclerView.ViewHolder>(DIFF) {
 
     // 메시지 종류별 말풍선 번호
@@ -69,10 +75,11 @@ class ChatAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatItem.Bubble) = with(binding) {
-            textContent.text = contentText(root.context, item)
+            bindContent(textContent, imageAttachment, item)
             textTime.text = timeText(item)
-            textContent.alpha =
-                if (item.sendState == SendState.SENDING) 0.5f else 1f
+            val alpha = if (item.sendState == SendState.SENDING) 0.5f else 1f
+            textContent.alpha = alpha
+            imageAttachment.alpha = alpha
             textFailed.isVisible =
                 item.sendState == SendState.FAILED
             textFailed.setOnClickListener { onRetryClick(item.id) }
@@ -89,7 +96,7 @@ class ChatAdapter(
                 if (item.isFromHost) R.string.detail_host
                 else R.string.chat_sender_participant
             )
-            textContent.text = contentText(root.context, item)
+            bindContent(textContent, imageAttachment, item)
             textTime.text = timeText(item)
         }
     }
@@ -101,6 +108,29 @@ class ChatAdapter(
 
         fun bind(item: ChatItem.System) {
             binding.textContent.text = item.content
+        }
+    }
+
+    // 글 / 사진 채우기. 내용이 없으면 글 칸, 사진이 없으면 사진 칸을 숨김
+    private fun bindContent(
+        textView: TextView,
+        imageView: ImageView,
+        item: ChatItem.Bubble,
+    ) {
+        val text = contentText(textView.context, item)
+        textView.text = text
+        textView.isVisible = text.isNotEmpty()
+
+        val showImage = item.hasImage && !item.deleted
+        imageView.isVisible = showImage
+        val url = item.imageUrl
+        if (showImage && url != null) {
+            imageView.loadImage(url)
+            imageView.setOnClickListener { onImageClick(url) }
+        } else {
+            // 주소를 받기 전이면 빈 칸 (재사용된 칸의 예전 사진 지우기)
+            Glide.with(imageView).clear(imageView)
+            imageView.setOnClickListener(null)
         }
     }
 

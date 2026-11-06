@@ -56,6 +56,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <!-- 사진 보내기 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_image"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:minWidth="0dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="@string/chat_pick_image"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            app:backgroundTint="@color/mode_off"
+            app:cornerRadius="0dp"
+            app:strokeColor="@color/black"
+            app:strokeWidth="2dp" />
+
         <EditText
             android:id="@+id/edit_message"
             android:layout_width="0dp"
