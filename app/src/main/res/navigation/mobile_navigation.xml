@@ -116,6 +116,11 @@
         <action
             android:id="@+id/action_home_to_create_room"
             app:destination="@+id/navigation_create_room" />
+
+        <action
+            android:id="@+id/action_home_to_room_detail"
+            app:destination="@+id/navigation_room_detail" />
+
     </fragment>
 
     <fragment
@@ -123,6 +128,20 @@
         android:name="com.example.delibuddy.ui.room.create.CreateRoomFragment"
         android:label="방 만들기"
         tools:layout="@layout/fragment_create_room" />
+
+    <fragment
+        android:id="@+id/navigation_room_detail"
+        android:name="com.example.delibuddy.ui.room.detail.RoomDetailFragment"
+        android:label="@string/detail_title"
+        tools:layout="@layout/fragment_room_detail">
+        <argument
+            android:name="roomId"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_room_detail_to_chat"
+            app:destination="@id/navigation_chat" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_recommendation"
@@ -134,7 +153,14 @@
         android:id="@+id/navigation_chat"
         android:name="com.example.delibuddy.ui.chat.ChatFragment"
         android:label="@string/chatting"
-        tools:layout="@layout/fragment_chat" />
+        tools:layout="@layout/fragment_chat">
+        <!-- 방 상세에서 올 때만 값 있음, 하단 탭으로 오면 null -->
+        <argument
+            android:name="roomId"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_mypage"

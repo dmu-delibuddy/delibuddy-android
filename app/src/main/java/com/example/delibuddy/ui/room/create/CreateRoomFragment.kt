@@ -39,6 +39,7 @@ class CreateRoomFragment : Fragment() {
 
     private lateinit var backCallback : OnBackPressedCallback // 2단계 이상일 때만 켜져서 시스템 뒤로가기를 이전 단계로 바꿈
 
+    // 화면 레이아웃(ViewBinding) 생성
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,6 +49,7 @@ class CreateRoomFragment : Fragment() {
         return binding.root
     }
 
+    // 단계별로 버튼 / 입력 연결과 상태 구독 시작
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -84,11 +86,13 @@ class CreateRoomFragment : Fragment() {
         observeSubmitState()
     }
 
+    // 시스템 뒤로가기 : 2단계 이상이면 이전 단계로 (1단계에서는 꺼져 있어서 화면 종료)
     private fun setUpBackPress() {
         backCallback = requireActivity().onBackPressedDispatcher
             .addCallback(viewLifecycleOwner, enabled = false) { viewModel.prev() }
     }
 
+    // 상단 < 버튼 : 방 만들기 종료
     private fun setUpTopBar() {
         binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
     }
@@ -179,6 +183,7 @@ class CreateRoomFragment : Fragment() {
         ).show()
     }
 
+    // 단계가 바뀔 때마다 화면 다시 그리기
     private fun observeStep() {
         viewModel.step.observe(viewLifecycleOwner) { step -> renderStep(step) }
     }
@@ -212,6 +217,7 @@ class CreateRoomFragment : Fragment() {
         }
     }
 
+    // 인원 -/+ 버튼 연결
     private fun setUpParticipantButtons() {
         binding.step1.buttonMinus.setOnClickListener { viewModel.decreaseParticipants() }
         binding.step1.buttonPlus.setOnClickListener { viewModel.increaseParticipants() }
@@ -229,6 +235,7 @@ class CreateRoomFragment : Fragment() {
         }
     }
 
+    // 모드 선택 (픽업만 / 밥친구)
     private fun setUpModeSelect() {
         binding.step1.groupCreateMode.setOnCheckedChangeListener { _, checkedId ->
             viewModel.setMode(
@@ -250,13 +257,16 @@ class CreateRoomFragment : Fragment() {
         ).apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
 
         binding.step2.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            // 항목을 고르면 카테고리 저장 (0번 = 선택 안 함)
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 viewModel.setCategory(if (position == 0) null else categories[position - 1])
             }
+            // 아무것도 안 골랐을 때는 처리 없음
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
     }
 
+    // 음식점 입력값 저장
     private fun setUpRestaurantInput() {
         binding.step2.editRestaurant.doAfterTextChanged { text ->
             viewModel.setRestaurant(text?.toString().orEmpty())
@@ -280,6 +290,7 @@ class CreateRoomFragment : Fragment() {
         }, initHour, initMinute, true).show()
     }
 
+    // 고른 마감 시각을 "18:30 마감" 형태로 표시
     private fun observeDeadline() {
         viewModel.deadlineMinutes.observe(viewLifecycleOwner) { minutes ->
             binding.step3.textDeadline.text =
@@ -288,6 +299,7 @@ class CreateRoomFragment : Fragment() {
     }
 
 
+    // 시간 제한 없음 체크 여부 저장
     private fun setUpNoTimeLimitCheck() {
         binding.step3.checkNoTimeLimit.setOnCheckedChangeListener { _, isChecked ->
             viewModel.setNoTimeLimit(isChecked)
@@ -313,6 +325,7 @@ class CreateRoomFragment : Fragment() {
         }
     }
 
+    // 음식값 정산 방법 선택 (버튼 id → 정산 방법)
     private fun setUpFoodSplitSelect() {
         val ids = mapOf(
             R.id.radio_food_host to FoodCostSplitMethod.HOST_PAYS,
@@ -339,6 +352,7 @@ class CreateRoomFragment : Fragment() {
         }
     }
 
+    // 배달비 정산 방법 선택 (버튼 id → 정산 방법)
     private fun setUpDeliverySplitSelect() {
         val ids = mapOf(
             R.id.radio_delivery_host to DeliveryFeeSplitMethod.HOST_PAYS,
@@ -357,6 +371,7 @@ class CreateRoomFragment : Fragment() {
         viewModel.deliveryFeeSplit.observe(viewLifecycleOwner) { renderFeeNote() }
     }
 
+    // 배달비 정산 방법에 맞는 1인당 배달비 안내 문구 표시
     private fun renderFeeNote() {
         val fee = viewModel.deliveryFee.value
         val people = viewModel.maxParticipants.value ?: CreateRoomViewModel.DEFAULT_PARTICIPANTS
@@ -368,6 +383,7 @@ class CreateRoomFragment : Fragment() {
         }
     }
 
+    // 화면이 사라질 때 binding 해제 (메모리 누수 방지)
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

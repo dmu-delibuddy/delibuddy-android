@@ -24,11 +24,13 @@ class RoomAdapter (
     private val onClick : (roomId : String) -> Unit
 ) : ListAdapter<RoomModel, RoomAdapter.RoomViewHolder>(DIFF) {
 
+    // 방 카드 한 칸(item_room) 만들기
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomViewHolder {
         val binding = ItemRoomBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return RoomViewHolder(binding)
     }
 
+    // position 번째 방 정보를 카드에 채우기
     override fun onBindViewHolder(holder: RoomViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
@@ -37,6 +39,7 @@ class RoomAdapter (
         private val binding: ItemRoomBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
+        // 방 정보 → 카드 화면 (배지, 마감, 배달비, 제목, 태그) + 클릭 연결
         fun bind(room : RoomModel) = with(binding) {
             // 모집 배지 = 상태 + 인원 / 마감 시간
             textStatus.text = "${statusLabel(room.status)} ${room.currentCount}/${room.maxParticipants}명"
@@ -72,6 +75,7 @@ class RoomAdapter (
         }
     }
 
+    // 방 상태 → 카드 표시 문구
     private fun statusLabel(status: RoomStatus) = when (status) {
         RoomStatus.RECRUITING -> "모집 중"
         RoomStatus.FULL -> "정원 마감"
@@ -79,11 +83,13 @@ class RoomAdapter (
         RoomStatus.COMPLETED -> "완료"
     }
 
+    // 모드 → 카드 표시 문구
     private fun modeLabel(mode: RoomMode) = when (mode) {
         RoomMode.PICKUP_ONLY -> "픽업"
         RoomMode.MEAL_BUDDY -> "밥 친구"
     }
 
+    // 카테고리 → 표시 문구
     private fun categoryLabel(category: FoodCategory) = when (category) {
         FoodCategory.KOR -> "한식"
         FoodCategory.CHN -> "중식"
