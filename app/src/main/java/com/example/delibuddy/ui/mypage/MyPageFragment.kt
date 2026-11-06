@@ -6,7 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
+import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentMypageBinding
+import com.google.firebase.auth.FirebaseAuth
 
 class MyPageFragment : Fragment() {
 
@@ -26,6 +30,23 @@ class MyPageFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 개발용 임시 버튼
+        binding.buttonLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            findNavController().navigate(
+                R.id.navigation_auth_entry,
+                null,
+                navOptions {
+                    popUpTo(R.id.mobile_navigation) { inclusive = false }
+                    launchSingleTop = true
+                },
+            )
+        }
     }
 
     override fun onDestroyView() {

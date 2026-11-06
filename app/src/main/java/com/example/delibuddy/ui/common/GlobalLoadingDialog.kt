@@ -1,6 +1,5 @@
 package com.example.delibuddy.ui.common
 
-import android.animation.ValueAnimator
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -9,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
-import android.view.animation.LinearInterpolator
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
@@ -18,7 +16,7 @@ import com.example.delibuddy.databinding.DialogGlobalLoadingBinding
 
 class GlobalLoadingDialog : DialogFragment() {
     private var binding: DialogGlobalLoadingBinding? = null
-    private var bounce: ValueAnimator? = null
+    private var bounce: PizzaLoadingAnimation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,25 +47,13 @@ class GlobalLoadingDialog : DialogFragment() {
             ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         val content = binding ?: return
-        val height = 28f * resources.displayMetrics.density
-        bounce = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 900L
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = LinearInterpolator()
-            addUpdateListener {
-                val phase = it.animatedValue as Float
-                val lift = 4f * phase * (1f - phase)
-                content.loadingPizza.translationY = -height * lift
-                content.loadingShadow.scaleX = 1f - 0.35f * lift
-                content.loadingShadow.scaleY = 1f - 0.2f * lift
-                content.loadingShadow.alpha = 1f - 0.45f * lift
-            }
+        bounce = PizzaLoadingAnimation(content.loadingPizza, content.loadingShadow).apply {
             start()
         }
     }
 
     override fun onStop() {
-        bounce?.cancel()
+        bounce?.stop()
         bounce = null
         super.onStop()
     }

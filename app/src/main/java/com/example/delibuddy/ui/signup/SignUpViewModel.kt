@@ -6,6 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
 import com.example.delibuddy.data.auth.AuthRepository
+import com.example.delibuddy.data.auth.EmailNotVerifiedException
+import com.example.delibuddy.data.auth.SignUpSessionMissingException
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.example.delibuddy.data.user.UserModel
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
@@ -23,11 +27,18 @@ class SignUpViewModel : ViewModel() {
     private val _verificationMessage = MutableLiveData<Int?>()
     val verificationMessage: LiveData<Int?> = _verificationMessage
 
+    private val _isVerificationEmailSent = MutableLiveData(false)
+    val isVerificationEmailSent: LiveData<Boolean> = _isVerificationEmailSent
+
     private val _isCompletingSignUp = MutableLiveData(false)
     val isCompletingSignUp: LiveData<Boolean> = _isCompletingSignUp
 
-    private val _isLoggedIn = MutableLiveData(false)
-    val isLoggedIn: LiveData<Boolean> = _isLoggedIn
+    private val _isReadyForBirthDate = MutableLiveData(false)
+    val isReadyForBirthDate: LiveData<Boolean> = _isReadyForBirthDate
+
+    fun onBirthDateNavigated() {
+        _isReadyForBirthDate.value = false
+    }
 
     private val _email = MutableLiveData("")
     val email: LiveData<String> = _email
@@ -38,6 +49,78 @@ class SignUpViewModel : ViewModel() {
     private val _passwordConfirm = MutableLiveData("")
     val passwordConfirm: LiveData<String> = _passwordConfirm
 
+    private val _birthDate = MutableLiveData<String?>()
+    val birthDate: LiveData<String?> = _birthDate
+
+    fun setBirthDate(value: String?) {
+        _birthDate.value = value
+    }
+
+    private val _bankName = MutableLiveData("")
+    val bankName: LiveData<String> = _bankName
+
+    private val _account = MutableLiveData("")
+    val account: LiveData<String> = _account
+
+    fun setBankName(value: String) {
+        _bankName.value = value
+    }
+
+    fun setAccount(value: String) {
+        _account.value = value
+    }
+
+    private val _isSavingProfile = MutableLiveData(false)
+    val isSavingProfile: LiveData<Boolean> = _isSavingProfile
+
+    private val _isRegistrationComplete = MutableLiveData(false)
+    val isRegistrationComplete: LiveData<Boolean> = _isRegistrationComplete
+
+    private val _profileError = MutableLiveData<Int?>()
+    val profileError: LiveData<Int?> = _profileError
+
+    fun finishRegistration(skipAccount: Boolean) {
+        if (_isSavingProfile.value == true || _isRegistrationComplete.value == true) return
+        val bank = bankName.value.orEmpty().trim()
+        val number = account.value.orEmpty().trim()
+        _profileError.value = when {
+            !skipAccount && (bank.isBlank() || number.isBlank()) -> R.string.signup_account_required
+            !skipAccount && number.any { it !in '0'..'9' } -> R.string.signup_account_invalid
+            else -> null
+        }
+        if (_profileError.value != null) return
+
+        val profile = UserModel(
+            univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
+            birthDate = birthDate.value,
+            bankName = if (skipAccount) null else bank,
+            account = if (skipAccount) null else number,
+        )
+        _isSavingProfile.value = true
+        viewModelScope.launch {
+            try {
+                authRepository.completeSignUp(profile).await()
+                if (skipAccount) {
+                    _bankName.value = ""
+                    _account.value = ""
+                }
+                _isRegistrationComplete.value = true
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _profileError.value = when (e) {
+                    is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
+                    is SignUpSessionMissingException,
+                    is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+                    is EmailNotVerifiedException -> R.string.signup_email_not_verified
+                    else -> R.string.signup_completion_failed
+                }
+            } finally {
+                _isSavingProfile.value = false
+            }
+        }
+    }
+
     fun setPassword(value: String) {
         _password.value = value
     }
@@ -47,6 +130,10 @@ class SignUpViewModel : ViewModel() {
     }
 
     fun setEmail(value: String) {
+        if (_email.value != value) {
+            _isVerificationEmailSent.value = false
+            _verificationMessage.value = null
+        }
         _email.value = value
     }
 
@@ -63,14 +150,21 @@ class SignUpViewModel : ViewModel() {
                         birthDate = null,
                     )
                 ).await()
-                _isLoggedIn.value = authRepository.isLoggedIn()
-                if (_isLoggedIn.value != true) {
+                if (authRepository.isLoggedIn()) {
+                    _isReadyForBirthDate.value = true
+                } else {
                     _verificationMessage.value = R.string.signup_completion_failed
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _verificationMessage.value = R.string.signup_completion_failed
+                _verificationMessage.value = when (e) {
+                    is EmailNotVerifiedException -> R.string.signup_email_not_verified
+                    is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
+                    is SignUpSessionMissingException,
+                    is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+                    else -> R.string.signup_completion_failed
+                }
             } finally {
                 _isCompletingSignUp.value = false
             }
@@ -102,7 +196,7 @@ class SignUpViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 authRepository.sendSignUpVerification(fullEmail, passwordValue)
-                _verificationMessage.value = R.string.signup_verification_sent
+                _isVerificationEmailSent.value = true
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

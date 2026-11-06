@@ -5,11 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.navGraphViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentPasswordBinding
+import com.example.delibuddy.ui.common.GlobalLoadingDialog
 
 class PasswordFragment : Fragment() {
 
@@ -33,6 +35,7 @@ class PasswordFragment : Fragment() {
         setUpVerifyEmailButton()
         setUpVerificationCompleteButton()
         observeSignUpState()
+        observeVerificationCompletion()
         setUpPasswordInputs()
     }
 
@@ -58,17 +61,26 @@ class PasswordFragment : Fragment() {
         viewModel.isCompletingSignUp.observe(viewLifecycleOwner) {
             updateLoadingState()
         }
-        viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
-            val navController = findNavController()
-            if (isLoggedIn && navController.currentDestination?.id == R.id.navigation_password) {
-                navController.navigate(R.id.action_password_to_home)
-            }
-        }
         viewModel.isSendingVerification.observe(viewLifecycleOwner) {
             updateLoadingState()
         }
         viewModel.verificationMessage.observe(viewLifecycleOwner) { message ->
             binding.textVerificationStatus.text = message?.let { getString(it) }.orEmpty()
+            binding.textVerificationStatus.isVisible = message != null
+        }
+        viewModel.isVerificationEmailSent.observe(viewLifecycleOwner) { sent ->
+            binding.textVerificationGuide.isVisible = sent
+        }
+    }
+
+    private fun observeVerificationCompletion() {
+        viewModel.isReadyForBirthDate.observe(viewLifecycleOwner) { isReady ->
+            val navController = findNavController()
+            if (isReady && navController.currentDestination?.id == R.id.navigation_password) {
+                GlobalLoadingDialog.hide(childFragmentManager)
+                navController.navigate(R.id.action_password_to_birth_date)
+                viewModel.onBirthDateNavigated()
+            }
         }
     }
 
@@ -92,6 +104,17 @@ class PasswordFragment : Fragment() {
         binding.buttonPrevious.isEnabled = !isBusy
         binding.editPassword.isEnabled = !isBusy
         binding.editPasswordConfirm.isEnabled = !isBusy
+
+        val loadingMessage = when {
+            viewModel.isCompletingSignUp.value == true -> R.string.signup_checking_verification
+            viewModel.isSendingVerification.value == true -> R.string.signup_sending_verification_email
+            else -> null
+        }
+        if (loadingMessage != null) {
+            GlobalLoadingDialog.show(childFragmentManager, getString(loadingMessage))
+        } else {
+            GlobalLoadingDialog.hide(childFragmentManager)
+        }
     }
 
     override fun onDestroyView() {
