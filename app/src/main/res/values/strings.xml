@@ -161,4 +161,5 @@
     <string name="detail_done_complete">주문을 완료했어요</string>
     <string name="detail_confirm_close">모집을 마감할까요?\n마감 후에는 새로 참여할 수 없어요</string>
     <string name="detail_confirm_complete">공동 주문을 완료할까요?</string>
+    <string name="detail_go_chat">채팅방</string>
 </resources>

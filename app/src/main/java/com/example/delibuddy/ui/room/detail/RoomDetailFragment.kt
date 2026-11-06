@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -49,6 +52,7 @@ class RoomDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpBackButton()
+        setUpChatButton()
         setUpActionButton()
         observeRoom()
         observeActionState()
@@ -60,6 +64,34 @@ class RoomDetailFragment : Fragment() {
             findNavController().popBackStack()
         }
     }
+
+    // 채팅방 버튼 : roomId 를 넘기며 채팅 화면으로 이동
+    private fun setUpChatButton() {
+        binding.buttonChat.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_room_detail_to_chat,
+                bundleOf(
+                    RoomDetailViewModel.ARG_ROOM_ID
+                        to viewModel.roomId
+                )
+            )
+        }
+    }
+
+    // 방장 / 참여자에게만 채팅방 버튼 표시
+    // 채팅 버튼이 없을 때는 오른쪽 버튼의 왼쪽 여백 제거
+    private fun renderChatButton(room : RoomModel) {
+        val canChat = viewModel.canChat(room)
+        binding.buttonChat.isVisible = canChat
+        binding.buttonAction.updateLayoutParams<
+            LinearLayout.LayoutParams> {
+            marginStart = if (canChat) 8.dp() else 0
+        }
+    }
+
+    // dp → px 변환
+    private fun Int.dp() : Int =
+        (this * resources.displayMetrics.density).toInt()
 
     // 하단 버튼 클릭 연결
     private fun setUpActionButton() {
@@ -178,6 +210,7 @@ class RoomDetailFragment : Fragment() {
             binding.layoutContent.isVisible = loaded
             binding.textMessage.isVisible = !loaded
             binding.buttonAction.isVisible = false // 로드 전, 실패 시
+            binding.buttonChat.isVisible = false
             when (state) {
                 is DetailState.Loaded -> renderRoom(state.room)
                 DetailState.NotFound -> binding.textMessage
@@ -223,6 +256,7 @@ class RoomDetailFragment : Fragment() {
 
         renderParticipants(room)
         renderActionButton(room)
+        renderChatButton(room)
     }
 
     // 라벨 값 한 줄
@@ -276,7 +310,7 @@ class RoomDetailFragment : Fragment() {
         FoodCostSplitMethod.CUSTOM -> R.string.split_custom
     }
 
-    // 배달비 정산 방법 → 화면 표시 문구
+    // 배달비 정산 방법 => 화면 표시 문구
     @StringRes
     private fun deliverySplitLabel(m : DeliveryFeeSplitMethod) = when (m) {
         DeliveryFeeSplitMethod.HOST_PAYS -> R.string.split_host

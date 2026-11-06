@@ -121,6 +121,10 @@ class RoomDetailViewModel(
             roomRepository.completeRoom(roomId)
     }
 
+    // 채팅방에 들어갈 수 있는지 (방장 / 참여자만)
+    fun canChat(room : RoomModel) : Boolean =
+        room.isHost(myUid) || room.isParticipant(myUid)
+
     // 토스트 보여준 뒤 대기 상태로
     fun clearActionState() {
         _actionState.value = ActionState.Idle
