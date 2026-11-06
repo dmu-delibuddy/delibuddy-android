@@ -39,14 +39,18 @@ class CreateRoomViewModel (
     private val _mode = MutableLiveData(RoomMode.PICKUP_ONLY)
     val mode : LiveData<RoomMode> = _mode
 
+    // 방 제목 저장
     fun setTitle(value: String) { _title.value = value }
+    // 모드 저장 (픽업만 / 밥친구)
     fun setMode(value: RoomMode) { _mode.value = value }
 
+    // 인원 +1 (최대 인원까지)
     fun increaseParticipants() {
         val n = _maxParticipants.value ?: DEFAULT_PARTICIPANTS
         if (n < MAX_PARTICIPANTS) _maxParticipants.value = n + 1
     }
 
+    // 인원 -1 (최소 인원까지)
     fun decreaseParticipants() {
         val n = _maxParticipants.value ?: DEFAULT_PARTICIPANTS
         if (n > MIN_PARTICIPANTS) _maxParticipants.value = n - 1
@@ -59,7 +63,9 @@ class CreateRoomViewModel (
     private val _restaurant = MutableLiveData("")
     val restaurant : LiveData<String> = _restaurant
 
+    // 카테고리 저장 (null = 선택 안 함)
     fun setCategory(value : FoodCategory?) { _category.value = value }
+    // 음식점 저장
     fun setRestaurant(value : String) { _restaurant.value = value }
 
 
@@ -84,12 +90,18 @@ class CreateRoomViewModel (
     private val _deliveryFeeSplit = MutableLiveData(DeliveryFeeSplitMethod.EQUAL_SPLIT) // 1/N
     val deliveryFeeSplit : LiveData<DeliveryFeeSplitMethod> = _deliveryFeeSplit
 
+    // 최소 주문 금액 저장 (null = 입력 안 함)
     fun setMinOrderAmount (value : Int?) { _minOrderAmount.value = value }
+    // 예상 배달비 저장 (null = 입력 안 함)
     fun setDeliveryFee (value : Int?) { _deliveryFee.value = value }
+    // 음식값 정산 방법 저장
     fun setFoodCostSplit (value : FoodCostSplitMethod) { _foodCostSplit.value = value }
+    // 배달비 정산 방법 저장
     fun setDeliveryFeeSplit (value : DeliveryFeeSplitMethod) { _deliveryFeeSplit.value = value }
 
+    // 마감 시각을 하루 중 몇 분째로 저장 (18:30 → 1110)
     fun setDeadline (hour : Int, minute : Int) { _deadlineMinutes.value = hour * 60 + minute }
+    // 시간 제한 없음 여부 저장
     fun setNoTimeLimit (value : Boolean) { _noTimeLimit.value = value }
 
     // 개설 진행 상태 (대기 / 저장 중 / 성공 / 실패)

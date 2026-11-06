@@ -258,7 +258,7 @@ class RoomDetailFragment : Fragment() {
         }
     }
 
-    // 방 상태 → 화면 표시 문구 (모집 중 / 정원 마감 / 모집 마감 / 완료)
+    // 방 상태 => 화면 표시 문구 (모집 중 / 정원 마감 / 모집 마감 / 완료)
     @StringRes
     private fun statusLabel(status : RoomStatus) = when (status) {
         RoomStatus.RECRUITING -> R.string.detail_status_recruiting
@@ -267,7 +267,7 @@ class RoomDetailFragment : Fragment() {
         RoomStatus.COMPLETED -> R.string.detail_status_completed
     }
 
-    // 음식값 정산 방법 → 화면 표시 문구
+    // 음식값 정산 방법 => 화면 표시 문구
     @StringRes
     private fun foodSplitLabel(m : FoodCostSplitMethod) = when (m) {
         FoodCostSplitMethod.HOST_PAYS -> R.string.split_host

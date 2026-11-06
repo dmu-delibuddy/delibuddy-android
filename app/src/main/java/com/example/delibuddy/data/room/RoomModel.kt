@@ -61,6 +61,8 @@ data class RoomModel (
     val isJoinable : Boolean
         get() = status == RoomStatus.RECRUITING && currentCount < maxParticipants && !isDeadLinePassed
 
+    // 이 uid 가 방장인지
     fun isHost(uid : String?) : Boolean = uid != null && uid == hostId
+    // 이 uid 가 참여자인지 (방장 포함)
     fun isParticipant(uid : String?) : Boolean = uid != null && uid in participantIds
 }

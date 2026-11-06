@@ -42,9 +42,13 @@ class RoomListViewModel(
         }.asLiveData()
 
     // 화면에서 필터를 바꿀 때 부르는 함수
+    // 모드 필터 변경
     fun setMode(value : RoomMode) { mode.value = value }
+    // 카테고리 필터 변경 (null = 전체)
     fun setCategory(value : FoodCategory?) { category.value = value }
+    // 참여 가능한 방만 보기 변경
     fun setJoinableOnly(value : Boolean) { joinableOnly.value = value }
+    // 검색어 변경
     fun setQuery(value : String) { query.value = value }
 
     companion object {

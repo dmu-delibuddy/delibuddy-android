@@ -19,6 +19,7 @@ class RoomRepository(
 ) {
     private val rooms = db.collection("rooms")
 
+    // 로그인한 내 uid. 로그인 안 했으면 NOT_LOGGED_IN 예외
     private fun requireUid(): String =
         auth.currentUser?.uid ?: throw RoomException(RoomException.Reason.NOT_LOGGED_IN)
 
@@ -26,7 +27,7 @@ class RoomRepository(
     suspend fun createRoom(room: RoomModel): String {
         val uid = requireUid()
         val ref = rooms.document()
-        val newRoom = room.copy(
+        val newRoom = room.copy (
             hostId = uid,
             participantIds = listOf(uid),
             status = RoomStatus.RECRUITING,
@@ -155,6 +156,7 @@ class RoomRepository(
         to = RoomStatus.COMPLETED,
     )
 
+    // 방장만, 허용된 상태(from)일 때만 방 상태를 to 로 변경 (트랜잭션)
     private suspend fun changeStatusAsHost(roomId: String, from: Set<RoomStatus>, to: RoomStatus) {
         val uid = requireUid()
         val ref = rooms.document(roomId)
