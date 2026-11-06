@@ -18,10 +18,35 @@ service cloud.firestore {
       }
     }
 
-    // 로그인했고, 방의 participantIds 에 내 uid 가 있는지
     function isRoomMember(roomId) {
       return request.auth != null
         && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
+      match /orders/{userId} {
+        function isParticipant() {
+          return request.auth != null
+                 && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
+        }
+
+        function canEdit() {
+          let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
+          return isParticipant()
+                 && request.auth.uid == userId
+                 && room.status in ['RECRUITING', 'FULL']
+                 && (room.deadline == null || request.time < room.deadline);
+        }
+
+        allow read: if isParticipant();
+        allow create, update: if canEdit()
+                              && request.resource.data.keys().hasAll(['price'])
+                              && request.resource.data.keys().hasOnly(['price', 'cartScreenshotUrl', 'memo'])
+                              && request.resource.data.price is int
+                              && request.resource.data.price >= 0
+                              && (request.resource.data.get('cartScreenshotUrl', null) == null
+                                  || request.resource.data.cartScreenshotUrl is string)
+                              && (request.resource.data.get('memo', null) == null
+                                  || request.resource.data.memo is string);
+        allow delete: if canEdit();
+      }
     }
 
     match /test/{docId} {
