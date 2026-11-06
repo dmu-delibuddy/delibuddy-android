@@ -162,4 +162,11 @@
     <string name="detail_confirm_close">모집을 마감할까요?\n마감 후에는 새로 참여할 수 없어요</string>
     <string name="detail_confirm_complete">공동 주문을 완료할까요?</string>
     <string name="detail_go_chat">채팅방</string>
+    <string name="chat_no_room">방 상세에서 채팅방에 들어가 주세요</string>
+    <string name="chat_load_error">채팅을 불러오지 못했어요\n방에 참여 중인지 확인해 주세요</string>
+    <string name="chat_input_hint">메시지를 입력하세요</string>
+    <string name="chat_send">전송</string>
+    <string name="chat_failed_retry">전송 실패 · 다시 보내기</string>
+    <string name="chat_deleted">삭제된 메시지예요</string>
+    <string name="chat_sender_participant">참여자</string>
 </resources>
