@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
+import com.example.delibuddy.data.chat.ChatRepository
+import com.example.delibuddy.data.chat.SystemMessage
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
@@ -26,6 +28,9 @@ import java.util.Calendar
 class CreateRoomViewModel (
     private val roomRepository : RoomRepository = RoomRepository()
 ) : ViewModel() {
+
+    // 방이 만들어지면 채팅방에 첫 안내를 남길 때 사용
+    private val chatRepository = ChatRepository()
 
     private val _step = MutableLiveData(1)
     val step: LiveData<Int> = _step
@@ -182,6 +187,7 @@ class CreateRoomViewModel (
         viewModelScope.launch {
             _submitState.value = try {
                 val id = roomRepository.createRoom(room)
+                notifyRoomCreated(id)
                 SubmitState.Success(id)
             } catch (e: Exception) {
                 Log.w("CreateRoom", "createRoom 실패", e)
@@ -192,6 +198,15 @@ class CreateRoomViewModel (
                     else R.string.create_error_unknown
                 )
             }
+        }
+    }
+
+    // 새 채팅방에 첫 안내 남기기. 실패해도 방 만들기는 성공
+    private suspend fun notifyRoomCreated(roomId: String) {
+        try {
+            chatRepository.sendSystem(roomId, SystemMessage.ROOM_CREATED)
+        } catch (e: Exception) {
+            Log.w(TAG, "시스템 메시지 실패 : $roomId", e)
         }
     }
 
@@ -255,6 +270,7 @@ class CreateRoomViewModel (
         const val MAX_PARTICIPANTS = 6
         const val DEFAULT_PARTICIPANTS = 3 // 기본값 설정
         const val RESTAURANT_MAX = 30
+        private const val TAG = "CreateRoomVM"
     }
 
     // 개설 진행 상태 종류
