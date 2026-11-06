@@ -40,7 +40,9 @@ class RoomRepository(
     // ----------------- 방 리스트 / 상세 ---------------------
     /*
         * 홈 화면 방 목록 실시간 구독.
-        * onlyJoinable = true 이면 모집 중 (RECRUITING)인 방만, false 이면 정원 마감도 함께 보여줌
+        * onlyJoinable = true 이면 모집 중 (RECRUITING)인 방만,
+        * false 이면 정원 마감, 모집 마감(주문 확정) 방도 함께 가져옴
+        * 누구에게 보일지(마감된 방은 방장 / 참여자만)는 RoomListViewModel 에서 거름
     */
 
     fun observeRooms(
@@ -51,7 +53,11 @@ class RoomRepository(
         var query: Query = if (onlyJoinable) {
             rooms.whereEqualTo("status", RoomStatus.RECRUITING.name)
         } else {
-            rooms.whereIn("status", listOf(RoomStatus.RECRUITING.name, RoomStatus.FULL.name))
+            rooms.whereIn("status", listOf(
+                RoomStatus.RECRUITING.name,
+                RoomStatus.FULL.name,
+                RoomStatus.ORDER_CONFIRMED.name,  // 참여자는 마감 후에도 계속 봐야 함
+            ))
         }
         if (mode != null) query = query.whereEqualTo("mode", mode.name)
         if (category != null) query = query.whereEqualTo("category", category.name)
@@ -71,7 +77,6 @@ class RoomRepository(
                         null
                     }
                 }
-                .filterNot { it.isDeadLinePassed }
                 .sortedBy { it.deadline?.seconds ?: MAX_VALUE }
             trySend(list)
         }
