@@ -28,7 +28,7 @@
             android:gravity="center"
             android:paddingStart="12dp"
             android:paddingEnd="15dp"
-            android:text="@string/mypage_mode_pickup"
+            android:text="@string/mode_pickup"
             android:textColor="@color/black" />
 
         <RadioButton
@@ -41,7 +41,7 @@
             android:gravity="center"
             android:paddingStart="12dp"
             android:paddingEnd="15dp"
-            android:text="@string/mypage_mode_meal_buddy"
+            android:text="@string/mode_meal_buddy"
             android:textColor="@color/black" />
     </RadioGroup>
 

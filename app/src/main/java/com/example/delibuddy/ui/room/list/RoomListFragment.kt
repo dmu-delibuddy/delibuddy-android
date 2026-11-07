@@ -70,7 +70,7 @@ class RoomListFragment : Fragment() {
         }
     }
 
-    // 모드 필터 (픽업 / 밥친구)
+    // 모드 필터 (픽업만 / 밥친구)
     private fun setUpModeFilter() {
         binding.groupMode.setOnCheckedChangeListener { _, checkedId ->
             viewModel.setMode (

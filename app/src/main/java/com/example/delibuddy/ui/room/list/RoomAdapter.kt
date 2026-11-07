@@ -3,9 +3,11 @@ package com.example.delibuddy.ui.room.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.delibuddy.R
 import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
@@ -56,7 +58,7 @@ class RoomAdapter (
             // 메뉴 태그 , 장소 태그 / 모드 배지
             textMenu.text = "메뉴: ${room.restaurant}"
             textPlace.visibility = View.GONE // 장소 필드가 정해지면 표시로 바꿀 예정
-            textMode.text = "${modeLabel(room.mode)} 모드"
+            textMode.setText(modeLabel(room.mode))
 
             root.setOnClickListener { onClick(room.id) }
         }
@@ -83,10 +85,11 @@ class RoomAdapter (
         RoomStatus.COMPLETED -> "완료"
     }
 
-    // 모드 → 카드 표시 문구
+    // 모드 → 카드 표시 문구 (픽업만 / 밥친구, 홈 / 상세와 같은 문구)
+    @StringRes
     private fun modeLabel(mode: RoomMode) = when (mode) {
-        RoomMode.PICKUP_ONLY -> "픽업"
-        RoomMode.MEAL_BUDDY -> "밥 친구"
+        RoomMode.PICKUP_ONLY -> R.string.mode_pickup
+        RoomMode.MEAL_BUDDY -> R.string.mode_meal_buddy
     }
 
     // 카테고리 → 표시 문구

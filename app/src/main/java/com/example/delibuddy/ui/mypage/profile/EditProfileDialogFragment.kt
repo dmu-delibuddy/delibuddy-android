@@ -88,8 +88,8 @@ class EditProfileDialogFragment : DialogFragment() {
     // 창 제목에 수정 중인 모드 표시 (예 : 픽업만 프로필 수정)
     private fun renderTitle() {
         val mode = getString(
-            if (viewModel.selectedType.value == ProfileType.MEAL_BUDDY) R.string.mypage_mode_meal_buddy
-            else R.string.mypage_mode_pickup
+            if (viewModel.selectedType.value == ProfileType.MEAL_BUDDY) R.string.mode_meal_buddy
+            else R.string.mode_pickup
         )
         binding.textTitle.text = getString(R.string.mypage_edit_profile_title_mode, mode)
     }

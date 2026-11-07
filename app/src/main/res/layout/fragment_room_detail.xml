@@ -99,7 +99,7 @@
                 android:paddingBottom="5dp"
                 android:textColor="@color/black"
                 android:textSize="12sp"
-                tools:text="픽업 모드" />
+                tools:text="픽업만" />
 
             <include
                 android:id="@+id/information"

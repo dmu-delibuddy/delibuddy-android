@@ -28,8 +28,8 @@
     <string name="signin_failed">로그인하지 못했습니다. 이메일, 비밀번호와 네트워크 상태를 확인하고 다시 시도해 주세요.</string>
     <string name="auth_existing_account">이미 계정이 있다면 로그인해 주세요</string>
     <string name="home_logo">DELI-BUDDY</string>
-    <string name="mode_pickup">픽업 모드</string>
-    <string name="mode_meal_buddy">밥 친구 모드</string>
+    <string name="mode_pickup">픽업만</string>
+    <string name="mode_meal_buddy">밥친구</string>
     <string name="home_joinable_only">참여 가능한 방만 보기</string>
     <string name="home_search_hint">위치, 메뉴, 가게 검색…</string>
     <string name="category_all">전체</string>
@@ -80,8 +80,8 @@
     <string name="create_title_hint">예) 맘스터치 싸이버거 드실 분</string>
     <string name="create_participants_label">2. 최대 참가자 수 (방장 포함)</string>
     <string name="create_mode_label">3. 모드 선택</string>
-    <string name="create_mode_pickup">픽업 모드\n음식만 같이 받아요</string>
-    <string name="create_mode_meal_buddy">밥 친구 모드\n같이 모여서 먹어요</string>
+    <string name="create_mode_pickup">픽업만\n음식만 같이 받아요</string>
+    <string name="create_mode_meal_buddy">밥친구\n같이 모여서 먹어요</string>
     <string name="create_category_label">1. 카테고리</string>
     <string name="create_category_hint">카테고리를 선택해주세요</string>
     <string name="create_restaurant_label">2. 음식점</string>
@@ -178,8 +178,6 @@
     <string name="chat_list_empty">참여 중인 채팅방이 없어요</string>
 
     <!-- 마이페이지 -->
-    <string name="mypage_mode_pickup">픽업만</string>
-    <string name="mypage_mode_meal_buddy">밥친구</string>
     <string name="mypage_profile_image_desc">프로필 사진</string>
     <string name="mypage_nickname_label">닉네임</string>
     <string name="mypage_nickname_empty">닉네임을 설정해 주세요</string>

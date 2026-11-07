@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 모드 버튼 (픽업 / 밥 친구): 선택 = 주황, 아니면 연노랑 -->
+<!-- 모드 버튼 (픽업만 / 밥친구): 선택 = 주황, 아니면 연노랑 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 선택됨 -->
     <item android:state_checked="true">
