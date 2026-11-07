@@ -12,10 +12,12 @@ import com.example.delibuddy.data.chat.SystemMessage
 import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
+import com.example.delibuddy.data.user.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 /*
     * 방 상세 화면. roomId 는 Navigation 인자로 받아 SavedStateHandle 에서 꺼냄
@@ -26,6 +28,9 @@ class RoomDetailViewModel(
 ) : ViewModel() {
 
     private val roomRepository = RoomRepository()
+
+    // 참여 전에 송금 계좌가 등록돼 있는지 확인할 때 사용
+    private val userRepository = UserRepository()
 
     val roomId: String = savedStateHandle[ARG_ROOM_ID] ?: ""
 
@@ -78,6 +83,7 @@ class RoomDetailViewModel(
         _actionState.value = ActionState.Loading
         viewModelScope.launch {
             _actionState.value = try {
+                requireAccount()
                 roomRepository.joinRoom(roomId)
                 notifyChat()
                 ActionState.Done
@@ -87,6 +93,16 @@ class RoomDetailViewModel(
                 Log.e(TAG, "참여 실패 : $roomId", e)
                 ActionState.Failed(null)
             }
+        }
+    }
+
+    // 송금 계좌(은행, 계좌번호)가 없으면 참여 막기
+    // 회원가입에서 계좌 입력을 건너뛸 수 있어서 참여 직전에 확인
+    private suspend fun requireAccount() {
+        val uid = myUid ?: throw RoomException(RoomException.Reason.NOT_LOGGED_IN)
+        val user = userRepository.getById(uid).await()
+        if (user?.bankName.isNullOrBlank() || user?.account.isNullOrBlank()) {
+            throw RoomException(RoomException.Reason.ACCOUNT_REQUIRED)
         }
     }
 
