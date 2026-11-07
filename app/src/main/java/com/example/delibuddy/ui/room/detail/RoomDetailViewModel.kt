@@ -7,6 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.delibuddy.data.chat.ChatRepository
+import com.example.delibuddy.data.chat.SystemMessage
 import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
@@ -89,6 +91,9 @@ class RoomDetailViewModel(
         }
     }
 
+    // 참여 / 마감 등 성공 시 채팅방에 시스템 안내를 남길 때 사용
+    private val chatRepository = ChatRepository()
+
     // 버튼 동작 실행 -> 성공 | 실패 상태 전달
     fun runAction(action: RoomAction) {
         if (_actionState.value == ActionState.Loading)
@@ -96,7 +101,10 @@ class RoomDetailViewModel(
         _actionState.value = ActionState.Loading
         viewModelScope.launch {
             _actionState.value = try {
+                // 나가면 채팅을 못 쓰니 취소는 먼저 안내
+                if (action == RoomAction.LEAVE) notifyChat(action)
                 callRepository(action)
+                if (action != RoomAction.LEAVE) notifyChat(action)
                 ActionState.Done(action)
             } catch (e : RoomException) {
                 ActionState.Failed(e.reason)
@@ -104,6 +112,21 @@ class RoomDetailViewModel(
                 Log.e(TAG, "$action 실패 : $roomId", e)
                 ActionState.Failed(null)
             }
+        }
+    }
+
+    // 채팅방에 시스템 안내 남기기. 실패해도 본 동작은 계속
+    private suspend fun notifyChat(action: RoomAction) {
+        val content = when (action) {
+            RoomAction.JOIN -> SystemMessage.JOINED
+            RoomAction.LEAVE -> SystemMessage.LEFT
+            RoomAction.CLOSE -> SystemMessage.CLOSED
+            RoomAction.COMPLETE -> SystemMessage.COMPLETED
+        }
+        try {
+            chatRepository.sendSystem(roomId, content)
+        } catch (e: Exception) {
+            Log.w(TAG, "시스템 메시지 실패 : $action", e)
         }
     }
 

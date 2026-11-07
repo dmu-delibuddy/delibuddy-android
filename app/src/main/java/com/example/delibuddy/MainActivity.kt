@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_signin,
                 R.id.navigation_create_room,
                 R.id.navigation_room_detail,
+                R.id.navigation_chat_room,
             )
         }
 
@@ -64,11 +65,13 @@ class MainActivity : AppCompatActivity() {
     private fun applySystemBarInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // 키보드가 올라오면 그 높이만큼 아래 여백 (입력창이 가려지지 않게)
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             view.updatePadding(
                 left = bars.left,
                 top = bars.top,
                 right = bars.right,
-                bottom = bars.bottom,
+                bottom = maxOf(bars.bottom, ime.bottom),
             )
             // 자식 뷰에서 시스템 바 여백을 중복 적용하지 않도록 처리
             WindowInsetsCompat.CONSUMED
@@ -108,5 +111,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // 액션바 ← 버튼 : 이전 화면으로
+    override fun onSupportNavigateUp(): Boolean =
+        findNavController(R.id.nav_host_fragment_activity_main).navigateUp()
+            || super.onSupportNavigateUp()
 }
-

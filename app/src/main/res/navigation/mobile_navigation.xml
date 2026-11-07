@@ -137,10 +137,10 @@
         <argument
             android:name="roomId"
             app:argType="string" />
-
+        <!-- 방 상세 : 채팅방 이동 목적지만 변경 -->
         <action
             android:id="@+id/action_room_detail_to_chat"
-            app:destination="@id/navigation_chat" />
+            app:destination="@id/navigation_chat_room" />
     </fragment>
 
     <fragment
@@ -149,17 +149,26 @@
         android:label="@string/location_recommendation"
         tools:layout="@layout/fragment_recommendation" />
 
+    <!-- 하단 탭 "채팅" : 내 채팅방 목록으로 교체 -->
     <fragment
         android:id="@+id/navigation_chat"
+        android:name="com.example.delibuddy.ui.chat.list.ChatListFragment"
+        android:label="@string/chatting"
+        tools:layout="@layout/fragment_chat_list">
+        <action
+            android:id="@+id/action_chat_list_to_chat_room"
+            app:destination="@id/navigation_chat_room" />
+    </fragment>
+
+    <!-- 채팅방 (새로 추가) : roomId 필수 -->
+    <fragment
+        android:id="@+id/navigation_chat_room"
         android:name="com.example.delibuddy.ui.chat.ChatFragment"
         android:label="@string/chatting"
         tools:layout="@layout/fragment_chat">
-        <!-- 방 상세에서 올 때만 값 있음, 하단 탭으로 오면 null -->
         <argument
             android:name="roomId"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
+            app:argType="string" />
     </fragment>
 
     <fragment

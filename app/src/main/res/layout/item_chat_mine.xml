@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="end"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="4dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="4dp">
+
+    <!-- 시각 + 말풍선 (시각이 왼쪽) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:alpha="0.6"
+            android:textColor="@color/black"
+            android:textSize="11sp"
+            tools:text="오후 6:31" />
+
+        <!-- 사진(있을 때) + 글 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/image_attachment"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:background="@drawable/bg_pixel_box"
+                android:contentDescription="@string/chat_image_desc"
+                android:paddingStart="4dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="7dp"
+                android:paddingBottom="7dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/text_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_chat_mine"
+                android:maxWidth="240dp"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="11dp"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                tools:text="네 반가워요" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 전송 실패일 때만 보임, 누르면 재전송 -->
+    <TextView
+        android:id="@+id/text_failed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:padding="4dp"
+        android:text="@string/chat_failed_retry"
+        android:textColor="@color/button_red"
+        android:textSize="12sp"
+        android:visibility="gone" />
+</LinearLayout>

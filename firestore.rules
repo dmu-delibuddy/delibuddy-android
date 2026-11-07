@@ -5,6 +5,23 @@ service cloud.firestore {
     match /rooms/{roomId} {
       allow read: if true;
       allow write: if request.auth != null;
+
+      // 채팅 : 같은 방 참여자(방장 포함)만 읽고 쓰기
+      match /messages/{messageId} {
+        allow read: if isRoomMember(roomId);
+        // 일반 메시지는 본인 이름으로만, 시스템 메시지는 보낸 사람 없이
+        allow create: if isRoomMember(roomId) && (
+          request.resource.data.senderId == request.auth.uid
+          || (request.resource.data.type == 'SYSTEM'
+              && request.resource.data.senderId == null)
+        );
+      }
+    }
+
+    // 로그인했고, 방의 participantIds 에 내 uid 가 있는지
+    function isRoomMember(roomId) {
+      return request.auth != null
+        && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
     }
 
     match /test/{docId} {
