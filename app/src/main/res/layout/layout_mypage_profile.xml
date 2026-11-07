@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 마이페이지 프로필 카드 : 모드 / 사진 / 닉네임 / 한 줄 소개 / 생일 / 수정하기 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_pixel_box"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="19dp"
+    android:paddingBottom="19dp">
+
+    <!-- 모드 선택 (픽업만 / 밥친구) -->
+    <RadioGroup
+        android:id="@+id/group_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radio_pickup"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_mode_button"
+            android:button="@null"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="15dp"
+            android:text="@string/mypage_mode_pickup"
+            android:textColor="@color/black" />
+
+        <RadioButton
+            android:id="@+id/radio_meal_buddy"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="6dp"
+            android:background="@drawable/bg_mode_button"
+            android:button="@null"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="15dp"
+            android:text="@string/mypage_mode_meal_buddy"
+            android:textColor="@color/black" />
+    </RadioGroup>
+
+    <!-- 프로필 사진 + 닉네임 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/image_profile"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_pixel_box"
+            android:contentDescription="@string/mypage_profile_image_desc"
+            android:paddingStart="4dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="7dp"
+            android:paddingBottom="7dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/mypage_icon" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:alpha="0.6"
+                android:text="@string/mypage_nickname_label"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/text_nickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                tools:text="김밥러" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 한 줄 소개 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:src="@drawable/chat_icon" />
+
+        <TextView
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:alpha="0.6"
+            android:text="@string/mypage_bio_label"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/text_bio"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            tools:text="맛있는 한 끼, 같이 먹어요!" />
+    </LinearLayout>
+
+    <!-- 생일 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:src="@drawable/cake_icon" />
+
+        <TextView
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:alpha="0.6"
+            android:text="@string/mypage_birth_label"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/text_birth"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            tools:text="2004. 03. 15" />
+    </LinearLayout>
+
+    <!-- 점선 구분선 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_dotted_line"
+        android:layerType="software" />
+
+    <!-- 프로필 수정하기 -->
+    <TextView
+        android:id="@+id/button_edit_profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="?attr/selectableItemBackground"
+        android:padding="8dp"
+        android:text="@string/mypage_edit_profile"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+</LinearLayout>
