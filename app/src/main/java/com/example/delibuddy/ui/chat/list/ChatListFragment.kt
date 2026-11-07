@@ -12,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentChatListBinding
 import com.example.delibuddy.ui.chat.ChatViewModel
-import com.example.delibuddy.ui.room.RoomAdapter
+import com.example.delibuddy.ui.room.list.RoomAdapter
 
 /*
     * 내 채팅방 목록. 방 카드를 누르면 그 방 채팅으로 이동

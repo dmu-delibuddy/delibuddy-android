@@ -1,4 +1,4 @@
-package com.example.delibuddy.ui.room
+package com.example.delibuddy.ui.room.list
 
 import android.os.Bundle
 import android.util.Log

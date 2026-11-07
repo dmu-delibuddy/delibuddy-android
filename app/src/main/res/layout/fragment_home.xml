@@ -10,7 +10,7 @@
     <!-- 방 목록 + 필터 (ui/room/RoomListFragment) -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container_room_list"
-        android:name="com.example.delibuddy.ui.room.RoomListFragment"
+        android:name="com.example.delibuddy.ui.room.list.RoomListFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"

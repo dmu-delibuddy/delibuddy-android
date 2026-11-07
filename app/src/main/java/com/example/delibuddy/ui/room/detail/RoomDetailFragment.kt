@@ -1,12 +1,9 @@
 package com.example.delibuddy.ui.room.detail
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
@@ -25,13 +22,10 @@ import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.FragmentRoomDetailBinding
 import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.DetailState
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 import android.net.Uri
-import android.widget.ImageView
-import android.graphics.drawable.GradientDrawable
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
@@ -39,7 +33,6 @@ import com.example.delibuddy.data.order.OrderRepository
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.tasks.await
 
 class RoomDetailFragment : Fragment() {
 
@@ -52,6 +45,7 @@ class RoomDetailFragment : Fragment() {
     private var screenshotUrl: String? = null
     private var orderLoaded = false
     private val orderRepository = OrderRepository()
+    private var participantRenderer: ParticipantRenderer? = null
     private val photoPicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null && _binding != null) {
             selectedImage = uri
@@ -73,6 +67,7 @@ class RoomDetailFragment : Fragment() {
     // 버튼 연결 + 방 정보 / 처리 상태 구독 시작
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        participantRenderer = ParticipantRenderer(this, binding.participants)
         setUpBackButton()
         setUpActionButton()
         observeRoom()
@@ -86,10 +81,6 @@ class RoomDetailFragment : Fragment() {
             findNavController().popBackStack()
         }
     }
-
-    // dp → px 변환
-    private fun Int.dp() : Int =
-        (this * resources.displayMetrics.density).toInt()
 
     // 하단 버튼 클릭 연결
     private fun setUpActionButton() {
@@ -218,7 +209,8 @@ class RoomDetailFragment : Fragment() {
         information.textDeliverySplit.text = row(R.string.detail_delivery_split,
             getString(deliverySplitLabel(room.deliveryFeeSplitMethod)))
 
-        renderParticipants(room)
+        participantRenderer?.render(room)
+        renderOrder(room)
         renderActionButton(room)
     }
 
@@ -226,101 +218,7 @@ class RoomDetailFragment : Fragment() {
     private fun row(@StringRes label : Int, value : String) =
         "${getString(label)} $value"
 
-    // 방장을 맨 위에, 나머지는 참여 순서대로. 닉네임 필드 생기면 교체 예정
-    private fun renderParticipants(room : RoomModel) {
-        binding.participants.textParticipantsTitle.text = getString(
-            R.string.detail_participants,
-            room.currentCount, room.maxParticipants)
-
-        val myUid = FirebaseAuth.getInstance().currentUser?.uid
-        val ordered = listOf(room.hostId) +
-                room.participantIds.filter { it != room.hostId }
-
-        val container = binding.participants.layoutParticipants
-        container.removeAllViews()
-        val slots = maxOf(6, room.currentCount, room.maxParticipants)
-        var row: LinearLayout? = null
-        for (index in 0 until slots) {
-            if (index % 3 == 0) {
-                row = LinearLayout(requireContext()).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                }
-                container.addView(row, LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { bottomMargin = 8.dp() })
-            }
-            val cardRow = requireNotNull(row)
-            val uid = ordered.getOrNull(index)
-            val fallbackName = when {
-                uid == room.hostId -> "방장"
-                uid == myUid && uid != null -> "나"
-                uid != null -> "참여자 ${index + 1}"
-                index < room.maxParticipants -> "빈자리"
-                else -> "모집 안 함"
-            }
-            val card = LinearLayout(requireContext()).apply {
-                orientation = LinearLayout.VERTICAL
-                gravity = android.view.Gravity.CENTER
-                setPadding(4.dp(), 10.dp(), 4.dp(), 10.dp())
-                background = GradientDrawable().apply {
-                    setColor(Color.WHITE)
-                    cornerRadius = 8.dp().toFloat()
-                    setStroke(1.dp(), Color.rgb(220, 224, 232))
-                }
-            }
-            val avatar = ImageView(requireContext()).apply {
-                setImageResource(R.drawable.mypage_icon)
-                scaleType = ImageView.ScaleType.CENTER_CROP
-                contentDescription = if (uid != null) "$fallbackName 프로필 사진" else null
-                background = GradientDrawable().apply {
-                    setColor(Color.rgb(245, 246, 248))
-                    cornerRadius = 24.dp().toFloat()
-                }
-                clipToOutline = true
-            }
-            card.addView(avatar, LinearLayout.LayoutParams(48.dp(), 48.dp()))
-            val name = TextView(requireContext()).apply {
-                text = fallbackName
-                textSize = 15f
-                gravity = android.view.Gravity.CENTER
-                setTextColor(if (uid == null) Color.GRAY else Color.BLACK)
-                setPadding(0, 6.dp(), 0, 0)
-                maxLines = 1
-                ellipsize = android.text.TextUtils.TruncateAt.END
-            }
-            card.addView(name, LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
-            cardRow.addView(card, LinearLayout.LayoutParams(0, 100.dp(), 1f).apply {
-                if (index % 3 != 2) marginEnd = 8.dp()
-            })
-
-            if (uid != null) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    val profile = try {
-                        FirebaseFirestore.getInstance().collection("users")
-                            .document(uid).get().await()
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (_: Exception) {
-                        null
-                    }
-                    if (_binding == null || card.parent !== cardRow || cardRow.parent !== container || profile == null) return@launch
-                    val nickname = profile.getString("nickname")?.takeIf { it.isNotBlank() }
-                    val photoUrl = profile.getString("photoUrl")?.takeIf { it.isNotBlank() }
-                    name.text = nickname ?: fallbackName
-                    name.contentDescription = name.text
-                    if (photoUrl != null) {
-                        Glide.with(this@RoomDetailFragment)
-                            .load(photoUrl)
-                            .placeholder(R.drawable.mypage_icon)
-                            .error(R.drawable.mypage_icon)
-                            .circleCrop()
-                            .into(avatar)
-                    }
-                }
-            }
-        }
+    private fun renderOrder(room: RoomModel) {
         renderOrderAvailability(room)
         if (!orderLoaded && viewModel.canChat(room)) {
             orderLoaded = true
@@ -398,6 +296,7 @@ class RoomDetailFragment : Fragment() {
 
     // 화면이 사라질 때 binding 해제 (메모리 누수 방지)
     override fun onDestroyView() {
+        participantRenderer = null
         super.onDestroyView()
         _binding = null
     }
