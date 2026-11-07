@@ -25,7 +25,8 @@ import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.FragmentRoomDetailBinding
 import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.DetailState
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.delibuddy.data.profile.ProfileRepository
+import com.example.delibuddy.data.profile.ProfileType
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -52,6 +53,7 @@ class RoomDetailFragment : Fragment() {
     private var screenshotUrl: String? = null
     private var orderLoaded = false
     private val orderRepository = OrderRepository()
+    private val profileRepository = ProfileRepository()
     private val photoPicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null && _binding != null) {
             selectedImage = uri
@@ -298,16 +300,19 @@ class RoomDetailFragment : Fragment() {
             if (uid != null) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     val profile = try {
-                        FirebaseFirestore.getInstance().collection("users")
-                            .document(uid).get().await()
+                        val profileType = when (room.mode) {
+                            RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
+                            RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
+                        }
+                        profileRepository.getById(uid, profileType).await()
                     } catch (e: CancellationException) {
                         throw e
                     } catch (_: Exception) {
                         null
                     }
                     if (_binding == null || card.parent !== cardRow || cardRow.parent !== container || profile == null) return@launch
-                    val nickname = profile.getString("nickname")?.takeIf { it.isNotBlank() }
-                    val photoUrl = profile.getString("photoUrl")?.takeIf { it.isNotBlank() }
+                    val nickname = profile.nickname.takeIf { it.isNotBlank() }
+                    val photoUrl = profile.imageUrl?.takeIf { it.isNotBlank() }
                     name.text = nickname ?: fallbackName
                     name.contentDescription = name.text
                     if (photoUrl != null) {
