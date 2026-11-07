@@ -16,11 +16,7 @@ service cloud.firestore {
               && request.resource.data.senderId == null)
         );
       }
-    }
 
-    function isRoomMember(roomId) {
-      return request.auth != null
-        && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
       match /orders/{userId} {
         function isParticipant() {
           return request.auth != null
@@ -49,6 +45,11 @@ service cloud.firestore {
       }
     }
 
+    function isRoomMember(roomId) {
+      return request.auth != null
+        && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
+    }
+
     match /test/{docId} {
       allow create: if request.resource.data.keys().hasAll(['message'])
                     && request.resource.data.keys().hasOnly(['message'])
@@ -63,6 +64,13 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null
                                  && request.auth.uid == userId
                                  && request.auth.token.email_verified == true;
+    }
+
+    match /profiles/{userId}/types/{profileType} {
+      allow read, write: if request.auth != null
+                        && request.auth.uid == userId
+                        && request.auth.token.email_verified == true
+                        && profileType in ['PICKUP_ONLY', 'MEAL_BUDDY'];
     }
 
     match /images/{imageId} {
