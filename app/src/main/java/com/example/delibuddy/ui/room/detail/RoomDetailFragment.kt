@@ -30,12 +30,34 @@ import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+import android.net.Uri
+import android.widget.ImageView
+import android.graphics.drawable.GradientDrawable
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
+import com.example.delibuddy.data.order.OrderRepository
+import com.bumptech.glide.Glide
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
+
 class RoomDetailFragment : Fragment() {
 
     private var _binding : FragmentRoomDetailBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel : RoomDetailViewModel by viewModels()
+
+    private var selectedImage: Uri? = null
+    private var screenshotUrl: String? = null
+    private var orderLoaded = false
+    private val orderRepository = OrderRepository()
+    private val photoPicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null && _binding != null) {
+            selectedImage = uri
+            Glide.with(this).load(uri).into(binding.order.imageOrderPreview)
+        }
+    }
 
     // 화면 레이아웃(ViewBinding) 생성
     override fun onCreateView(
@@ -56,6 +78,7 @@ class RoomDetailFragment : Fragment() {
         setUpActionButton()
         observeRoom()
         observeActionState()
+        setUpOrder()
     }
 
     // 상단 < 버튼 : 이전 화면(방 목록)으로
@@ -232,26 +255,26 @@ class RoomDetailFragment : Fragment() {
             else R.string.mode_pickup
         )
 
-        textRestaurant.text = row(R.string.detail_restaurant,
+        information.textRestaurant.text = row(R.string.detail_restaurant,
             room.restaurant)
 
-        textDeadline.text = row(R.string.detail_deadline_label,
+        information.textDeadline.text = row(R.string.detail_deadline_label,
             room.deadline
                 ?.let { TIME_FORMAT.format(it.toDate()) }
                 ?: getString(R.string.detail_no_deadline))
 
-        textMinOrder.text = row(R.string.detail_min_order,
+        information.textMinOrder.text = row(R.string.detail_min_order,
             getString(R.string.detail_won, room.minOrderAmount))
 
-        textDeliveryFee.text = row(R.string.detail_delivery_fee,
+        information.textDeliveryFee.text = row(R.string.detail_delivery_fee,
             getString(R.string.detail_won, room.estimatedDeliveryFee) +
                     " (" + getString(R.string.detail_fee_per_person,
                 room.deliveryFeePerPerson) + ")")
 
-        textFoodSplit.text = row(R.string.detail_food_split,
+        information.textFoodSplit.text = row(R.string.detail_food_split,
             getString(foodSplitLabel(room.foodCostSplitMethod)))
 
-        textDeliverySplit.text = row(R.string.detail_delivery_split,
+        information.textDeliverySplit.text = row(R.string.detail_delivery_split,
             getString(deliverySplitLabel(room.deliveryFeeSplitMethod)))
 
         renderParticipants(room)
@@ -265,7 +288,7 @@ class RoomDetailFragment : Fragment() {
 
     // 방장을 맨 위에, 나머지는 참여 순서대로. 닉네임 필드 생기면 교체 예정
     private fun renderParticipants(room : RoomModel) {
-        binding.textParticipantsTitle.text = getString(
+        binding.participants.textParticipantsTitle.text = getString(
             R.string.detail_participants,
             room.currentCount, room.maxParticipants)
 
@@ -273,22 +296,90 @@ class RoomDetailFragment : Fragment() {
         val ordered = listOf(room.hostId) +
                 room.participantIds.filter { it != room.hostId }
 
-        binding.layoutParticipants.removeAllViews()
-        ordered.forEachIndexed { index, uid ->
-            val name =
-                if (uid == room.hostId) getString(R.string.detail_host)
-                else getString(R.string.detail_participant, index + 1)
-            val me =
-                if (uid == myUid) " " + getString(R.string.detail_me)
-                else ""
-            binding.layoutParticipants.addView (
-                TextView(requireContext()).apply {
-                    text = "$name$me"
-                    textSize = 15f
-                    setTextColor(Color.BLACK)
-                    setPadding(0, 12, 0, 12)
+        binding.participants.layoutParticipants.removeAllViews()
+        val slots = maxOf(6, room.maxParticipants)
+        for (rowIndex in 0 until (slots + 2) / 3) {
+            val row = LinearLayout(requireContext())
+            for (column in 0..2) {
+                val index = rowIndex * 3 + column
+                if (index >= slots) break
+                val uid = ordered.getOrNull(index)
+                val cell = LinearLayout(requireContext()).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = android.view.Gravity.CENTER
+                    setPadding(4.dp(), 12.dp(), 4.dp(), 12.dp())
+                    background = GradientDrawable().apply {
+                        setColor(Color.WHITE)
+                        setStroke(1.dp(), Color.rgb(16, 24, 44))
+                    }
                 }
-            )
+                cell.addView(ImageView(requireContext()).apply {
+                    setImageResource(if (uid != null) R.drawable.mypage_icon else android.R.drawable.ic_input_add)
+                    alpha = if (index >= room.maxParticipants) 0.35f else 1f
+                    contentDescription = null
+                }, LinearLayout.LayoutParams(44.dp(), 44.dp()))
+                cell.addView(TextView(requireContext()).apply {
+                    text = when {
+                        uid == room.hostId -> "방장"
+                        uid == myUid && uid != null -> "나"
+                        uid != null -> "참여자 ${index + 1}"
+                        index < room.maxParticipants -> "빈자리"
+                        else -> "모집 안 함"
+                    }
+                    textSize = 15f
+                    gravity = android.view.Gravity.CENTER
+                    setTextColor(if (index >= room.maxParticipants) Color.GRAY else Color.BLACK)
+                })
+                row.addView(cell, LinearLayout.LayoutParams(0, 100.dp(), 1f))
+            }
+            binding.participants.layoutParticipants.addView(row)
+        }
+        renderOrderAvailability(room)
+        if (!orderLoaded && viewModel.canChat(room)) {
+            orderLoaded = true
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                    val order = orderRepository.getOrder(viewModel.roomId, uid) ?: return@launch
+                    if (_binding == null) return@launch
+                    // 복원 시 진행 중인 입력은 유지한다.
+                    val price = binding.order.inputOrderPrice
+                    val memo = binding.order.inputOrderMemo
+                    if (price.text.isEmpty()) price.setText(order.price.toString())
+                    if (memo.text.isEmpty()) memo.setText(order.memo.orEmpty())
+                    screenshotUrl = order.cartScreenshotUrl
+                    if (selectedImage == null && screenshotUrl != null) {
+                        Glide.with(this@RoomDetailFragment).load(screenshotUrl)
+                            .into(binding.order.imageOrderPreview)
+                    }
+                } catch (e: CancellationException) { throw e
+                } catch (e: Exception) { toast("주문 정보를 불러오지 못했습니다.") }
+            }
+        }
+    }
+
+    private fun setUpOrder() {
+        binding.order.imageOrderPreview.setOnClickListener {
+            photoPicker.launch("image/*")
+        }
+        binding.order.inputOrderMemo.doAfterTextChanged {
+            binding.order.textMemoCount.text = "${it?.length ?: 0}/100"
+        }
+    }
+
+    private fun renderOrderAvailability(room: RoomModel) {
+        val editable = viewModel.canChat(room) && !room.isDeadLinePassed &&
+            room.status in setOf(RoomStatus.RECRUITING, RoomStatus.FULL)
+        val enabled = editable
+        with(binding.order) {
+            inputOrderPrice.isEnabled = enabled
+            inputOrderMemo.isEnabled = enabled
+            imageOrderPreview.isEnabled = enabled
+        }
+        binding.order.textOrderMessage.text = when {
+            !viewModel.canChat(room) -> "방에 참여한 후 주문을 입력할 수 있습니다."
+            !editable -> "모집이 마감되어 주문을 변경할 수 없습니다."
+            else -> ""
         }
     }
 

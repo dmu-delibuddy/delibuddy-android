@@ -109,7 +109,9 @@
                 android:id="@+id/participants"
                 layout="@layout/layout_room_detail_participants" />
 
-            <include layout="@layout/layout_room_detail_order" />
+            <include
+                android:id="@+id/order"
+                layout="@layout/layout_room_detail_order" />
         </LinearLayout>
     </ScrollView>
 
