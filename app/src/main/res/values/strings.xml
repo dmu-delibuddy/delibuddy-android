@@ -161,7 +161,7 @@
     <string name="detail_done_complete">주문을 완료했어요</string>
     <string name="detail_confirm_close">모집을 마감할까요?\n마감 후에는 새로 참여할 수 없어요</string>
     <string name="detail_confirm_complete">공동 주문을 완료할까요?</string>
-    <string name="detail_go_chat">채팅방</string>
+    <string name="detail_go_chat">채팅방으로 이동</string>
     <string name="chat_no_room">방 상세에서 채팅방에 들어가 주세요</string>
     <string name="chat_load_error">채팅을 불러오지 못했어요\n방에 참여 중인지 확인해 주세요</string>
     <string name="chat_input_hint">메시지를 입력하세요</string>

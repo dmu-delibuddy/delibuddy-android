@@ -9,15 +9,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.ActionState
-import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.RoomAction
 import com.example.delibuddy.R
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
 import com.example.delibuddy.data.room.FoodCostSplitMethod
@@ -76,7 +74,6 @@ class RoomDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpBackButton()
-        setUpChatButton()
         setUpActionButton()
         observeRoom()
         observeActionState()
@@ -87,30 +84,6 @@ class RoomDetailFragment : Fragment() {
     private fun setUpBackButton() {
         binding.buttonBack.setOnClickListener {
             findNavController().popBackStack()
-        }
-    }
-
-    // 채팅방 버튼 : roomId 를 넘기며 채팅 화면으로 이동
-    private fun setUpChatButton() {
-        binding.buttonChat.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_room_detail_to_chat,
-                bundleOf(
-                    RoomDetailViewModel.ARG_ROOM_ID
-                        to viewModel.roomId
-                )
-            )
-        }
-    }
-
-    // 방장 / 참여자에게만 채팅방 버튼 표시
-    // 채팅 버튼이 없을 때는 오른쪽 버튼의 왼쪽 여백 제거
-    private fun renderChatButton(room : RoomModel) {
-        val canChat = viewModel.canChat(room)
-        binding.buttonChat.isVisible = canChat
-        binding.buttonAction.updateLayoutParams<
-            LinearLayout.LayoutParams> {
-            marginStart = if (canChat) 8.dp() else 0
         }
     }
 
@@ -125,18 +98,20 @@ class RoomDetailFragment : Fragment() {
         }
     }
 
-    // 마감, 완료는 되돌릴 수 없어서 확인 후 실행
     private fun onActionClick() {
         val room = currentRoom() ?: return
-        val action = viewModel.actionFor(room)
-            ?: return
-        when (action) {
-            RoomAction.CLOSE ->
-                confirm(R.string.detail_confirm_close, action)
-            RoomAction.COMPLETE ->
-                confirm(R.string.detail_confirm_complete, action)
-            else -> viewModel.runAction(action)
+        if (viewModel.canChat(room)) {
+            openChat()
+        } else {
+            viewModel.joinRoom()
         }
+    }
+
+    private fun openChat() {
+        findNavController().navigate(
+            R.id.action_room_detail_to_chat,
+            bundleOf(RoomDetailViewModel.ARG_ROOM_ID to viewModel.roomId)
+        )
     }
 
     // 지금 화면에 보이는 방 (로드 전이면 null)
@@ -144,46 +119,20 @@ class RoomDetailFragment : Fragment() {
         (viewModel.state.value as? DetailState.Loaded)
             ?.room
 
-    // 확인 창 : 확인 누르면 실행
-    private fun confirm(@StringRes message : Int, action: RoomAction) {
-        AlertDialog.Builder(requireContext())
-            .setMessage(message)
-            .setPositiveButton(android.R.string.ok) {_, _ ->
-                viewModel.runAction(action)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-    }
-
-    // 역할 / 상태에 맞게 하단 버튼 글자, 보임, 활성 여부 설정
+    // 참여 여부에 따라 버튼 문구와 활성 여부를 설정한다.
     private fun renderActionButton(room : RoomModel) {
-        val action = viewModel.actionFor(room)
-        binding.buttonAction.isVisible = action != null
-        if (action == null) return
-
-        val canJoin = action != RoomAction.JOIN ||
-                room.isJoinable
-        val busy = viewModel.actionState.value ==
-                ActionState.Loading
-        binding.buttonAction.isEnabled = canJoin && !busy
-        binding.buttonAction.setText (
-            when {
-                busy -> R.string.detail_action_loading
-                canJoin -> actionLabel(action)
-                else -> R.string.detail_action_unavailable
-            }
+        val joined = viewModel.canChat(room)
+        binding.buttonAction.isVisible = true
+        binding.buttonAction.isEnabled = (joined || room.isJoinable) &&
+                viewModel.actionState.value != ActionState.Loading
+        binding.buttonAction.setText(if (joined) R.string.detail_go_chat else R.string.detail_action_join)
+        binding.buttonAction.backgroundTintList = ContextCompat.getColorStateList(
+            requireContext(), if (joined) R.color.mode_off else R.color.button_red
         )
+        binding.buttonAction.setTextColor(ContextCompat.getColor(
+            requireContext(), if (joined) R.color.black else R.color.white
+        ))
     }
-
-    // 동작별 하단 버튼 글자
-    @StringRes
-    private fun actionLabel(action : RoomAction) =
-        when (action) {
-            RoomAction.JOIN -> R.string.detail_action_join
-            RoomAction.LEAVE -> R.string.detail_action_leave
-            RoomAction.CLOSE -> R.string.detail_action_close
-            RoomAction.COMPLETE -> R.string.detail_action_complete
-        }
 
     // 처리 상태 : 버튼 갱신 + 결과 토스트
     private fun observeActionState() {
@@ -197,9 +146,10 @@ class RoomDetailFragment : Fragment() {
     // 성공, 실패 안내 후 대기 상태로
     private fun handleActionResult(state : ActionState) {
         when (state) {
-            is ActionState.Done -> {
-                toast(getString(doneMessage(state.action)))
+            ActionState.Done -> {
+                toast(getString(R.string.detail_done_join))
                 viewModel.clearActionState()
+                openChat()
             }
             is ActionState.Failed -> {
                 toast (
@@ -211,16 +161,6 @@ class RoomDetailFragment : Fragment() {
             else -> Unit
         }
     }
-
-    // 동작별 성공 안내 문구
-    @StringRes
-    private fun doneMessage(action : RoomAction) =
-        when (action) {
-            RoomAction.JOIN -> R.string.detail_done_join
-            RoomAction.LEAVE -> R.string.detail_done_leave
-            RoomAction.CLOSE -> R.string.detail_done_close
-            RoomAction.COMPLETE -> R.string.detail_done_complete
-        }
 
     // 짧은 안내 토스트 띄우기
     private fun toast(message : String) {
@@ -235,7 +175,6 @@ class RoomDetailFragment : Fragment() {
             binding.layoutContent.isVisible = loaded
             binding.textMessage.isVisible = !loaded
             binding.buttonAction.isVisible = false // 로드 전, 실패 시
-            binding.buttonChat.isVisible = false
             when (state) {
                 is DetailState.Loaded -> renderRoom(state.room)
                 DetailState.NotFound -> binding.textMessage
@@ -281,7 +220,6 @@ class RoomDetailFragment : Fragment() {
 
         renderParticipants(room)
         renderActionButton(room)
-        renderChatButton(room)
     }
 
     // 라벨 값 한 줄
