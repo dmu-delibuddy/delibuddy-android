@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentSigninBinding
+import com.example.delibuddy.ui.common.GlobalLoadingDialog
 
 class SignInFragment : Fragment() {
 
@@ -48,6 +49,11 @@ class SignInFragment : Fragment() {
             binding.buttonSignin.isEnabled = !isSigningIn
             binding.editEmail.isEnabled = !isSigningIn
             binding.editPassword.isEnabled = !isSigningIn
+            if (isSigningIn) {
+                GlobalLoadingDialog.show(childFragmentManager, getString(R.string.signin_loading))
+            } else {
+                GlobalLoadingDialog.hide(childFragmentManager)
+            }
         }
     }
 
@@ -61,6 +67,7 @@ class SignInFragment : Fragment() {
         viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             val navController = findNavController()
             if (isLoggedIn && navController.currentDestination?.id == R.id.navigation_signin) {
+                GlobalLoadingDialog.hide(childFragmentManager)
                 navController.navigate(R.id.action_signin_to_home)
             }
         }

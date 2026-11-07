@@ -22,6 +22,7 @@
     <string name="auth_entry_description">동네 친구들과 배달비는 가볍게, 한 끼는 든든하게</string>
     <string name="auth_entry_start">시작하기</string>
     <string name="auth_signin">로그인</string>
+    <string name="signin_loading">로그인 중이에요...</string>
     <string name="signin_password_required">비밀번호를 입력해 주세요.</string>
     <string name="signin_signup_incomplete">이메일 인증과 회원가입을 먼저 완료해 주세요.</string>
     <string name="signin_failed">로그인하지 못했습니다. 이메일, 비밀번호와 네트워크 상태를 확인하고 다시 시도해 주세요.</string>
