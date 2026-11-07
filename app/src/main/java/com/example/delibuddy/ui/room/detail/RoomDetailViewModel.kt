@@ -12,7 +12,6 @@ import com.example.delibuddy.data.chat.SystemMessage
 import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
-import com.example.delibuddy.data.room.RoomStatus
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -48,16 +47,11 @@ class RoomDetailViewModel(
         }
         .asLiveData()
 
-    // 하단 버튼으로 할 수 있는 일
-    enum class RoomAction { JOIN, LEAVE, CLOSE, COMPLETE }
-
     // 버튼 처리 상태
     sealed interface ActionState {
         data object Idle : ActionState
         data object Loading : ActionState
-        data class Done (
-            val action : RoomAction
-        ) : ActionState
+        data object Done : ActionState
         data class Failed (
             val reason : RoomException.Reason? // reason == null : 네트워크 등 알 수 없는 실패
         ) : ActionState
@@ -74,74 +68,35 @@ class RoomDetailViewModel(
     val actionState : LiveData<ActionState> =
         _actionState
 
-    // 내 역할 + 방 상태로 버튼이 할 일 결정, null 이면 버튼 숨김
-    fun actionFor(room : RoomModel) : RoomAction? {
-        val open = room.status == RoomStatus.RECRUITING ||
-                room.status == RoomStatus.FULL
-        return when {
-            room.isHost(myUid) -> when (room.status) {
-                RoomStatus.RECRUITING,
-                RoomStatus.FULL -> RoomAction.CLOSE
-                RoomStatus.ORDER_CONFIRMED -> RoomAction.COMPLETE
-                RoomStatus.COMPLETED -> null
-            }
-            room.isParticipant(myUid) ->
-                if (open) RoomAction.LEAVE else null
-            else -> RoomAction.JOIN
-        }
-    }
-
-    // 참여 / 마감 등 성공 시 채팅방에 시스템 안내를 남길 때 사용
+    // 참여 성공 시 채팅방에 시스템 안내를 남긴다.
     private val chatRepository = ChatRepository()
 
     // 버튼 동작 실행 -> 성공 | 실패 상태 전달
-    fun runAction(action: RoomAction) {
+    fun joinRoom() {
         if (_actionState.value == ActionState.Loading)
             return // 중복 클릭 방지
         _actionState.value = ActionState.Loading
         viewModelScope.launch {
             _actionState.value = try {
-                // 나가면 채팅을 못 쓰니 취소는 먼저 안내
-                if (action == RoomAction.LEAVE) notifyChat(action)
-                callRepository(action)
-                if (action != RoomAction.LEAVE) notifyChat(action)
-                ActionState.Done(action)
+                roomRepository.joinRoom(roomId)
+                notifyChat()
+                ActionState.Done
             } catch (e : RoomException) {
                 ActionState.Failed(e.reason)
             } catch (e : Exception) {
-                Log.e(TAG, "$action 실패 : $roomId", e)
+                Log.e(TAG, "참여 실패 : $roomId", e)
                 ActionState.Failed(null)
             }
         }
     }
 
     // 채팅방에 시스템 안내 남기기. 실패해도 본 동작은 계속
-    private suspend fun notifyChat(action: RoomAction) {
-        val content = when (action) {
-            RoomAction.JOIN -> SystemMessage.JOINED
-            RoomAction.LEAVE -> SystemMessage.LEFT
-            RoomAction.CLOSE -> SystemMessage.CLOSED
-            RoomAction.COMPLETE -> SystemMessage.COMPLETED
-        }
+    private suspend fun notifyChat() {
         try {
-            chatRepository.sendSystem(roomId, content)
+            chatRepository.sendSystem(roomId, SystemMessage.JOINED)
         } catch (e: Exception) {
-            Log.w(TAG, "시스템 메시지 실패 : $action", e)
+            Log.w(TAG, "참여 시스템 메시지 실패", e)
         }
-    }
-
-    // 동작별 Repository 함수 호출
-    private suspend fun callRepository (
-        action: RoomAction
-    ) = when (action) {
-        RoomAction.JOIN ->
-            roomRepository.joinRoom(roomId)
-        RoomAction.LEAVE ->
-            roomRepository.leaveRoom(roomId)
-        RoomAction.CLOSE ->
-            roomRepository.closeRecruiting(roomId)
-        RoomAction.COMPLETE ->
-            roomRepository.completeRoom(roomId)
     }
 
     // 채팅방에 들어갈 수 있는지 (방장 / 참여자만)

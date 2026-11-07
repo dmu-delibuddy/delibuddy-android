@@ -9,15 +9,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.ActionState
-import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.RoomAction
 import com.example.delibuddy.R
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
 import com.example.delibuddy.data.room.FoodCostSplitMethod
@@ -27,8 +25,21 @@ import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.FragmentRoomDetailBinding
 import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.DetailState
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Locale
+
+import android.net.Uri
+import android.widget.ImageView
+import android.graphics.drawable.GradientDrawable
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
+import com.example.delibuddy.data.order.OrderRepository
+import com.bumptech.glide.Glide
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.tasks.await
 
 class RoomDetailFragment : Fragment() {
 
@@ -36,6 +47,17 @@ class RoomDetailFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel : RoomDetailViewModel by viewModels()
+
+    private var selectedImage: Uri? = null
+    private var screenshotUrl: String? = null
+    private var orderLoaded = false
+    private val orderRepository = OrderRepository()
+    private val photoPicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null && _binding != null) {
+            selectedImage = uri
+            Glide.with(this).load(uri).into(binding.order.imageOrderPreview)
+        }
+    }
 
     // 화면 레이아웃(ViewBinding) 생성
     override fun onCreateView(
@@ -52,40 +74,16 @@ class RoomDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpBackButton()
-        setUpChatButton()
         setUpActionButton()
         observeRoom()
         observeActionState()
+        setUpOrder()
     }
 
     // 상단 < 버튼 : 이전 화면(방 목록)으로
     private fun setUpBackButton() {
         binding.buttonBack.setOnClickListener {
             findNavController().popBackStack()
-        }
-    }
-
-    // 채팅방 버튼 : roomId 를 넘기며 채팅 화면으로 이동
-    private fun setUpChatButton() {
-        binding.buttonChat.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_room_detail_to_chat,
-                bundleOf(
-                    RoomDetailViewModel.ARG_ROOM_ID
-                        to viewModel.roomId
-                )
-            )
-        }
-    }
-
-    // 방장 / 참여자에게만 채팅방 버튼 표시
-    // 채팅 버튼이 없을 때는 오른쪽 버튼의 왼쪽 여백 제거
-    private fun renderChatButton(room : RoomModel) {
-        val canChat = viewModel.canChat(room)
-        binding.buttonChat.isVisible = canChat
-        binding.buttonAction.updateLayoutParams<
-            LinearLayout.LayoutParams> {
-            marginStart = if (canChat) 8.dp() else 0
         }
     }
 
@@ -100,18 +98,20 @@ class RoomDetailFragment : Fragment() {
         }
     }
 
-    // 마감, 완료는 되돌릴 수 없어서 확인 후 실행
     private fun onActionClick() {
         val room = currentRoom() ?: return
-        val action = viewModel.actionFor(room)
-            ?: return
-        when (action) {
-            RoomAction.CLOSE ->
-                confirm(R.string.detail_confirm_close, action)
-            RoomAction.COMPLETE ->
-                confirm(R.string.detail_confirm_complete, action)
-            else -> viewModel.runAction(action)
+        if (viewModel.canChat(room)) {
+            openChat()
+        } else {
+            viewModel.joinRoom()
         }
+    }
+
+    private fun openChat() {
+        findNavController().navigate(
+            R.id.action_room_detail_to_chat,
+            bundleOf(RoomDetailViewModel.ARG_ROOM_ID to viewModel.roomId)
+        )
     }
 
     // 지금 화면에 보이는 방 (로드 전이면 null)
@@ -119,46 +119,20 @@ class RoomDetailFragment : Fragment() {
         (viewModel.state.value as? DetailState.Loaded)
             ?.room
 
-    // 확인 창 : 확인 누르면 실행
-    private fun confirm(@StringRes message : Int, action: RoomAction) {
-        AlertDialog.Builder(requireContext())
-            .setMessage(message)
-            .setPositiveButton(android.R.string.ok) {_, _ ->
-                viewModel.runAction(action)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-    }
-
-    // 역할 / 상태에 맞게 하단 버튼 글자, 보임, 활성 여부 설정
+    // 참여 여부에 따라 버튼 문구와 활성 여부를 설정한다.
     private fun renderActionButton(room : RoomModel) {
-        val action = viewModel.actionFor(room)
-        binding.buttonAction.isVisible = action != null
-        if (action == null) return
-
-        val canJoin = action != RoomAction.JOIN ||
-                room.isJoinable
-        val busy = viewModel.actionState.value ==
-                ActionState.Loading
-        binding.buttonAction.isEnabled = canJoin && !busy
-        binding.buttonAction.setText (
-            when {
-                busy -> R.string.detail_action_loading
-                canJoin -> actionLabel(action)
-                else -> R.string.detail_action_unavailable
-            }
+        val joined = viewModel.canChat(room)
+        binding.buttonAction.isVisible = true
+        binding.buttonAction.isEnabled = (joined || room.isJoinable) &&
+                viewModel.actionState.value != ActionState.Loading
+        binding.buttonAction.setText(if (joined) R.string.detail_go_chat else R.string.detail_action_join)
+        binding.buttonAction.backgroundTintList = ContextCompat.getColorStateList(
+            requireContext(), if (joined) R.color.mode_off else R.color.button_red
         )
+        binding.buttonAction.setTextColor(ContextCompat.getColor(
+            requireContext(), if (joined) R.color.black else R.color.white
+        ))
     }
-
-    // 동작별 하단 버튼 글자
-    @StringRes
-    private fun actionLabel(action : RoomAction) =
-        when (action) {
-            RoomAction.JOIN -> R.string.detail_action_join
-            RoomAction.LEAVE -> R.string.detail_action_leave
-            RoomAction.CLOSE -> R.string.detail_action_close
-            RoomAction.COMPLETE -> R.string.detail_action_complete
-        }
 
     // 처리 상태 : 버튼 갱신 + 결과 토스트
     private fun observeActionState() {
@@ -172,9 +146,10 @@ class RoomDetailFragment : Fragment() {
     // 성공, 실패 안내 후 대기 상태로
     private fun handleActionResult(state : ActionState) {
         when (state) {
-            is ActionState.Done -> {
-                toast(getString(doneMessage(state.action)))
+            ActionState.Done -> {
+                toast(getString(R.string.detail_done_join))
                 viewModel.clearActionState()
+                openChat()
             }
             is ActionState.Failed -> {
                 toast (
@@ -186,16 +161,6 @@ class RoomDetailFragment : Fragment() {
             else -> Unit
         }
     }
-
-    // 동작별 성공 안내 문구
-    @StringRes
-    private fun doneMessage(action : RoomAction) =
-        when (action) {
-            RoomAction.JOIN -> R.string.detail_done_join
-            RoomAction.LEAVE -> R.string.detail_done_leave
-            RoomAction.CLOSE -> R.string.detail_done_close
-            RoomAction.COMPLETE -> R.string.detail_done_complete
-        }
 
     // 짧은 안내 토스트 띄우기
     private fun toast(message : String) {
@@ -210,7 +175,6 @@ class RoomDetailFragment : Fragment() {
             binding.layoutContent.isVisible = loaded
             binding.textMessage.isVisible = !loaded
             binding.buttonAction.isVisible = false // 로드 전, 실패 시
-            binding.buttonChat.isVisible = false
             when (state) {
                 is DetailState.Loaded -> renderRoom(state.room)
                 DetailState.NotFound -> binding.textMessage
@@ -232,31 +196,30 @@ class RoomDetailFragment : Fragment() {
             else R.string.mode_pickup
         )
 
-        textRestaurant.text = row(R.string.detail_restaurant,
+        information.textRestaurant.text = row(R.string.detail_restaurant,
             room.restaurant)
 
-        textDeadline.text = row(R.string.detail_deadline_label,
+        information.textDeadline.text = row(R.string.detail_deadline_label,
             room.deadline
                 ?.let { TIME_FORMAT.format(it.toDate()) }
                 ?: getString(R.string.detail_no_deadline))
 
-        textMinOrder.text = row(R.string.detail_min_order,
+        information.textMinOrder.text = row(R.string.detail_min_order,
             getString(R.string.detail_won, room.minOrderAmount))
 
-        textDeliveryFee.text = row(R.string.detail_delivery_fee,
+        information.textDeliveryFee.text = row(R.string.detail_delivery_fee,
             getString(R.string.detail_won, room.estimatedDeliveryFee) +
                     " (" + getString(R.string.detail_fee_per_person,
                 room.deliveryFeePerPerson) + ")")
 
-        textFoodSplit.text = row(R.string.detail_food_split,
+        information.textFoodSplit.text = row(R.string.detail_food_split,
             getString(foodSplitLabel(room.foodCostSplitMethod)))
 
-        textDeliverySplit.text = row(R.string.detail_delivery_split,
+        information.textDeliverySplit.text = row(R.string.detail_delivery_split,
             getString(deliverySplitLabel(room.deliveryFeeSplitMethod)))
 
         renderParticipants(room)
         renderActionButton(room)
-        renderChatButton(room)
     }
 
     // 라벨 값 한 줄
@@ -265,7 +228,7 @@ class RoomDetailFragment : Fragment() {
 
     // 방장을 맨 위에, 나머지는 참여 순서대로. 닉네임 필드 생기면 교체 예정
     private fun renderParticipants(room : RoomModel) {
-        binding.textParticipantsTitle.text = getString(
+        binding.participants.textParticipantsTitle.text = getString(
             R.string.detail_participants,
             room.currentCount, room.maxParticipants)
 
@@ -273,22 +236,137 @@ class RoomDetailFragment : Fragment() {
         val ordered = listOf(room.hostId) +
                 room.participantIds.filter { it != room.hostId }
 
-        binding.layoutParticipants.removeAllViews()
-        ordered.forEachIndexed { index, uid ->
-            val name =
-                if (uid == room.hostId) getString(R.string.detail_host)
-                else getString(R.string.detail_participant, index + 1)
-            val me =
-                if (uid == myUid) " " + getString(R.string.detail_me)
-                else ""
-            binding.layoutParticipants.addView (
-                TextView(requireContext()).apply {
-                    text = "$name$me"
-                    textSize = 15f
-                    setTextColor(Color.BLACK)
-                    setPadding(0, 12, 0, 12)
+        val container = binding.participants.layoutParticipants
+        container.removeAllViews()
+        val slots = maxOf(6, room.currentCount, room.maxParticipants)
+        var row: LinearLayout? = null
+        for (index in 0 until slots) {
+            if (index % 3 == 0) {
+                row = LinearLayout(requireContext()).apply {
+                    orientation = LinearLayout.HORIZONTAL
                 }
-            )
+                container.addView(row, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { bottomMargin = 8.dp() })
+            }
+            val cardRow = requireNotNull(row)
+            val uid = ordered.getOrNull(index)
+            val fallbackName = when {
+                uid == room.hostId -> "방장"
+                uid == myUid && uid != null -> "나"
+                uid != null -> "참여자 ${index + 1}"
+                index < room.maxParticipants -> "빈자리"
+                else -> "모집 안 함"
+            }
+            val card = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = android.view.Gravity.CENTER
+                setPadding(4.dp(), 10.dp(), 4.dp(), 10.dp())
+                background = GradientDrawable().apply {
+                    setColor(Color.WHITE)
+                    cornerRadius = 8.dp().toFloat()
+                    setStroke(1.dp(), Color.rgb(220, 224, 232))
+                }
+            }
+            val avatar = ImageView(requireContext()).apply {
+                setImageResource(R.drawable.mypage_icon)
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                contentDescription = if (uid != null) "$fallbackName 프로필 사진" else null
+                background = GradientDrawable().apply {
+                    setColor(Color.rgb(245, 246, 248))
+                    cornerRadius = 24.dp().toFloat()
+                }
+                clipToOutline = true
+            }
+            card.addView(avatar, LinearLayout.LayoutParams(48.dp(), 48.dp()))
+            val name = TextView(requireContext()).apply {
+                text = fallbackName
+                textSize = 15f
+                gravity = android.view.Gravity.CENTER
+                setTextColor(if (uid == null) Color.GRAY else Color.BLACK)
+                setPadding(0, 6.dp(), 0, 0)
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            }
+            card.addView(name, LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+            cardRow.addView(card, LinearLayout.LayoutParams(0, 100.dp(), 1f).apply {
+                if (index % 3 != 2) marginEnd = 8.dp()
+            })
+
+            if (uid != null) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val profile = try {
+                        FirebaseFirestore.getInstance().collection("users")
+                            .document(uid).get().await()
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (_: Exception) {
+                        null
+                    }
+                    if (_binding == null || card.parent !== cardRow || cardRow.parent !== container || profile == null) return@launch
+                    val nickname = profile.getString("nickname")?.takeIf { it.isNotBlank() }
+                    val photoUrl = profile.getString("photoUrl")?.takeIf { it.isNotBlank() }
+                    name.text = nickname ?: fallbackName
+                    name.contentDescription = name.text
+                    if (photoUrl != null) {
+                        Glide.with(this@RoomDetailFragment)
+                            .load(photoUrl)
+                            .placeholder(R.drawable.mypage_icon)
+                            .error(R.drawable.mypage_icon)
+                            .circleCrop()
+                            .into(avatar)
+                    }
+                }
+            }
+        }
+        renderOrderAvailability(room)
+        if (!orderLoaded && viewModel.canChat(room)) {
+            orderLoaded = true
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                    val order = orderRepository.getOrder(viewModel.roomId, uid) ?: return@launch
+                    if (_binding == null) return@launch
+                    // 복원 시 진행 중인 입력은 유지한다.
+                    val price = binding.order.inputOrderPrice
+                    val memo = binding.order.inputOrderMemo
+                    if (price.text.isEmpty()) price.setText(order.price.toString())
+                    if (memo.text.isEmpty()) memo.setText(order.memo.orEmpty())
+                    screenshotUrl = order.cartScreenshotUrl
+                    if (selectedImage == null && screenshotUrl != null) {
+                        Glide.with(this@RoomDetailFragment).load(screenshotUrl)
+                            .into(binding.order.imageOrderPreview)
+                    }
+                } catch (e: CancellationException) { throw e
+                } catch (e: Exception) { toast("주문 정보를 불러오지 못했습니다.") }
+            }
+        }
+    }
+
+    private fun setUpOrder() {
+        binding.order.imageOrderPreview.setOnClickListener {
+            photoPicker.launch("image/*")
+        }
+        binding.order.inputOrderMemo.doAfterTextChanged {
+            binding.order.textMemoCount.text = "${it?.length ?: 0}/100"
+        }
+    }
+
+    private fun renderOrderAvailability(room: RoomModel) {
+        val editable = viewModel.canChat(room) && !room.isDeadLinePassed &&
+            room.status in setOf(RoomStatus.RECRUITING, RoomStatus.FULL)
+        val enabled = editable
+        with(binding.order) {
+            inputOrderPrice.isEnabled = enabled
+            inputOrderMemo.isEnabled = enabled
+            imageOrderPreview.isEnabled = enabled
+        }
+        binding.order.textOrderMessage.text = when {
+            !viewModel.canChat(room) -> "방에 참여한 후 주문을 입력할 수 있습니다."
+            !editable -> "모집이 마감되어 주문을 변경할 수 없습니다."
+            else -> ""
         }
     }
 

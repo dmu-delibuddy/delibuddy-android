@@ -101,63 +101,21 @@
                 android:textSize="12sp"
                 tools:text="픽업 모드" />
 
-            <!-- 방 정보 박스 (그림자 보정 +3dp) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_pixel_box"
-                android:orientation="vertical"
-                android:paddingStart="14dp"
-                android:paddingTop="12dp"
-                android:paddingEnd="17dp"
-                android:paddingBottom="15dp">
+            <include
+                android:id="@+id/information"
+                layout="@layout/layout_room_detail_information" />
 
-                <TextView android:id="@+id/text_restaurant"
-                    style="@style/DetailRow" />
-                <TextView android:id="@+id/text_deadline"
-                    style="@style/DetailRow" />
-                <TextView android:id="@+id/text_min_order"
-                    style="@style/DetailRow" />
-                <TextView android:id="@+id/text_delivery_fee"
-                    style="@style/DetailRow" />
-                <TextView android:id="@+id/text_food_split"
-                    style="@style/DetailRow" />
-                <TextView android:id="@+id/text_delivery_split"
-                    style="@style/DetailRow" />
-            </LinearLayout>
+            <include
+                android:id="@+id/participants"
+                layout="@layout/layout_room_detail_participants" />
 
-            <!-- 참여자 박스 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_pixel_box"
-                android:orientation="vertical"
-                android:paddingStart="14dp"
-                android:paddingTop="12dp"
-                android:paddingEnd="17dp"
-                android:paddingBottom="15dp">
-
-                <TextView
-                    android:id="@+id/text_participants_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    tools:text="참여자 (2/3)" />
-
-                <!-- 코드에서 한 줄씩 추가 -->
-                <LinearLayout
-                    android:id="@+id/layout_participants"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </LinearLayout>
+            <include
+                android:id="@+id/order"
+                layout="@layout/layout_room_detail_order" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- 하단 버튼 : 채팅방 + 참여 / 취소 / 마감 / 완료 -->
+    <!-- 하단 버튼 : 참여 / 채팅방 이동 -->
     <LinearLayout
         android:id="@+id/layout_bottom_buttons"
         android:layout_width="0dp"
@@ -169,28 +127,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- 방장 / 참여자에게만 보임 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_chat"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginBottom="16dp"
-            android:layout_weight="1"
-            android:text="@string/detail_go_chat"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:visibility="gone"
-            app:backgroundTint="@color/mode_off"
-            app:cornerRadius="0dp"
-            app:strokeColor="@color/black"
-            app:strokeWidth="2dp" />
-
         <!-- 역할 / 방 상태에 따라 글자가 바뀜 -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_action"
             android:layout_width="0dp"
             android:layout_height="52dp"
-            android:layout_marginStart="8dp"
             android:layout_marginBottom="16dp"
             android:layout_weight="2"
             android:textAllCaps="false"
