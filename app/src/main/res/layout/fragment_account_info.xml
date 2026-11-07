@@ -101,39 +101,42 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
                 android:id="@+id/button_previous"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/auth_button_secondary"
                 android:text="@string/signup_previous"
-                android:textColor="@color/navy"
-                android:textSize="18sp"
-                app:backgroundTint="@null" />
+                android:textSize="18sp" />
 
             <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
                 android:id="@+id/button_skip"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/auth_button_secondary"
                 android:text="@string/signup_skip"
-                android:textColor="@color/navy"
-                android:textSize="18sp"
-                app:backgroundTint="@null" />
+                android:textSize="18sp" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box_yellow"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
             android:id="@+id/button_finish"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="12dp"
-            android:background="@drawable/auth_button_primary"
             android:text="@string/signup_finish"
-            android:textColor="@color/navy"
-            android:textSize="18sp"
-            app:backgroundTint="@null" />
+            android:textSize="18sp" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

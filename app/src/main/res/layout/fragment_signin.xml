@@ -99,14 +99,15 @@
             android:layout_weight="1" />
 
         <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box_yellow"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
             android:id="@+id/button_signin"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
-            android:background="@drawable/auth_button_primary"
             android:text="@string/auth_signin"
-            android:textColor="@color/navy"
-            android:textSize="18sp"
-            app:backgroundTint="@null" />
+            android:textSize="18sp" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -35,18 +35,17 @@
             android:textStyle="bold" />
 
         <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
             android:id="@+id/button_birth_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="60dp"
             android:layout_marginTop="32dp"
             android:text="@string/signup_birth_date_hint"
-            android:textColor="@color/navy"
-            android:textSize="18sp"
-            app:backgroundTint="@color/white"
-            app:cornerRadius="4dp"
-            app:strokeColor="@color/navy"
-            app:strokeWidth="1dp" />
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -60,29 +59,31 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
                 android:id="@+id/button_skip"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/auth_button_secondary"
                 android:text="@string/signup_skip"
-                android:textColor="@color/navy"
-                android:textSize="18sp"
-                app:backgroundTint="@null" />
+                android:textSize="18sp" />
 
             <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box_yellow"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
                 android:id="@+id/button_next"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/auth_button_primary"
                 android:enabled="false"
                 android:text="@string/signup_next"
-                android:textColor="@color/navy"
-                android:textSize="18sp"
-                app:backgroundTint="@null" />
+                android:textSize="18sp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

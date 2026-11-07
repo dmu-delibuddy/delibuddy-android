@@ -34,24 +34,26 @@
             android:layout_height="wrap_content" />
 
         <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box_yellow"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
             android:id="@+id/button_retry"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:background="@drawable/auth_button_primary"
             android:text="@string/startup_retry"
-            android:textColor="@color/navy"
-            android:visibility="gone"
-            app:backgroundTint="@null" />
+            android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
+            android:background="@drawable/bg_pixel_box"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
             android:id="@+id/button_login"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/auth_button_secondary"
             android:text="@string/startup_go_to_login"
-            android:textColor="@color/navy"
-            android:visibility="gone"
-            app:backgroundTint="@null" />
+            android:visibility="gone" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
