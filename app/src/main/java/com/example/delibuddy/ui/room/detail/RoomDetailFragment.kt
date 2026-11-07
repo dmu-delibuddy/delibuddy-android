@@ -228,7 +228,6 @@ class RoomDetailFragment : Fragment() {
     private fun row(@StringRes label : Int, value : String) =
         "${getString(label)} $value"
 
-    // 방장을 맨 위에, 나머지는 참여 순서대로. 닉네임 필드 생기면 교체 예정
     private fun renderParticipants(room : RoomModel) {
         binding.participants.textParticipantsTitle.text = getString(
             R.string.detail_participants,
@@ -254,6 +253,9 @@ class RoomDetailFragment : Fragment() {
             }
             val cardRow = requireNotNull(row)
             val uid = ordered.getOrNull(index)
+            val isMine = uid != null && uid == myUid
+            val isEmptySlot = uid == null && index < room.maxParticipants
+            val isUnavailable = uid == null && !isEmptySlot
             val fallbackName = when {
                 uid == room.hostId -> "방장"
                 uid == myUid && uid != null -> "나"
@@ -266,9 +268,18 @@ class RoomDetailFragment : Fragment() {
                 gravity = android.view.Gravity.CENTER
                 setPadding(4.dp(), 10.dp(), 4.dp(), 10.dp())
                 background = GradientDrawable().apply {
-                    setColor(Color.WHITE)
+                    setColor(if (isUnavailable) Color.rgb(235, 237, 240) else Color.WHITE)
                     cornerRadius = 8.dp().toFloat()
-                    setStroke(1.dp(), Color.rgb(220, 224, 232))
+                    val strokeColor = if (isMine) {
+                        ContextCompat.getColor(context, R.color.point_orange)
+                    } else {
+                        Color.rgb(120, 129, 145)
+                    }
+                    if (isEmptySlot) {
+                        setStroke(1.dp(), strokeColor, 4.dp().toFloat(), 3.dp().toFloat())
+                    } else {
+                        setStroke(if (isMine) 2.dp() else 1.dp(), strokeColor)
+                    }
                 }
             }
             val avatar = ImageView(requireContext()).apply {
