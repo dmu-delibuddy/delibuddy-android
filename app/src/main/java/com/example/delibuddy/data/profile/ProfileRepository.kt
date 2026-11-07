@@ -5,10 +5,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfileRepository {
     private val firestore = FirebaseFirestore.getInstance()
-    private val profiles = firestore.collection("profiles")
+    private val users = firestore.collection("users")
 
     private fun profileDocument(userId: String, type: ProfileType) =
-        profiles.document(userId).collection("types").document(type.name)
+        users.document(userId).collection("profiles").document(type.name)
 
     fun createInitialProfiles(userId: String): Task<Void> {
         val initialProfiles = ProfileType.values().map { type ->
