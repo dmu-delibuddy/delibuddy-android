@@ -12,6 +12,10 @@ import com.example.delibuddy.data.chat.Attachment
 import com.example.delibuddy.data.chat.ChatModel
 import com.example.delibuddy.data.chat.ChatRepository
 import com.example.delibuddy.data.chat.MessageType
+import com.example.delibuddy.data.profile.ProfileModel
+import com.example.delibuddy.data.profile.ProfileRepository
+import com.example.delibuddy.data.profile.ProfileType
+import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +27,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.tasks.await
 
 /*
     * 채팅방 화면
@@ -36,6 +42,7 @@ class ChatViewModel(
 
     private val chatRepository = ChatRepository()
     private val roomRepository = RoomRepository()
+    private val profileRepository = ProfileRepository()
 
     // 넘어온 방 id (없으면 null)
     val roomId: String? = savedStateHandle[ARG_ROOM_ID]
@@ -87,6 +94,8 @@ class ChatViewModel(
 
     // 이미 URL 을 요청한 storagePath (중복 요청 방지)
     private val requestedPaths = mutableSetOf<String>()
+    private val profiles = MutableStateFlow<Map<Pair<String, ProfileType>, ProfileModel>>(emptyMap())
+    private val requestedProfiles = mutableSetOf<Pair<String, ProfileType>>()
 
     // 내가 보낸 사진의 기기 주소 (URL 받기 전까지 이걸로 보여줌)
     private val localImages = mutableMapOf<String, Uri>()
@@ -107,8 +116,9 @@ class ChatViewModel(
 
     // 화면에 보여줄 메시지 목록
     val items: LiveData<List<ChatItem>> =
-        combine(serverMessages, pending, room, imageUrls) { server, local, room, urls ->
-            buildItems(server, local, room, urls)
+        combine(serverMessages, pending, room, imageUrls, profiles) { server, local, room, urls, profiles ->
+            if (room != null) requestProfiles(server, room.mode)
+            buildItems(server, local, room, urls, profiles)
         }.asLiveData()
 
     // 서버 메시지 뒤에, 서버에 아직 없는 내 메시지를 붙임
@@ -117,9 +127,10 @@ class ChatViewModel(
         local: Map<String, PendingMessage>,
         room: RoomModel?,
         urls: Map<String, String>,
+        profiles: Map<Pair<String, ProfileType>, ProfileModel>,
     ): List<ChatItem> {
         val serverIds = server.map { it.id }.toSet()
-        val fromServer = server.map { toItem(it, room, urls) }
+        val fromServer = server.map { toItem(it, room, urls, profiles) }
         val notSaved = local.values
             .filter { it.id !in serverIds }
             .map { toPendingItem(it) }
@@ -132,6 +143,7 @@ class ChatViewModel(
         message: ChatModel,
         room: RoomModel?,
         urls: Map<String, String>,
+        profiles: Map<Pair<String, ProfileType>, ProfileModel>,
     ): ChatItem {
         if (message.type == MessageType.SYSTEM) {
             return ChatItem.System(
@@ -140,6 +152,9 @@ class ChatViewModel(
             )
         }
         val path = message.attachments.firstOrNull()?.storagePath
+        val profile = room?.let { currentRoom ->
+            message.senderId?.let { profiles[it to profileType(currentRoom.mode)] }
+        }
         return ChatItem.Bubble(
             id = message.id,
             isMine = message.senderId == chatRepository.myUid,
@@ -153,7 +168,37 @@ class ChatViewModel(
             hasImage = path != null,
             imageUrl = path?.let { urls[it] }
                 ?: localImages[message.id]?.toString(),
+            senderNickname = profile?.nickname?.takeIf { it.isNotBlank() },
+            senderImageUrl = profile?.imageUrl?.takeIf { it.isNotBlank() },
         )
+    }
+
+    private fun profileType(mode: RoomMode): ProfileType = when (mode) {
+        RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
+        RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
+    }
+
+    private fun requestProfiles(messages: List<ChatModel>, mode: RoomMode) {
+        val type = profileType(mode)
+        messages.asSequence()
+            .filter { it.type == MessageType.NORMAL }
+            .mapNotNull { it.senderId?.takeIf { id -> id.isNotBlank() && id != chatRepository.myUid } }
+            .distinct()
+            .map { it to type }
+            .filter { requestedProfiles.add(it) }
+            .forEach { key ->
+                viewModelScope.launch {
+                    try {
+                        profileRepository.getById(key.first, key.second).await()?.let { profile ->
+                            profiles.update { it + (key to profile) }
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Log.w(TAG, "프로필 조회 실패: ${key.first}", e)
+                    }
+                }
+            }
     }
 
     // 서버에 없는 내 메시지 -> 화면용 메시지

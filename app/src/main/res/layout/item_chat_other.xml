@@ -5,13 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="start"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:paddingStart="16dp"
     android:paddingTop="4dp"
     android:paddingEnd="16dp"
     android:paddingBottom="4dp">
 
-    <!-- 보낸 사람 (방장 / 참여자) -->
+    <ImageView
+        android:id="@+id/image_profile"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/chat_profile_image_desc"
+        android:scaleType="centerCrop"
+        android:src="@drawable/mypage_icon" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <!-- 보낸 사람 -->
     <TextView
         android:id="@+id/text_sender"
         android:layout_width="wrap_content"
@@ -72,5 +86,6 @@
             android:textColor="@color/black"
             android:textSize="11sp"
             tools:text="오후 6:30" />
+    </LinearLayout>
     </LinearLayout>
 </LinearLayout>
