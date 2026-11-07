@@ -28,9 +28,11 @@ class ImageRepository(
 
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
-            contentResolver.openInputStream(uri)?.use { stream ->
+            val input = contentResolver.openInputStream(uri)
+                ?: throw IllegalArgumentException("이미지 파일을 읽을 수 없습니다.")
+            input.use { stream ->
                 BitmapFactory.decodeStream(stream, null, options)
-            } ?: throw IllegalArgumentException("이미지 파일을 읽을 수 없습니다.")
+            }
             require(options.outWidth > 0 && options.outHeight > 0) {
                 "이미지 해상도를 확인할 수 없습니다."
             }
