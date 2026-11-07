@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 송금 계좌 변경 창 : 은행 선택 / 계좌번호 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_pixel_box"
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="23dp"
+    android:paddingBottom="23dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mypage_edit_account_title"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:alpha="0.7"
+        android:text="@string/mypage_bank_label"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
+    <Spinner
+        android:id="@+id/spinner_bank"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_pixel_box"
+        android:paddingStart="8dp"
+        android:paddingEnd="11dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:alpha="0.7"
+        android:text="@string/mypage_account_number_label"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/edit_account"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_pixel_box"
+        android:hint="@string/mypage_account_number_hint"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        android:maxLength="20"
+        android:paddingStart="12dp"
+        android:paddingEnd="15dp"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_pixel_box"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="19dp"
+            android:paddingBottom="11dp"
+            android:text="@string/mypage_cancel"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/button_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_pixel_box_yellow"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="19dp"
+            android:paddingBottom="11dp"
+            android:text="@string/mypage_save"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

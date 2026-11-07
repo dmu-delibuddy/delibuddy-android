@@ -176,4 +176,58 @@
     <string name="chat_image_desc">채팅 사진</string>
     <string name="chat_list_title">내 채팅방</string>
     <string name="chat_list_empty">참여 중인 채팅방이 없어요</string>
+
+    <!-- 마이페이지 -->
+    <string name="mypage_mode_pickup">픽업만</string>
+    <string name="mypage_mode_meal_buddy">밥친구</string>
+    <string name="mypage_profile_image_desc">프로필 사진</string>
+    <string name="mypage_nickname_label">닉네임</string>
+    <string name="mypage_nickname_empty">닉네임을 설정해 주세요</string>
+    <string name="mypage_bio_label">한 줄 소개</string>
+    <string name="mypage_bio_empty">한 줄 소개를 입력해 주세요</string>
+    <string name="mypage_birth_label">생일</string>
+    <string name="mypage_birth_empty">미입력</string>
+    <string name="mypage_edit_profile">프로필 수정하기</string>
+    <string name="mypage_manner_score">매너 점수</string>
+    <string name="mypage_review_count">받은 리뷰</string>
+    <string name="mypage_join_count">참여 내역</string>
+    <string name="mypage_count_empty">-</string>
+    <string name="mypage_account_label">송금 계좌</string>
+    <string name="mypage_account_empty">송금 계좌를 등록해 주세요</string>
+    <string name="mypage_account_change">변경</string>
+    <string name="mypage_menu_history">참여 내역</string>
+    <string name="mypage_menu_history_desc">지난 공동 주문과 리뷰</string>
+    <string name="mypage_menu_settings">설정</string>
+    <string name="mypage_menu_settings_desc">위치 권한 · 약관 · 탈퇴</string>
+    <string name="mypage_menu_arrow">&gt;</string>
+    <string name="mypage_edit_profile_title">프로필 수정</string>
+    <string name="mypage_edit_profile_title_mode">%s 프로필 수정</string>
+    <string name="mypage_remove_image">기본 사진으로</string>
+    <string name="mypage_nickname_hint">닉네임을 입력하세요</string>
+    <string name="mypage_bio_hint">한 줄 소개를 입력하세요</string>
+    <string name="mypage_birth_hint">생년월일을 선택하세요</string>
+    <string name="mypage_edit_account_title">송금 계좌 변경</string>
+    <string name="mypage_bank_label">은행 선택</string>
+    <string name="mypage_account_number_label">계좌번호</string>
+    <string name="mypage_account_number_hint">- 없이 숫자만 입력</string>
+    <string name="mypage_cancel">취소</string>
+    <string name="mypage_save">저장</string>
+    <string name="mypage_load_error">프로필 정보를 불러오지 못했어요</string>
+    <string name="mypage_save_error">저장하지 못했어요. 네트워크를 확인해 주세요</string>
+    <string name="mypage_profile_saved">프로필을 수정했어요</string>
+    <string name="mypage_account_saved">송금 계좌를 변경했어요</string>
+    <string name="mypage_nickname_required">닉네임을 입력해 주세요</string>
+    <string name="mypage_account_required">계좌번호를 입력해 주세요</string>
+    <string name="mypage_account_invalid">계좌번호는 숫자만 입력해 주세요</string>
+    <string-array name="mypage_bank_list">
+        <item>국민은행</item>
+        <item>농협은행</item>
+        <item>신한은행</item>
+        <item>IBK기업은행</item>
+        <item>카카오뱅크</item>
+        <item>토스뱅크</item>
+        <item>하나은행</item>
+        <item>우리은행</item>
+        <item>수협은행</item>
+    </string-array>
 </resources>

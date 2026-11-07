@@ -29,6 +29,19 @@ class UserRepository {
             )
         )
 
+    // 생년월일만 수정 (다른 필드는 건드리지 않음)
+    fun updateBirthDate(userId: String, birthDate: String?): Task<Void> =
+        users.document(userId).update("birthDate", birthDate)
+
+    // 송금 계좌(은행, 계좌번호)만 수정 (다른 필드는 건드리지 않음)
+    fun updateAccount(userId: String, bankName: String, account: String): Task<Void> =
+        users.document(userId).update(
+            mapOf(
+                "bankName" to bankName,
+                "account" to account,
+            )
+        )
+
     fun delete(userId: String): Task<Void> =
         users.document(userId).delete()
 }
