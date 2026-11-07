@@ -15,6 +15,7 @@ import com.example.delibuddy.R
 import com.example.delibuddy.data.profile.ProfileModel
 import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.databinding.FragmentMypageBinding
+import com.example.delibuddy.ui.common.GlobalLoadingDialog
 import com.example.delibuddy.ui.mypage.account.AccountViewModel
 import com.example.delibuddy.ui.mypage.account.EditAccountDialogFragment
 import com.example.delibuddy.ui.mypage.profile.EditProfileDialogFragment
@@ -55,6 +56,13 @@ class MyPageFragment : Fragment() {
         observeSelectedMode()
         observeProfile()
         observeBirthDate()
+        profileViewModel.saving.observe(viewLifecycleOwner) { saving ->
+            if (saving) {
+                GlobalLoadingDialog.show(childFragmentManager, getString(R.string.mypage_saving_profile))
+            } else {
+                GlobalLoadingDialog.hide(childFragmentManager)
+            }
+        }
         observeMessages(profileViewModel.message) { profileViewModel.clearMessage() }
 
         // 송금 계좌
