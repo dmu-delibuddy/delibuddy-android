@@ -3,6 +3,7 @@ package com.example.delibuddy.ui.common
 import android.animation.ValueAnimator
 import android.view.View
 import android.view.animation.LinearInterpolator
+import kotlin.math.floor
 
 class PizzaLoadingAnimation(private val pizza: View, private val shadow: View) {
     private var animator: ValueAnimator? = null
@@ -15,7 +16,7 @@ class PizzaLoadingAnimation(private val pizza: View, private val shadow: View) {
             repeatCount = ValueAnimator.INFINITE
             interpolator = LinearInterpolator()
             addUpdateListener {
-                val phase = it.animatedValue as Float
+                val phase = floor((it.animatedValue as Float) * 5f) / 5f
                 val lift = 4f * phase * (1f - phase)
                 pizza.translationY = -height * lift
                 shadow.scaleX = 1f - 0.35f * lift
