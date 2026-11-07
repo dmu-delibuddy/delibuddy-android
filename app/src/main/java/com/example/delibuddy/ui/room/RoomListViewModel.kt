@@ -8,6 +8,8 @@ import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
+import com.example.delibuddy.data.room.RoomStatus
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -23,7 +25,11 @@ class RoomListViewModel(
     private val joinableOnly = MutableStateFlow(false)
     private val query = MutableStateFlow("")
 
-    // Firebase 에서 받은 전체 목록 (모집 중 + 정원 마감)
+    // 지금 로그인한 내 uid (내 방 판단용)
+    private val myUid =
+        FirebaseAuth.getInstance().currentUser?.uid
+
+    // Firebase 에서 받은 전체 목록 (모집 중 + 정원 마감 + 모집 마감)
     private val allRooms = roomRepository.observeRooms()
         .onEach { Log.d(TAG, "rooms=${it.size}개") }
         .catch { e -> Log.e(TAG, "observeRooms 실패", e) }
@@ -31,7 +37,8 @@ class RoomListViewModel(
     // 화면에 보여줄 목록
     val rooms : LiveData<List<RoomModel>> =
         combine(allRooms, mode, category, joinableOnly, query) { list, m, c, j, q ->
-            list.filter { it.mode == m }
+            list.filter { isVisible(it) }
+                .filter { it.mode == m }
                 .filter { c == null || it.category == c }
                 .filter { !j || it.isJoinable }
                 .filter {
@@ -40,6 +47,17 @@ class RoomListViewModel(
                             it.restaurant.contains(q, ignoreCase = true)
                 }
         }.asLiveData()
+
+    // 모집 중인 방은 모두에게,
+    // 모집 마감 / 마감 시간 지난 방은 방장, 참여자에게만 보임
+    private fun isVisible(room : RoomModel) : Boolean {
+        val mine = room.isHost(myUid) ||
+                room.isParticipant(myUid)
+        val open = (room.status == RoomStatus.RECRUITING ||
+                room.status == RoomStatus.FULL) &&
+                !room.isDeadLinePassed
+        return open || mine
+    }
 
     // 화면에서 필터를 바꿀 때 부르는 함수
     // 모드 필터 변경
