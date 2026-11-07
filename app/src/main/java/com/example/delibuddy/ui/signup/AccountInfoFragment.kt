@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -30,9 +32,22 @@ class AccountInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.editBankName.setText(viewModel.bankName.value)
+        val banks = resources.getStringArray(R.array.mypage_bank_list)
+        binding.spinnerBank.adapter = ArrayAdapter(
+            requireContext(), android.R.layout.simple_spinner_dropdown_item, banks,
+        )
+        val selectedBank = banks.indexOf(viewModel.bankName.value)
+        if (selectedBank >= 0) binding.spinnerBank.setSelection(selectedBank)
+        binding.spinnerBank.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                viewModel.setBankName(banks[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                viewModel.setBankName("")
+            }
+        }
         binding.editAccount.setText(viewModel.account.value)
-        binding.editBankName.doAfterTextChanged { viewModel.setBankName(it?.toString().orEmpty()) }
         binding.editAccount.doAfterTextChanged { viewModel.setAccount(it?.toString().orEmpty()) }
         binding.buttonPrevious.setOnClickListener { findNavController().popBackStack() }
         binding.buttonSkip.setOnClickListener { viewModel.finishRegistration(skipAccount = true) }
@@ -45,7 +60,7 @@ class AccountInfoFragment : Fragment() {
             binding.buttonPrevious.isEnabled = !saving
             binding.buttonSkip.isEnabled = !saving
             binding.buttonFinish.isEnabled = !saving
-            binding.editBankName.isEnabled = !saving
+            binding.spinnerBank.isEnabled = !saving
             binding.editAccount.isEnabled = !saving
             if (saving) {
                 GlobalLoadingDialog.show(childFragmentManager, getString(R.string.signup_saving_profile))
