@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:background="@drawable/app_bg"
-    tools:context=".ui.room.RoomListFragment">
+    tools:context=".ui.room.list.RoomListFragment">
 
     <!-- 상단 고정 영역 -->
     <LinearLayout
