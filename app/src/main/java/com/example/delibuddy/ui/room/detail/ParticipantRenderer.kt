@@ -82,7 +82,13 @@ class ParticipantRenderer(
                 }
             }
             val avatar = ImageView(fragment.requireContext()).apply {
-                setImageResource(R.drawable.mypage_icon)
+                setImageResource(
+                    when {
+                        isEmptySlot -> R.drawable.question_mark_icon
+                        isUnavailable -> R.drawable.x_mark_icon
+                        else -> R.drawable.mypage_icon
+                    }
+                )
                 scaleType = ImageView.ScaleType.CENTER_CROP
                 contentDescription = if (uid != null) "$fallbackName 프로필 사진" else null
                 background = GradientDrawable().apply {
