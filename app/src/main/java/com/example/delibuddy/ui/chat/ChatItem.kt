@@ -29,5 +29,7 @@ sealed interface ChatItem {
         val deleted: Boolean,      // deletedAt 이 있으면 true
         val hasImage: Boolean = false,  // 사진이 붙은 메시지인지
         val imageUrl: String? = null,   // 다운로드 URL 또는 보내는 중인 기기 사진 주소
+        val senderNickname: String? = null,
+        val senderImageUrl: String? = null,
     ) : ChatItem
 }

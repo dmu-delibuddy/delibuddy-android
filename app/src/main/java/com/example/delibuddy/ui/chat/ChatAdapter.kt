@@ -92,10 +92,18 @@ class ChatAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatItem.Bubble) = with(binding) {
-            textSender.setText(
-                if (item.isFromHost) R.string.detail_host
-                else R.string.chat_sender_participant
-            )
+            val fallback = if (item.isFromHost) R.string.detail_host else R.string.chat_sender_participant
+            textSender.text = item.senderNickname?.let { nickname ->
+                if (item.isFromHost) textSender.context.getString(R.string.chat_sender_host, nickname)
+                else nickname
+            } ?: textSender.context.getString(fallback)
+            Glide.with(imageProfile)
+                .load(item.senderImageUrl)
+                .placeholder(R.drawable.mypage_icon)
+                .error(R.drawable.mypage_icon)
+                .fallback(R.drawable.mypage_icon)
+                .circleCrop()
+                .into(imageProfile)
             bindContent(textContent, imageAttachment, item)
             textTime.text = timeText(item)
         }
