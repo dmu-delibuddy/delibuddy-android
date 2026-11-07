@@ -6,6 +6,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.example.delibuddy.data.user.UserModel
 import com.example.delibuddy.data.user.UserRepository
+import com.example.delibuddy.data.profile.ProfileRepository
 import kotlinx.coroutines.tasks.await
 
 class SignUpSessionMissingException : IllegalStateException()
@@ -14,6 +15,7 @@ class EmailNotVerifiedException : IllegalStateException()
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
     private val userRepository = UserRepository()
+    private val profileRepository = ProfileRepository()
 
     suspend fun isLoggedIn(): Boolean {
         val user = auth.currentUser ?: return false
@@ -42,18 +44,6 @@ class AuthRepository {
     fun signIn(email: String, password: String): Task<AuthResult> =
         auth.signInWithEmailAndPassword(email, password)
 
-    fun signUp(email: String, password: String): Task<AuthResult> =
-        auth.createUserWithEmailAndPassword(email, password)
-            .continueWithTask { createTask ->
-                val result = createTask.getResult(Exception::class.java)
-                val user = result.user
-                    ?: throw IllegalStateException("회원가입 사용자를 찾을 수 없습니다.")
-
-                user.sendEmailVerification().continueWith { verificationTask ->
-                    verificationTask.getResult(Exception::class.java)
-                    result
-                }
-            }
 
     fun completeSignUp(userData: UserModel): Task<Void> {
         val user = auth.currentUser
@@ -73,8 +63,24 @@ class AuthRepository {
                 userRepository.create(
                     user.uid,
                     userData.copy(univEmail = user.email ?: userData.univEmail)
-                )
+                ).continueWithTask { userTask ->
+                    userTask.getResult(Exception::class.java)
+                    profileRepository.createInitialProfiles(user.uid)
+                }
             }
         }
     }
+
+    private fun signUp(email: String, password: String): Task<AuthResult> =
+        auth.createUserWithEmailAndPassword(email, password)
+            .continueWithTask { createTask ->
+                val result = createTask.getResult(Exception::class.java)
+                val user = result.user
+                    ?: throw IllegalStateException("회원가입 사용자를 찾을 수 없습니다.")
+
+                user.sendEmailVerification().continueWith { verificationTask ->
+                    verificationTask.getResult(Exception::class.java)
+                    result
+                }
+            }
 }
