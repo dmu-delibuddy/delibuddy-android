@@ -8,10 +8,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.delibuddy.data.chat.Attachment
 import com.example.delibuddy.data.chat.ChatModel
 import com.example.delibuddy.data.chat.ChatRepository
 import com.example.delibuddy.data.chat.MessageType
+import com.example.delibuddy.data.image.ImageRepository
 import com.example.delibuddy.data.profile.ProfileModel
 import com.example.delibuddy.data.profile.ProfileRepository
 import com.example.delibuddy.data.profile.ProfileType
@@ -41,6 +41,7 @@ class ChatViewModel(
 ) : AndroidViewModel(application) {
 
     private val chatRepository = ChatRepository()
+    private val imageRepository = ImageRepository()
     private val roomRepository = RoomRepository()
     private val profileRepository = ProfileRepository()
 
@@ -55,7 +56,7 @@ class ChatViewModel(
         val id: String,
         val content: String? = null,
         val imageUri: Uri? = null,          // 보내려는 기기 사진
-        val attachment: Attachment? = null, // 업로드가 끝난 첨부 (재전송 때 다시 올리지 않음)
+        val imageId: String? = null,        // 업로드한 이미지 ID (재전송 때 재사용)
         val failed: Boolean = false,
     )
 
@@ -88,12 +89,12 @@ class ChatViewModel(
     private val pending =
         MutableStateFlow<Map<String, PendingMessage>>(emptyMap())
 
-    // 받아 둔 사진 주소 (storagePath -> 다운로드 URL)
+    // 받아 둔 사진 주소 (이미지 ID -> 다운로드 URL)
     private val imageUrls =
         MutableStateFlow<Map<String, String>>(emptyMap())
 
-    // 이미 URL 을 요청한 storagePath (중복 요청 방지)
-    private val requestedPaths = mutableSetOf<String>()
+    // 이미 URL 을 요청한 이미지 ID (중복 요청 방지)
+    private val requestedImageIds = mutableSetOf<String>()
     private val profiles = MutableStateFlow<Map<Pair<String, ProfileType>, ProfileModel>>(emptyMap())
     private val requestedProfiles = mutableSetOf<Pair<String, ProfileType>>()
 
@@ -151,7 +152,7 @@ class ChatViewModel(
                 content = message.content.orEmpty(),
             )
         }
-        val path = message.attachments.firstOrNull()?.storagePath
+        val imageId = message.imageId?.takeIf { it.isNotBlank() }
         val profile = room?.let { currentRoom ->
             message.senderId?.let { profiles[it to profileType(currentRoom.mode)] }
         }
@@ -165,8 +166,8 @@ class ChatViewModel(
                 if (message.createdAt == null) SendState.SENDING
                 else SendState.SENT,
             deleted = message.deletedAt != null,
-            hasImage = path != null,
-            imageUrl = path?.let { urls[it] }
+            hasImage = imageId != null,
+            imageUrl = imageId?.let { urls[it] }
                 ?: localImages[message.id]?.toString(),
             senderNickname = profile?.nickname?.takeIf { it.isNotBlank() },
             senderImageUrl = profile?.imageUrl?.takeIf { it.isNotBlank() },
@@ -220,17 +221,19 @@ class ChatViewModel(
     // 사진이 붙은 메시지마다 다운로드 URL 을 한 번씩 받아 둠
     private fun requestImageUrls(messages: List<ChatModel>) {
         messages
-            .flatMap { it.attachments }
-            .map { it.storagePath }
-            .filter { it.isNotBlank() && requestedPaths.add(it) }
-            .forEach { path ->
+            .mapNotNull { it.imageId?.takeIf(String::isNotBlank) }
+            .filter { requestedImageIds.add(it) }
+            .forEach { imageId ->
                 viewModelScope.launch {
                     try {
-                        val url = chatRepository.imageUrl(path)
-                        imageUrls.update { it + (path to url) }
+                        val image = imageRepository.getImage(imageId)
+                            ?: throw IllegalStateException("이미지를 찾을 수 없습니다: $imageId")
+                        imageUrls.update { it + (imageId to image.url) }
+                    } catch (e: CancellationException) {
+                        throw e
                     } catch (e: Exception) {
-                        Log.w(TAG, "사진 주소 받기 실패: $path", e)
-                        requestedPaths.remove(path) // 다음 목록 갱신 때 다시 시도
+                        Log.w(TAG, "사진 주소 받기 실패: $imageId", e)
+                        requestedImageIds.remove(imageId) // 다음 목록 갱신 때 다시 시도
                     }
                 }
             }
@@ -274,23 +277,23 @@ class ChatViewModel(
                 pending.update { it - sending.id }
             } catch (e: Exception) {
                 Log.e(TAG, "메시지 전송 실패: ${sending.id}", e)
-                // 업로드까지 끝났다면 첨부 정보가 담긴 최신 값을 실패로 남김
+                // 업로드까지 끝났다면 이미지 ID가 담긴 최신 값을 실패로 남김
                 val latest = pending.value[sending.id] ?: sending
                 putPending(latest.copy(failed = true))
             }
         }
     }
 
-    // 사진 : 처음이면 업로드 -> 첨부 기억 -> 메시지 저장
+    // 사진 : 처음이면 업로드 -> 이미지 ID 기억 -> 메시지 저장
     private suspend fun sendImageMessage(
         roomId: String,
         message: PendingMessage,
         uri: Uri,
     ) {
-        val attachment = message.attachment
-            ?: chatRepository.uploadImage(uri, getApplication<Application>().contentResolver)
-                .also { putPending(message.copy(attachment = it)) }
-        chatRepository.sendImage(roomId, message.id, attachment)
+        val imageId = message.imageId
+            ?: imageRepository.uploadImage(uri, getApplication<Application>().contentResolver).id
+                .also { putPending(message.copy(imageId = it)) }
+        chatRepository.sendImage(roomId, message.id, imageId)
     }
 
     // 보내는 중 목록에 넣거나 갱신
