@@ -22,8 +22,6 @@ import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.FragmentRoomDetailBinding
 import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.DetailState
 import com.google.firebase.auth.FirebaseAuth
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
@@ -190,10 +188,6 @@ class RoomDetailFragment : Fragment() {
         information.textRestaurant.text = row(R.string.detail_restaurant,
             room.restaurant)
 
-        information.textDeadline.text = row(R.string.detail_deadline_label,
-            room.deadline
-                ?.let { TIME_FORMAT.format(it.toDate()) }
-                ?: getString(R.string.detail_no_deadline))
 
         information.textMinOrder.text = row(R.string.detail_min_order,
             getString(R.string.detail_won, room.minOrderAmount))
@@ -253,7 +247,7 @@ class RoomDetailFragment : Fragment() {
     }
 
     private fun renderOrderAvailability(room: RoomModel) {
-        val editable = viewModel.canChat(room) && !room.isDeadLinePassed &&
+        val editable = viewModel.canChat(room) &&
             room.status in setOf(RoomStatus.RECRUITING, RoomStatus.FULL)
         val enabled = editable
         with(binding.order) {
@@ -299,11 +293,5 @@ class RoomDetailFragment : Fragment() {
         participantRenderer = null
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        // 예 : 오후 6:30
-        private val TIME_FORMAT =
-            SimpleDateFormat("a h:mm", Locale.KOREA)
     }
 }

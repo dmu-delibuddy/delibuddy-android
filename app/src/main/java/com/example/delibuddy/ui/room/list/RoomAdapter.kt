@@ -13,8 +13,6 @@ import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.ItemRoomBinding
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 /*
     * 홈 화면 방 목록 어댑터. (카드 : item_room.xml)
@@ -41,13 +39,10 @@ class RoomAdapter (
         private val binding: ItemRoomBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        // 방 정보 → 카드 화면 (배지, 마감, 배달비, 제목, 태그) + 클릭 연결
+        // 방 정보 → 카드 화면 (배지, 배달비, 제목, 태그) + 클릭 연결
         fun bind(room : RoomModel) = with(binding) {
-            // 모집 배지 = 상태 + 인원 / 마감 시간
+            // 모집 배지 = 상태 + 인원
             textStatus.text = "${statusLabel(room.status)} ${room.currentCount}/${room.maxParticipants}명"
-            textDeadline.text = room.deadline
-                ?.let { "${TIME_FORMAT.format(it.toDate())} 마감" }
-                ?: "시간 제한 없음"
 
             // 배달비
             textDeliveryFee.text = "배달비 1인당 %,d원".format(room.deliveryFeePerPerson)
@@ -65,9 +60,6 @@ class RoomAdapter (
     }
 
     companion object {
-        // 예 : 오후 6:30
-        private val TIME_FORMAT = SimpleDateFormat("a h:mm", Locale.KOREA)
-
         private val DIFF = object : DiffUtil.ItemCallback<RoomModel>() {
             // 같은 방인지 문서 id로 판단
             override fun areItemsTheSame(old: RoomModel, new: RoomModel) = old.id == new.id

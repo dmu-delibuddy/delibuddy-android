@@ -16,9 +16,7 @@ import com.example.delibuddy.data.room.FoodCostSplitMethod
 import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
-import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 /*
     * 방 만들기 1 ~ 4 단계 상태.
@@ -73,15 +71,6 @@ class CreateRoomViewModel (
     // 음식점 저장
     fun setRestaurant(value : String) { _restaurant.value = value }
 
-
-    // 3단계 : 장소 , 마감 시간
-    // 마감 시각을 하루 중 몇 분째인지로 저장 (18:30 -> 1110). null = 아직 선택 안 함
-    private val _deadlineMinutes = MutableLiveData<Int?>(null)
-    val deadlineMinutes : LiveData<Int?> = _deadlineMinutes
-
-    private val _noTimeLimit = MutableLiveData(false)
-    val noTimeLimit : LiveData<Boolean> = _noTimeLimit
-
     // 4단계 : 금액, 정산
     private val _minOrderAmount = MutableLiveData<Int?>(null) // null = 입력 안 함
     val minOrderAmount : LiveData<Int?> = _minOrderAmount
@@ -103,11 +92,6 @@ class CreateRoomViewModel (
     fun setFoodCostSplit (value : FoodCostSplitMethod) { _foodCostSplit.value = value }
     // 배달비 정산 방법 저장
     fun setDeliveryFeeSplit (value : DeliveryFeeSplitMethod) { _deliveryFeeSplit.value = value }
-
-    // 마감 시각을 하루 중 몇 분째로 저장 (18:30 → 1110)
-    fun setDeadline (hour : Int, minute : Int) { _deadlineMinutes.value = hour * 60 + minute }
-    // 시간 제한 없음 여부 저장
-    fun setNoTimeLimit (value : Boolean) { _noTimeLimit.value = value }
 
     // 개설 진행 상태 (대기 / 저장 중 / 성공 / 실패)
     private val _submitState =
@@ -142,7 +126,7 @@ class CreateRoomViewModel (
             _restaurant.value.isNullOrBlank() -> R.string.create_error_restaurant
             else -> null
         }
-        3 -> if (_noTimeLimit.value != true && _deadlineMinutes.value == null) R.string.create_error_deadline else null
+        3 -> null // 장소는 아직 선택 기능 없음
         4 -> when {
             _minOrderAmount.value == null -> R.string.create_error_min_order
             _deliveryFee.value == null -> R.string.create_error_delivery_fee
@@ -156,8 +140,10 @@ class CreateRoomViewModel (
         if (_submitState.value == SubmitState.Loading) {
             return  // 중복 클릭 방지
         }
-        if (failOnInvalidStep()) return
-        save(buildRoom(buildDeadline()))
+        if (failOnInvalidStep()) {
+            return
+        }
+        save(buildRoom())
     }
 
     // 1~4단계를 차례로 검사해서
@@ -177,10 +163,6 @@ class CreateRoomViewModel (
         _submitState.value = SubmitState.Error(message)
     }
 
-    // 마감 시간이 필요한지 ('시간 제한 없음' 체크 안 했으면 true)
-    private fun needsDeadline(): Boolean =
-        _noTimeLimit.value != true
-
     // Firestore 에 방 저장. 저장 중 → 성공(방 id) / 실패
     private fun save(room: RoomModel) {
         _submitState.value = SubmitState.Loading
@@ -189,7 +171,8 @@ class CreateRoomViewModel (
                 val id = roomRepository.createRoom(room)
                 notifyRoomCreated(id)
                 SubmitState.Success(id)
-            } catch (e: Exception) {
+            }
+            catch (e: Exception) {
                 Log.w("CreateRoom", "createRoom 실패", e)
                 val notLoggedIn = e is RoomException &&
                     e.reason == RoomException.Reason.NOT_LOGGED_IN
@@ -205,36 +188,15 @@ class CreateRoomViewModel (
     private suspend fun notifyRoomCreated(roomId: String) {
         try {
             chatRepository.sendSystem(roomId, SystemMessage.ROOM_CREATED)
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             Log.w(TAG, "시스템 메시지 실패 : $roomId", e)
         }
     }
 
-    // 고른 시각 → Timestamp. 오늘 그 시각이 이미 지났으면 다음 날 (23:30 에 00:30 고르면 내일 00:30)
-    // 시각을 안 골랐으면 null
-    private fun buildDeadline(): Timestamp? {
-        val minutes = _deadlineMinutes.value
-            ?: return null
-        val cal = todayAt(minutes)
-        if (cal.timeInMillis <= System.currentTimeMillis()) {
-            cal.add(Calendar.DAY_OF_MONTH, 1)
-        }
-        return Timestamp(cal.time)
-    }
-
-    // 하루 중 몇 분째(18:30 → 1110)를 오늘 그 시각의 Calendar 로
-    private fun todayAt(minutes: Int): Calendar =
-        Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, minutes / 60)
-            set(Calendar.MINUTE, minutes % 60)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-
     // 입력값을 모아 Firestore 저장용 RoomModel 로
     // (방장 id, 참여자, 상태, 생성 시각은 RoomRepository 가 채움)
     private fun buildRoom(
-        deadline: Timestamp?
     ) = RoomModel(
         title = _title.value.orEmpty().trim(),
         maxParticipants = _maxParticipants.value
@@ -245,8 +207,6 @@ class CreateRoomViewModel (
             ?: FoodCategory.ETC,
         restaurant = _restaurant.value
             .orEmpty().trim(),
-        deadline = if (needsDeadline()) deadline
-            else null,
         minOrderAmount = _minOrderAmount.value ?: 0,
         estimatedDeliveryFee =
             _deliveryFee.value ?: 0,

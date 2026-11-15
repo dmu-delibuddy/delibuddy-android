@@ -54,8 +54,7 @@ class RoomListViewModel(
         val mine = room.isHost(myUid) ||
                 room.isParticipant(myUid)
         val open = (room.status == RoomStatus.RECRUITING ||
-                room.status == RoomStatus.FULL) &&
-                !room.isDeadLinePassed
+                room.status == RoomStatus.FULL)
         return open || mine
     }
 
