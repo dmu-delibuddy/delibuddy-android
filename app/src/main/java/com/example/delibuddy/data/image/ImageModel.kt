@@ -1,9 +1,10 @@
 package com.example.delibuddy.data.image
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentId
 
 data class ImageModel(
-    val id: String = "",
+    @DocumentId val id: String = "",
     val url: String = "",
     val storagePath: String = "",
     val fileName: String = "",
