@@ -1,27 +1,21 @@
 package com.example.delibuddy.data.chat
 
-import android.content.ContentResolver
-import android.net.Uri
 import android.util.Log
-import com.example.delibuddy.data.image.ImageRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 /*
-    * 채팅 메시지 저장 / 실시간 구독, 채팅 이미지 업로드
+    * 채팅 메시지 저장 / 실시간 구독
     * 위치 : rooms/{roomId}/messages/{messageId}
 */
 class ChatRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val storage: FirebaseStorage = FirebaseStorage.getInstance(),
-    private val imageRepository: ImageRepository = ImageRepository(),
 ) {
     // 로그인한 내 uid
     val myUid: String?
@@ -75,14 +69,14 @@ class ChatRepository(
     }
 
     // 일반 메시지 전송 (사진 한 장, 내용 없음)
-    suspend fun sendImage(roomId: String, messageId: String, attachment: Attachment) {
+    suspend fun sendImage(roomId: String, messageId: String, imageId: String) {
         val uid = myUid ?: throw IllegalStateException("로그인이 필요합니다.")
         messages(roomId).document(messageId).set(
             ChatModel(
                 senderId = uid,
                 type = MessageType.NORMAL,
                 content = null,
-                attachments = listOf(attachment),
+                imageId = imageId,
             )
         ).await()
     }
@@ -97,21 +91,6 @@ class ChatRepository(
             )
         ).await()
     }
-
-    // 기기 사진을 Storage 에 올리고 첨부 정보로 돌려줌 (ImageRepository 사용)
-    suspend fun uploadImage(uri: Uri, contentResolver: ContentResolver): Attachment {
-        val image = imageRepository.uploadImage(uri, contentResolver)
-        return Attachment(
-            storagePath = image.storagePath,
-            contentType = image.contentType,
-            width = image.width,
-            height = image.height,
-        )
-    }
-
-    // Storage 경로 -> 화면에 띄울 다운로드 URL
-    suspend fun imageUrl(storagePath: String): String =
-        storage.reference.child(storagePath).downloadUrl.await().toString()
 
     companion object {
         private const val TAG = "ChatRepo"
