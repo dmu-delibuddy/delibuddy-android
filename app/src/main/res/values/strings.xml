@@ -72,8 +72,8 @@
     <string name="create_step1_sub">제목, 인원, 모드를 정해주세요</string>
     <string name="create_step2_heading">무엇을 시킬까요?</string>
     <string name="create_step2_sub">카테고리와 음식점을 입력해주세요</string>
-    <string name="create_step3_heading">어디서 모일까요?</string>
-    <string name="create_step3_sub">모일 장소를 정해주세요</string>
+    <string name="create_step3_heading">어디서, 어떤 앱으로 시킬까요?</string>
+    <string name="create_step3_sub">모일 장소와 사용할 배달 앱을 정해주세요</string>
     <string name="create_step4_heading">금액을 정해요</string>
     <string name="create_step4_sub">주문 금액과 정산 방법을 정해주세요</string>
     <string name="create_title_label">1. 방 제목</string>
@@ -96,6 +96,15 @@
     </string-array>
     <string name="create_place_label">1. 장소</string>
     <string name="create_place_pending">장소 선택은 준비 중이에요</string>
+    <string name="create_delivery_app_label">2. 배달 앱</string>
+    <string name="create_delivery_app_name_hint">예) 땡겨요</string>
+    <string name="create_error_delivery_app">사용할 배달 앱을 선택해 주세요</string>
+    <string name="create_error_delivery_app_name">배달 앱 이름을 입력해 주세요</string>
+    <string name="delivery_app_baemin">배민</string>
+    <string name="delivery_app_coupang_eats">쿠팡이츠</string>
+    <string name="delivery_app_yogiyo">요기요</string>
+    <string name="delivery_app_other">직접 입력</string>
+    <string name="delivery_app_unknown">기타</string>
     <string name="create_min_order_label">1. 최소 주문 금액</string>
     <string name="create_min_order_hint">예) 15000</string>
     <string name="create_delivery_fee_label">2. 예상 배달비</string>
@@ -130,6 +139,7 @@
     <string name="detail_status_completed">완료</string>
     <string name="detail_count">%1$d/%2$d명</string>
     <string name="detail_restaurant">음식점</string>
+    <string name="detail_delivery_app">배달 앱</string>
     <string name="detail_min_order">최소 주문금액</string>
     <string name="detail_delivery_fee">예상 배달비</string>
     <string name="detail_fee_per_person">1인당 %,d원</string>

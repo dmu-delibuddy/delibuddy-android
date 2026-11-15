@@ -9,6 +9,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.annotation.StringRes
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.R
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.viewModels
 import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.FoodCostSplitMethod
+import com.example.delibuddy.data.room.DeliveryApp
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
 import com.example.delibuddy.ui.room.create.CreateRoomViewModel.SubmitState
 
@@ -66,6 +68,10 @@ class CreateRoomFragment : Fragment() {
         // 2단계 : 음식 정보
         setUpCategorySpinner()
         setUpRestaurantInput()
+
+        // 3단계 : 배달 앱
+        setUpDeliveryAppSelect()
+        observeDeliveryApp()
 
         // 4단계 : 금액, 정산
         setUpAmountInputs()
@@ -262,6 +268,29 @@ class CreateRoomFragment : Fragment() {
     private fun setUpRestaurantInput() {
         binding.step2.editRestaurant.doAfterTextChanged { text ->
             viewModel.setRestaurant(text?.toString().orEmpty())
+        }
+    }
+
+    // 3단계 : 배달 앱 선택 (버튼 id → 배달 앱) + 직접 입력한 이름 저장
+    private fun setUpDeliveryAppSelect() {
+        val ids = mapOf(
+            R.id.radio_app_baemin to DeliveryApp.BAEMIN,
+            R.id.radio_app_coupang to DeliveryApp.COUPANG_EATS,
+            R.id.radio_app_yogiyo to DeliveryApp.YOGIYO,
+            R.id.radio_app_other to DeliveryApp.OTHER,
+        )
+        binding.step3.groupDeliveryApp.setOnCheckedChangeListener { _, id ->
+            ids[id]?.let { viewModel.setDeliveryApp(it) }
+        }
+        binding.step3.editDeliveryApp.doAfterTextChanged { text ->
+            viewModel.setDeliveryAppName(text?.toString().orEmpty())
+        }
+    }
+
+    // "직접 입력"을 골랐을 때만 앱 이름 칸 보이기
+    private fun observeDeliveryApp() {
+        viewModel.deliveryApp.observe(viewLifecycleOwner) { app ->
+            binding.step3.editDeliveryApp.isVisible = app == DeliveryApp.OTHER
         }
     }
 

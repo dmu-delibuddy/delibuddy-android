@@ -13,6 +13,7 @@ import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.ItemRoomBinding
+import com.example.delibuddy.ui.room.deliveryAppLabel
 
 /*
     * 홈 화면 방 목록 어댑터. (카드 : item_room.xml)
@@ -50,8 +51,8 @@ class RoomAdapter (
             // 제목
             textTitle.text = room.title
 
-            // 메뉴 태그 , 장소 태그 / 모드 배지
-            textMenu.text = "메뉴: ${room.restaurant}"
+            // 배달 앱 · 음식점 태그 (예 : 배민 · 맘스터치), 장소 태그 / 모드 배지
+            textMenu.text = "${room.deliveryAppLabel(root.context)} · ${room.restaurant}"
             textPlace.visibility = View.GONE // 장소 필드가 정해지면 표시로 바꿀 예정
             textMode.setText(modeLabel(room.mode))
 

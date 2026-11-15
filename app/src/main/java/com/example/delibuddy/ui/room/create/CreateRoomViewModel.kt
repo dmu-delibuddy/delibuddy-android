@@ -11,6 +11,7 @@ import com.example.delibuddy.data.chat.ChatRepository
 import com.example.delibuddy.data.chat.SystemMessage
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.FoodCategory
+import com.example.delibuddy.data.room.DeliveryApp
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
 import com.example.delibuddy.data.room.FoodCostSplitMethod
 import com.example.delibuddy.data.room.RoomException
@@ -71,6 +72,17 @@ class CreateRoomViewModel (
     // 음식점 저장
     fun setRestaurant(value : String) { _restaurant.value = value }
 
+    // 3단계 : 장소, 배달 앱
+    private val _deliveryApp = MutableLiveData<DeliveryApp?>(null) // null = 아직 선택 안 함
+    val deliveryApp : LiveData<DeliveryApp?> = _deliveryApp
+
+    private val _deliveryAppName = MutableLiveData("") // 직접 입력한 앱 이름
+
+    // 배달 앱 저장
+    fun setDeliveryApp(value : DeliveryApp) { _deliveryApp.value = value }
+    // 직접 입력한 앱 이름 저장
+    fun setDeliveryAppName(value : String) { _deliveryAppName.value = value }
+
     // 4단계 : 금액, 정산
     private val _minOrderAmount = MutableLiveData<Int?>(null) // null = 입력 안 함
     val minOrderAmount : LiveData<Int?> = _minOrderAmount
@@ -126,7 +138,12 @@ class CreateRoomViewModel (
             _restaurant.value.isNullOrBlank() -> R.string.create_error_restaurant
             else -> null
         }
-        3 -> null // 장소는 아직 선택 기능 없음
+        3 -> when {
+            _deliveryApp.value == null -> R.string.create_error_delivery_app
+            _deliveryApp.value == DeliveryApp.OTHER &&
+                _deliveryAppName.value.isNullOrBlank() -> R.string.create_error_delivery_app_name
+            else -> null
+        }
         4 -> when {
             _minOrderAmount.value == null -> R.string.create_error_min_order
             _deliveryFee.value == null -> R.string.create_error_delivery_fee
@@ -207,6 +224,10 @@ class CreateRoomViewModel (
             ?: FoodCategory.ETC,
         restaurant = _restaurant.value
             .orEmpty().trim(),
+        deliveryApp = _deliveryApp.value ?: DeliveryApp.OTHER,
+        // 직접 입력일 때만 이름 저장 (아이콘 앱이면 빈 값)
+        deliveryAppName = if (_deliveryApp.value == DeliveryApp.OTHER)
+            _deliveryAppName.value.orEmpty().trim() else "",
         minOrderAmount = _minOrderAmount.value ?: 0,
         estimatedDeliveryFee =
             _deliveryFee.value ?: 0,
