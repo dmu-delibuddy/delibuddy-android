@@ -93,6 +93,7 @@ class ImageRepository(
             } catch (error: StorageException) {
                 if (error.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND) throw error
             }
+            images.document(imageId).delete().await()
         }
     }
 }
