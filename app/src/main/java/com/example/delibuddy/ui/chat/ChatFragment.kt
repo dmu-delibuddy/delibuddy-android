@@ -7,15 +7,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentChatBinding
 import com.example.delibuddy.ui.chat.ChatViewModel.ScreenState
@@ -34,13 +39,10 @@ class ChatFragment : Fragment() {
     private val viewModel: ChatViewModel by viewModels()
 
     private lateinit var chatAdapter: ChatAdapter
+    private val participantAdapter = ChatParticipantAdapter()
+    private var keyboardLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+    private var wasKeyboardVisible = false
 
-    // 갤러리(사진 선택기)에서 사진 한 장 고르기. 고르면 바로 전송
-    private val pickImage = registerForActivityResult(
-        ActivityResultContracts.PickVisualMedia()
-    ) { uri -> uri?.let { sendImage(it) } }
-
-    // 화면 레이아웃(ViewBinding) 생성
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,7 +56,15 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpMessageList()
-        setUpInput()
+        setUpParticipantList()
+        setUpMenuTab()
+        setUpParticipantsTab()
+        setUpMessageInput()
+        setUpSendButton()
+        setUpPhotoButton()
+        setUpPanelButton()
+        observeKeyboard()
+        observeParticipants()
         observeScreenState()
         observeRoomTitle()
         observeMessages()
@@ -73,20 +83,26 @@ class ChatFragment : Fragment() {
         binding.recyclerMessages.adapter = chatAdapter
     }
 
-    // 입력창 : 글자가 있을 때만 전송 버튼 활성, 키보드 전송 키도 지원
-    private fun setUpInput() {
+    private fun setUpParticipantList() {
+        binding.chatPanel.panelParticipants.layoutManager = GridLayoutManager(requireContext(), 3)
+        binding.chatPanel.panelParticipants.adapter = participantAdapter
+        showPanel(false)
+    }
+
+    private fun setUpMenuTab() {
+        binding.chatPanel.tabMenu.setOnClickListener { showPanel(false) }
+    }
+
+    private fun setUpParticipantsTab() {
+        binding.chatPanel.tabParticipants.setOnClickListener { showPanel(true) }
+    }
+
+    private fun setUpMessageInput() {
         binding.buttonSend.isEnabled = false
         binding.editMessage.doAfterTextChanged { text ->
             binding.buttonSend.isEnabled = !text.isNullOrBlank()
         }
-        binding.buttonSend.setOnClickListener { sendMessage() }
-        binding.buttonImage.setOnClickListener {
-            pickImage.launch(
-                PickVisualMediaRequest(
-                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                )
-            )
-        }
+        binding.editMessage.setOnClickListener { binding.chatPanel.root.isVisible = false }
         binding.editMessage.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 sendMessage()
@@ -95,6 +111,55 @@ class ChatFragment : Fragment() {
                 false
             }
         }
+    }
+
+    private fun setUpSendButton() {
+        binding.buttonSend.setOnClickListener { sendMessage() }
+    }
+
+    private fun setUpPhotoButton() {
+        binding.chatPanel.menuPhoto.setOnClickListener {
+            pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+    }
+
+    private fun setUpPanelButton() {
+        binding.buttonImage.setOnClickListener {
+            val opening = !binding.chatPanel.root.isVisible
+            if (opening) {
+                WindowInsetsControllerCompat(requireActivity().window, binding.editMessage)
+                    .hide(WindowInsetsCompat.Type.ime())
+                binding.editMessage.clearFocus()
+            }
+            binding.chatPanel.root.isVisible = opening
+        }
+    }
+
+    private fun observeParticipants() {
+        viewModel.participants.observe(viewLifecycleOwner) { participantAdapter.submitList(it) }
+    }
+
+    private fun observeKeyboard() {
+        val decorView = requireActivity().window.decorView
+        wasKeyboardVisible = ViewCompat.getRootWindowInsets(decorView)
+            ?.isVisible(WindowInsetsCompat.Type.ime()) == true
+        val listener = ViewTreeObserver.OnGlobalLayoutListener {
+            val insets = ViewCompat.getRootWindowInsets(decorView)
+            val visible = insets?.isVisible(WindowInsetsCompat.Type.ime()) == true
+            if (visible && !wasKeyboardVisible) binding.chatPanel.root.isVisible = false
+            wasKeyboardVisible = visible
+        }
+        keyboardLayoutListener = listener
+        decorView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+    }
+
+    private fun showPanel(participants: Boolean) {
+        binding.chatPanel.indicatorMenu.visibility =
+            if (participants) View.INVISIBLE else View.VISIBLE
+        binding.chatPanel.indicatorParticipants.visibility =
+            if (participants) View.VISIBLE else View.INVISIBLE
+        binding.chatPanel.panelMenu.isVisible = !participants
+        binding.chatPanel.panelParticipants.isVisible = participants
     }
 
     // 보내기 성공하면 입력창 비우고 맨 아래로
@@ -140,8 +205,10 @@ class ChatFragment : Fragment() {
             when (state) {
                 ScreenState.NO_ROOM ->
                     binding.textMessage.setText(R.string.chat_no_room)
+
                 ScreenState.ERROR ->
                     binding.textMessage.setText(R.string.chat_load_error)
+
                 else -> Unit
             }
         }
@@ -177,7 +244,17 @@ class ChatFragment : Fragment() {
     // 화면이 사라질 때 어댑터 / binding 해제
     override fun onDestroyView() {
         super.onDestroyView()
+        keyboardLayoutListener?.let {
+            requireActivity().window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(it)
+        }
+        keyboardLayoutListener = null
         binding.recyclerMessages.adapter = null
+        binding.chatPanel.panelParticipants.adapter = null
         _binding = null
     }
+
+    private val pickImage = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri -> uri?.let { sendImage(it) } }
+
 }

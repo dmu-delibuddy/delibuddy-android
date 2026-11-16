@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
@@ -66,6 +68,7 @@ class ChatViewModel(
             roomRepository.observeRoom(id)
                 .catch { emit(null) }
         } ?: flowOf(null)
+    private val sharedRoom = room.shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
     // 메시지 구독 실패 여부 (참여자가 아니면 규칙에 막힘)
     private val loadFailed = MutableStateFlow(false)
@@ -103,7 +106,19 @@ class ChatViewModel(
 
     // 상단에 보여줄 방 제목
     val roomTitle: LiveData<String> =
-        room.map { it?.title.orEmpty() }.asLiveData()
+        sharedRoom.map { it?.title.orEmpty() }.asLiveData()
+
+    val participants: LiveData<List<ChatParticipant>> =
+        combine(sharedRoom, profiles) { currentRoom, cachedProfiles ->
+            if (currentRoom == null) return@combine emptyList()
+            val type = profileType(currentRoom.mode)
+            val ids = currentRoom.participantIds.filter { it.isNotBlank() }.distinct()
+            requestProfileIds(ids, type)
+            ids.map { id ->
+                val profile = cachedProfiles[id to type]
+                ChatParticipant(id, profile?.nickname.orEmpty(), profile?.imageUrl, id == currentRoom.hostId)
+            }
+        }.asLiveData()
 
     // 화면 상태
     val screenState: LiveData<ScreenState> =
@@ -117,7 +132,7 @@ class ChatViewModel(
 
     // 화면에 보여줄 메시지 목록
     val items: LiveData<List<ChatItem>> =
-        combine(serverMessages, pending, room, imageUrls, profiles) { server, local, room, urls, profiles ->
+        combine(serverMessages, pending, sharedRoom, imageUrls, profiles) { server, local, room, urls, profiles ->
             if (room != null) requestProfiles(server, room.mode)
             buildItems(server, local, room, urls, profiles)
         }.asLiveData()
@@ -180,12 +195,16 @@ class ChatViewModel(
     }
 
     private fun requestProfiles(messages: List<ChatModel>, mode: RoomMode) {
-        val type = profileType(mode)
-        messages.asSequence()
+        val ids = messages.asSequence()
             .filter { it.type == MessageType.NORMAL }
             .mapNotNull { it.senderId?.takeIf { id -> id.isNotBlank() && id != chatRepository.myUid } }
             .distinct()
-            .map { it to type }
+            .toList()
+        requestProfileIds(ids, profileType(mode))
+    }
+
+    private fun requestProfileIds(ids: List<String>, type: ProfileType) {
+        ids.asSequence().map { it to type }
             .filter { requestedProfiles.add(it) }
             .forEach { key ->
                 viewModelScope.launch {
