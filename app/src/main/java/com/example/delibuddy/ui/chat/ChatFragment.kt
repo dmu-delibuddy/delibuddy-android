@@ -22,6 +22,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.delibuddy.R
@@ -47,7 +48,6 @@ class ChatFragment : Fragment() {
     private val participantAdapter = ChatParticipantAdapter()
     private var keyboardLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
     private var wasKeyboardVisible = false
-
     private var cameraPhotoUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +73,7 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpMessageList()
+        setUpHeader()
         setUpParticipantList()
         setUpMenuTab()
         setUpParticipantsTab()
@@ -84,8 +85,12 @@ class ChatFragment : Fragment() {
         observeKeyboard()
         observeParticipants()
         observeScreenState()
-        observeRoomTitle()
+        observeRoomHeader()
         observeMessages()
+    }
+
+    private fun setUpHeader() {
+        binding.chatHeader.buttonBack.setOnClickListener { findNavController().navigateUp() }
     }
 
     // 메시지 목록 : 아래부터 쌓이게
@@ -239,7 +244,6 @@ class ChatFragment : Fragment() {
             val ready = state == ScreenState.READY
             binding.recyclerMessages.isVisible = ready
             binding.layoutInput.isVisible = ready
-            binding.textRoomTitle.isVisible = ready
             binding.textMessage.isVisible = !ready
             when (state) {
                 ScreenState.NO_ROOM ->
@@ -254,9 +258,14 @@ class ChatFragment : Fragment() {
     }
 
     // 상단 방 제목
-    private fun observeRoomTitle() {
-        viewModel.roomTitle.observe(viewLifecycleOwner) { title ->
-            binding.textRoomTitle.text = title
+    private fun observeRoomHeader() {
+        viewModel.roomHeader.observe(viewLifecycleOwner) { room ->
+            binding.chatHeader.textRoomTitle.text = room?.title.orEmpty()
+            binding.chatHeader.textRestaurant.text = room?.restaurant.orEmpty()
+            binding.chatHeader.textRestaurant.isVisible = !room?.restaurant.isNullOrBlank()
+            binding.chatHeader.textCount.text = room?.let {
+                getString(R.string.chat_header_participant_count, it.currentCount, it.maxParticipants)
+            }.orEmpty()
         }
     }
 
@@ -295,6 +304,7 @@ class ChatFragment : Fragment() {
     private val pickImage = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> uri?.let { sendImage(it) } }
+
     private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         val uri = cameraPhotoUri
         cameraPhotoUri = null

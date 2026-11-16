@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
             R.id.navigation_account_info,
             R.id.navigation_signup,
             R.id.navigation_room_detail,
+            R.id.navigation_chat_room,
             R.id.navigation_create_room -> supportActionBar?.hide()
             else -> supportActionBar?.show()
         }

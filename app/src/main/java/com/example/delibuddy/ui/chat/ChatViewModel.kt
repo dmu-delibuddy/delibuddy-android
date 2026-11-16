@@ -104,9 +104,7 @@ class ChatViewModel(
     // 내가 보낸 사진의 기기 주소 (URL 받기 전까지 이걸로 보여줌)
     private val localImages = mutableMapOf<String, Uri>()
 
-    // 상단에 보여줄 방 제목
-    val roomTitle: LiveData<String> =
-        sharedRoom.map { it?.title.orEmpty() }.asLiveData()
+    val roomHeader: LiveData<RoomModel?> = sharedRoom.asLiveData()
 
     val participants: LiveData<List<ChatParticipant>> =
         combine(sharedRoom, profiles) { currentRoom, cachedProfiles ->

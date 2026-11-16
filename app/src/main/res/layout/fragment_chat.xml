@@ -9,23 +9,14 @@
     tools:context=".ui.chat.ChatFragment">
 
     <!-- 상단 방 제목 -->
-    <TextView
-        android:id="@+id/text_room_title"
+    <include
+        android:id="@+id/chat_header"
+        layout="@layout/layout_chat_header"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:paddingStart="16dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="12dp"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:visibility="gone"
+        android:layout_height="72dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="치킨 같이 시켜요" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- 메시지 목록 -->
     <androidx.recyclerview.widget.RecyclerView
@@ -39,7 +30,7 @@
         app:layout_constraintBottom_toTopOf="@id/layout_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_room_title" />
+        app:layout_constraintTop_toBottomOf="@id/chat_header" />
 
     <!-- 입력창 + 전송 버튼 -->
     <LinearLayout
