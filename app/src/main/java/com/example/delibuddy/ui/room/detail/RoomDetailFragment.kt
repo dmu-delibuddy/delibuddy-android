@@ -20,6 +20,7 @@ import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.FragmentRoomDetailBinding
+import com.example.delibuddy.ui.room.deliveryAppLabel
 import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.DetailState
 import com.google.firebase.auth.FirebaseAuth
 
@@ -187,6 +188,9 @@ class RoomDetailFragment : Fragment() {
 
         information.textRestaurant.text = row(R.string.detail_restaurant,
             room.restaurant)
+
+        information.textDeliveryApp.text = row(R.string.detail_delivery_app,
+            room.deliveryAppLabel(requireContext()))
 
 
         information.textMinOrder.text = row(R.string.detail_min_order,

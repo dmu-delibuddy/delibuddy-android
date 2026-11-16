@@ -39,6 +39,13 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <!-- 방 만들기 배달 앱 아이콘 버튼 (CategoryChip 에서 높이·아이콘 위치만 변경) -->
+    <style name="DeliveryAppIconChip" parent="CategoryChip">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
 
     <style name="DetailRow">
         <item name="android:layout_width">match_parent</item>

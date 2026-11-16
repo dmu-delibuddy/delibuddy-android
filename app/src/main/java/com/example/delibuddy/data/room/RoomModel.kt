@@ -20,6 +20,9 @@ enum class FoodCostSplitMethod { HOST_PAYS, EQUAL_SPLIT, PROPORTIONAL_SPLIT, CUS
 // 배달비 정산 방법 : 방장 부담 / 1/N / 직접 입력
 enum class DeliveryFeeSplitMethod { HOST_PAYS, EQUAL_SPLIT, CUSTOM }
 
+// 사용할 배달 앱 : 배민 / 쿠팡이츠 / 요기요 / 그 외(직접 입력)
+enum class DeliveryApp { BAEMIN, COUPANG_EATS, YOGIYO, OTHER }
+
 /*
     * Firestore rooms / {roodId} 문서
     * toObject() 로 변환 위해 인자 없는 생성자가 필요 -> 모든 값에 기본값을 둔다.
@@ -35,6 +38,8 @@ data class RoomModel (
     val mode : RoomMode = RoomMode.PICKUP_ONLY,
     val category : FoodCategory = FoodCategory.ETC,
     val restaurant : String = "",
+    val deliveryApp : DeliveryApp = DeliveryApp.OTHER,  // 예전 방은 OTHER 로 읽힘
+    val deliveryAppName : String = "",                  // OTHER 일 때 직접 입력한 앱 이름
     val location : GeoPoint? = null,
     val minOrderAmount : Int = 0,
     val estimatedDeliveryFee : Int = 0,

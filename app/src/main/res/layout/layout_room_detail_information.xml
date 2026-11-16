@@ -12,6 +12,8 @@
 
     <TextView android:id="@+id/text_restaurant"
         style="@style/DetailRow" />
+    <TextView android:id="@+id/text_delivery_app"
+        style="@style/DetailRow" />
     <TextView android:id="@+id/text_min_order"
         style="@style/DetailRow" />
     <TextView android:id="@+id/text_delivery_fee"
