@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 액션바 가운데에 들어가는 DELI-BUDDY 로고 (MainActivity 에서 setCustomView 로 사용) -->
+<!-- 홈 화면 상단 DELI-BUDDY 로고 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
