@@ -13,15 +13,6 @@
         android:padding="16dp">
 
         <!-- 1. 상단 제목 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"
-            android:text="@string/my_page"
-            android:textColor="@color/black"
-            android:textSize="24sp"
-            android:textStyle="bold" />
 
         <!-- 2. 프로필 카드 (profile) -->
         <include
