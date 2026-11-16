@@ -10,7 +10,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlin.Long.Companion.MAX_VALUE
 
 
 class RoomRepository(
@@ -77,7 +76,7 @@ class RoomRepository(
                         null
                     }
                 }
-                .sortedBy { it.deadline?.seconds ?: MAX_VALUE }
+                .sortedBy { it.createdAt?.seconds ?: 0L }
             trySend(list)
         }
         awaitClose { registration.remove() }
@@ -101,7 +100,7 @@ class RoomRepository(
 
     // ------------------- 방 상태관리 ---------------------------
 
-    // 방 참여. 트랜잭션으로 정원 / 중복 / 마감을 검사해서 동시에 눌러도 정원을 넘지 않음.
+    // 방 참여. 트랜잭션으로 정원 / 중복 / 모집 상태를 검사해서 동시에 눌러도 정원을 넘지 않음.
     suspend fun joinRoom(roomId: String) {
         val uid = requireUid()
         val ref = rooms.document(roomId)
@@ -113,7 +112,7 @@ class RoomRepository(
                 room.status == RoomStatus.FULL || room.currentCount >= room.maxParticipants ->
                     throw RoomException(RoomException.Reason.FULL)
 
-                room.status != RoomStatus.RECRUITING || room.isDeadLinePassed ->
+                room.status != RoomStatus.RECRUITING ->
                     throw RoomException(RoomException.Reason.CLOSED)
             }
             val nextStatus =

@@ -60,38 +60,16 @@
         app:layout_constraintTop_toTopOf="@id/image_host"
         tools:text="모집중 2/3명" />
 
-    <ImageView
-        android:id="@+id/image_clock"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginEnd="4dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_pixel_clock"
-        app:layout_constraintBottom_toBottomOf="@id/text_deadline"
-        app:layout_constraintEnd_toStartOf="@id/text_deadline"
-        app:layout_constraintTop_toTopOf="@id/text_deadline" />
-
-    <TextView
-        android:id="@+id/text_deadline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="19:30 마감" />
-
-    <!-- 2줄: 배달비 (오른쪽) -->
+    <!-- 1줄: 배달비 (오른쪽) -->
     <TextView
         android:id="@+id/text_delivery_fee"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
         android:alpha="0.8"
         android:textColor="@color/black"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_deadline"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="배달비 1인당 1,500원" />
 
     <!-- 3줄: 제목 -->

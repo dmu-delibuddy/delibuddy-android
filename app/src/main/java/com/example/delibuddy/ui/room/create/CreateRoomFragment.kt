@@ -1,6 +1,4 @@
 package com.example.delibuddy.ui.room.create
-import android.app.TimePickerDialog
-import java.util.Calendar
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -68,12 +66,6 @@ class CreateRoomFragment : Fragment() {
         // 2단계 : 음식 정보
         setUpCategorySpinner()
         setUpRestaurantInput()
-
-        // 3단계 : 마감 시간
-        setUpDeadlineBox()
-        observeDeadline()
-        setUpNoTimeLimitCheck()
-        observeNoTimeLimit()
 
         // 4단계 : 금액, 정산
         setUpAmountInputs()
@@ -272,48 +264,6 @@ class CreateRoomFragment : Fragment() {
             viewModel.setRestaurant(text?.toString().orEmpty())
         }
     }
-
-
-    // 3단계 : 마감 시간
-    private fun setUpDeadlineBox() {
-        binding.step3.boxDeadline.setOnClickListener { showDeadlinePicker() }
-    }
-
-    // 이미 고른 시각이 있으면 그 시각, 없으면 지금 + 1시간으로 시계 창 열기
-    private fun showDeadlinePicker() {
-        val saved = viewModel.deadlineMinutes.value
-        val now = Calendar.getInstance()
-        val initHour = saved?.div(60) ?: ((now.get(Calendar.HOUR_OF_DAY) + 1) % 24)
-        val initMinute = saved?.rem(60) ?: 0
-        TimePickerDialog(requireContext(), { _, hour, minute ->
-            viewModel.setDeadline(hour, minute)
-        }, initHour, initMinute, true).show()
-    }
-
-    // 고른 마감 시각을 "18:30 마감" 형태로 표시
-    private fun observeDeadline() {
-        viewModel.deadlineMinutes.observe(viewLifecycleOwner) { minutes ->
-            binding.step3.textDeadline.text =
-                minutes?.let { "%02d:%02d 마감".format(it / 60, it % 60) } ?: ""
-        }
-    }
-
-
-    // 시간 제한 없음 체크 여부 저장
-    private fun setUpNoTimeLimitCheck() {
-        binding.step3.checkNoTimeLimit.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.setNoTimeLimit(isChecked)
-        }
-    }
-
-    // 시간 제한 없음이면 마감 시간 칸을 흐리게 + 못 누르게
-    private fun observeNoTimeLimit() {
-        viewModel.noTimeLimit.observe(viewLifecycleOwner) { noLimit ->
-            binding.step3.boxDeadline.isEnabled = !noLimit
-            binding.step3.boxDeadline.alpha = if (noLimit) 0.4f else 1f
-        }
-    }
-
 
     // 4단계 : 금액, 정산
     private fun setUpAmountInputs() {

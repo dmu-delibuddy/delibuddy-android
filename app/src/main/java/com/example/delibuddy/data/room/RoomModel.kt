@@ -36,7 +36,6 @@ data class RoomModel (
     val category : FoodCategory = FoodCategory.ETC,
     val restaurant : String = "",
     val location : GeoPoint? = null,
-    val deadline : Timestamp? = null,
     val minOrderAmount : Int = 0,
     val estimatedDeliveryFee : Int = 0,
     val foodCostSplitMethod : FoodCostSplitMethod = FoodCostSplitMethod.EQUAL_SPLIT,
@@ -53,13 +52,10 @@ data class RoomModel (
     @get:Exclude
     val deliveryFeePerPerson : Int get() = estimatedDeliveryFee / maxOf(currentCount, 1)
 
-    @get:Exclude
-    val isDeadLinePassed : Boolean get() = deadline?.let { it < Timestamp.now() } ?: false
-
     // 지금 새로 참여할 수 있는지
     @get:Exclude
     val isJoinable : Boolean
-        get() = status == RoomStatus.RECRUITING && currentCount < maxParticipants && !isDeadLinePassed
+        get() = status == RoomStatus.RECRUITING && currentCount < maxParticipants
 
     // 이 uid 가 방장인지
     fun isHost(uid : String?) : Boolean = uid != null && uid == hostId
