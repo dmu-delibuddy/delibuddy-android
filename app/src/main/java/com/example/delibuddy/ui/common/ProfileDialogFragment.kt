@@ -70,7 +70,7 @@ class ProfileDialogFragment : DialogFragment() {
                         ProfileType.PICKUP_ONLY -> "픽업 모드"
                         ProfileType.MEAL_BUDDY -> "밥친구 모드"
                     }
-                    textBio.text = profile.bio.ifBlank { "소개가 없어요" }
+                    textBio.text = profile.bio.orEmpty().ifBlank { "소개가 없어요" }
                     // TODO: 리뷰(reviews) 기능이 생기면 받은 리뷰 평균 별점으로 교체
                     textManner.text = "매너 점수  -"
                     // TODO: imageUrl 이미지 로딩 (이미지 라이브러리 결정 후)
