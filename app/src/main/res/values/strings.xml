@@ -1,4 +1,6 @@
 <resources>
+    <string name="chat_camera_unavailable">사용할 수 있는 카메라 앱이 없습니다.</string>
+    <string name="chat_camera_error">카메라를 준비하지 못했습니다.</string>
     <string name="chat_menu_photo">사진</string>
     <string name="chat_menu_camera">카메라</string>
     <string name="chat_menu_order">내 주문</string>

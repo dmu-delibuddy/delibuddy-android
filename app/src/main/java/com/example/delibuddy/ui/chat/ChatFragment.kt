@@ -1,6 +1,7 @@
 package com.example.delibuddy.ui.chat
 
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -10,9 +11,11 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
+import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -25,6 +28,8 @@ import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentChatBinding
 import com.example.delibuddy.ui.chat.ChatViewModel.ScreenState
 import com.example.delibuddy.ui.common.loadImage
+import java.io.File
+import java.io.IOException
 
 /*
     * 채팅방
@@ -42,6 +47,18 @@ class ChatFragment : Fragment() {
     private val participantAdapter = ChatParticipantAdapter()
     private var keyboardLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
     private var wasKeyboardVisible = false
+
+    private var cameraPhotoUri: Uri? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        cameraPhotoUri = savedInstanceState?.getString(STATE_CAMERA_URI)?.let(Uri::parse)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        cameraPhotoUri?.let { outState.putString(STATE_CAMERA_URI, it.toString()) }
+        super.onSaveInstanceState(outState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,6 +79,7 @@ class ChatFragment : Fragment() {
         setUpMessageInput()
         setUpSendButton()
         setUpPhotoButton()
+        setUpCameraButton()
         setUpPanelButton()
         observeKeyboard()
         observeParticipants()
@@ -120,6 +138,27 @@ class ChatFragment : Fragment() {
     private fun setUpPhotoButton() {
         binding.chatPanel.menuPhoto.setOnClickListener {
             pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+    }
+
+    private fun setUpCameraButton() {
+        binding.chatPanel.menuCamera.setOnClickListener {
+            try {
+                val directory = File(requireContext().cacheDir, "chat_camera")
+                if (!directory.exists() && !directory.mkdirs()) throw IOException("Cannot create camera cache")
+                val file = File.createTempFile("photo_", ".jpg", directory)
+                val uri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", file)
+                cameraPhotoUri = uri
+                try {
+                    takePhoto.launch(uri)
+                } catch (e: ActivityNotFoundException) {
+                    cameraPhotoUri = null
+                    file.delete()
+                    Toast.makeText(requireContext(), R.string.chat_camera_unavailable, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: IOException) {
+                Toast.makeText(requireContext(), R.string.chat_camera_error, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -256,5 +295,21 @@ class ChatFragment : Fragment() {
     private val pickImage = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> uri?.let { sendImage(it) } }
+    private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        val uri = cameraPhotoUri
+        cameraPhotoUri = null
+        if (uri != null) {
+            if (success) {
+                viewModel.sendImage(uri)
+                if (_binding != null) scrollToBottom()
+            } else {
+                requireContext().contentResolver.delete(uri, null, null)
+            }
+        }
+    }
+
+    companion object {
+        private const val STATE_CAMERA_URI = "camera_photo_uri"
+    }
 
 }
