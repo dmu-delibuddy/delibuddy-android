@@ -71,7 +71,7 @@
         android:background="@drawable/bg_pixel_box"
         android:contentDescription="장바구니 사진 올리기"
         android:scaleType="centerInside"
-        android:src="@drawable/add_picture_icon" />
+        android:src="@drawable/picture_icon" />
 
     <TextView
         android:layout_width="match_parent"

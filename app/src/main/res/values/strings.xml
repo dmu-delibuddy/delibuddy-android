@@ -1,4 +1,12 @@
 <resources>
+    <string name="chat_header_participant_count">%1$d/%2$d</string>
+    <string name="chat_camera_unavailable">사용할 수 있는 카메라 앱이 없습니다.</string>
+    <string name="chat_camera_error">카메라를 준비하지 못했습니다.</string>
+    <string name="chat_menu_photo">사진</string>
+    <string name="chat_menu_camera">카메라</string>
+    <string name="chat_menu_order">내 주문</string>
+    <string name="chat_panel_menu">메뉴</string>
+    <string name="chat_panel_participants">참여자</string>
     <string name="mypage_logout">로그아웃</string>
     <string name="signup_account_info_description">배달비와 음식값 정산에 사용될 계좌예요.</string>
     <string name="signup_finish">회원가입 완료</string>
@@ -175,6 +183,7 @@
     <string name="chat_sender_participant">참여자</string>
     <string name="chat_sender_host">%1$s (방장)</string>
     <string name="chat_profile_image_desc">보낸 사람 프로필 사진</string>
+    <string name="chat_plus">+</string>
     <string name="chat_pick_image">사진</string>
     <string name="chat_image_desc">채팅 사진</string>
     <string name="chat_list_title">내 채팅방</string>
