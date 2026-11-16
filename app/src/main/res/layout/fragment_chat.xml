@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/app_bg"
     tools:context=".ui.chat.ChatFragment">
 
     <!-- 상단 방 제목 -->
@@ -52,7 +53,8 @@
         android:paddingEnd="12dp"
         android:paddingBottom="8dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/chat_navigation_background"
+        app:layout_constraintBottom_toTopOf="@id/chat_panel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -106,6 +108,16 @@
             app:strokeColor="@color/black"
             app:strokeWidth="2dp" />
     </LinearLayout>
+
+    <include
+        android:id="@+id/chat_panel"
+        layout="@layout/layout_chat_panel"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 방 없음 / 불러오기 실패 안내 -->
     <TextView

@@ -1,4 +1,9 @@
 <resources>
+    <string name="chat_menu_photo">사진</string>
+    <string name="chat_menu_camera">카메라</string>
+    <string name="chat_menu_order">내 주문</string>
+    <string name="chat_panel_menu">메뉴</string>
+    <string name="chat_panel_participants">참여자</string>
     <string name="mypage_logout">로그아웃</string>
     <string name="signup_account_info_description">배달비와 음식값 정산에 사용될 계좌예요.</string>
     <string name="signup_finish">회원가입 완료</string>
