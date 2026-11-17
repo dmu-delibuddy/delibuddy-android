@@ -89,3 +89,19 @@ private fun setUpListeners() {
     binding.buttonNext.setOnClickListener { navigateToAccountInfo() }
 }
 ```
+
+### 코루틴 예외 처리
+
+viewModel 코루틴에서 `Exception`을 처리할 때 `CancellationException`을 먼저 던져 취소가 전달되도록 한다.
+
+```kotlin
+try {
+    repository.save()
+} catch (e: CancellationException) {
+    throw e
+} catch (e: Exception) {
+    // 작업 실패 처리
+}
+```
+
+시간 초과를 오류 화면으로 보여주는 것처럼 취소를 의도적으로 먼저 처리해야 하는 경우는 예외.
