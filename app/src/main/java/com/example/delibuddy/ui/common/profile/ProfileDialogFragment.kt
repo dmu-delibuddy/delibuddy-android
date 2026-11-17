@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import com.example.delibuddy.R
 import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.databinding.DialogProfileBinding
+import com.example.delibuddy.ui.common.FullscreenImageDialogFragment
 import com.example.delibuddy.ui.common.GlobalLoadingDialog
 import com.example.delibuddy.ui.common.loadImage
 
@@ -48,6 +49,12 @@ class ProfileDialogFragment : DialogFragment() {
 
     private fun setUpListeners() {
         binding.buttonClose.setOnClickListener { dismiss() }
+        binding.imageProfile.setOnClickListener {
+            val imageUrl = (viewModel.state.value as? ProfileUiState.Success)
+                ?.profile?.imageUrl?.takeIf { it.isNotBlank() }
+                ?: return@setOnClickListener
+            FullscreenImageDialogFragment.show(childFragmentManager, imageUrl)
+        }
     }
 
     private fun observeProfile() {
