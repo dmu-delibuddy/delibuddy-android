@@ -26,17 +26,13 @@ class AuthEntryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpSignUpButton()
-        setUpSignInButton()
+        setUpListeners()
     }
 
-    private fun setUpSignUpButton() {
+    private fun setUpListeners() {
         binding.buttonAuthEntryStart.setOnClickListener {
             findNavController().navigate(R.id.action_auth_entry_to_signup)
         }
-    }
-
-    private fun setUpSignInButton() {
         binding.buttonAuthEntrySignin.setOnClickListener {
             findNavController().navigate(R.id.action_auth_entry_to_signin)
         }

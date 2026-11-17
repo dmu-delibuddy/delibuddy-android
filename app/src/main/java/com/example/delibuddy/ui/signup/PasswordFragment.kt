@@ -31,27 +31,19 @@ class PasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpPreviousButton()
-        setUpVerifyEmailButton()
-        setUpVerificationCompleteButton()
+        setUpButtonListeners()
         observeSignUpState()
         observeVerificationCompletion()
         setUpPasswordInputs()
     }
 
-    private fun setUpPreviousButton() {
+    private fun setUpButtonListeners() {
         binding.buttonPrevious.setOnClickListener {
             findNavController().popBackStack()
         }
-    }
-
-    private fun setUpVerifyEmailButton() {
         binding.buttonVerifyEmail.setOnClickListener {
             viewModel.sendVerificationEmail()
         }
-    }
-
-    private fun setUpVerificationCompleteButton() {
         binding.buttonVerificationComplete.setOnClickListener {
             viewModel.completeSignUp()
         }

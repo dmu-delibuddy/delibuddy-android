@@ -32,6 +32,12 @@ class AccountInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpAccountInput()
+        setUpListeners()
+        observeRegistrationState()
+    }
+
+    private fun setUpAccountInput() {
         val banks = resources.getStringArray(R.array.mypage_bank_list)
         binding.spinnerBank.adapter = ArrayAdapter(
             requireContext(), android.R.layout.simple_spinner_dropdown_item, banks,
@@ -49,10 +55,12 @@ class AccountInfoFragment : Fragment() {
         }
         binding.editAccount.setText(viewModel.account.value)
         binding.editAccount.doAfterTextChanged { viewModel.setAccount(it?.toString().orEmpty()) }
+    }
+
+    private fun setUpListeners() {
         binding.buttonPrevious.setOnClickListener { findNavController().popBackStack() }
         binding.buttonSkip.setOnClickListener { viewModel.finishRegistration(skipAccount = true) }
         binding.buttonFinish.setOnClickListener { viewModel.finishRegistration(skipAccount = false) }
-        observeRegistrationState()
     }
 
     private fun observeRegistrationState() {

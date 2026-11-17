@@ -75,8 +75,7 @@ class ChatFragment : Fragment() {
         setUpMessageList()
         setUpHeader()
         setUpParticipantList()
-        setUpMenuTab()
-        setUpParticipantsTab()
+        setUpPanelTabs()
         setUpMessageInput()
         setUpSendButton()
         setUpPhotoButton()
@@ -112,11 +111,8 @@ class ChatFragment : Fragment() {
         showPanel(false)
     }
 
-    private fun setUpMenuTab() {
+    private fun setUpPanelTabs() {
         binding.chatPanel.tabMenu.setOnClickListener { showPanel(false) }
-    }
-
-    private fun setUpParticipantsTab() {
         binding.chatPanel.tabParticipants.setOnClickListener { showPanel(true) }
     }
 

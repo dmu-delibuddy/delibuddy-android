@@ -29,18 +29,14 @@ class EmailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpNextButton()
-        setUpEmailInputListener()
+        setUpListeners()
         observeEmail()
     }
 
-    private fun setUpNextButton() {
+    private fun setUpListeners() {
         binding.buttonNext.setOnClickListener {
             findNavController().navigate(R.id.action_email_to_password)
         }
-    }
-
-    private fun setUpEmailInputListener() {
         binding.editEmail.doAfterTextChanged { text ->
             viewModel.setEmail(text?.toString().orEmpty())
         }

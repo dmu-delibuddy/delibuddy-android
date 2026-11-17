@@ -31,12 +31,20 @@ class BirthDateFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpListeners()
+        observeBirthDate()
+    }
+
+    private fun setUpListeners() {
         binding.buttonBirthDate.setOnClickListener { showDatePicker() }
         binding.buttonSkip.setOnClickListener {
             viewModel.setBirthDate(null)
             navigateToAccountInfo()
         }
         binding.buttonNext.setOnClickListener { navigateToAccountInfo() }
+    }
+
+    private fun observeBirthDate() {
         viewModel.birthDate.observe(viewLifecycleOwner) { date ->
             binding.buttonBirthDate.text = date ?: getString(R.string.signup_birth_date_hint)
             binding.buttonNext.isEnabled = date != null
