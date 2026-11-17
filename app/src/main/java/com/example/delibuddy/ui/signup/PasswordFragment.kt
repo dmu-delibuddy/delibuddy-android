@@ -90,7 +90,7 @@ class PasswordFragment : Fragment() {
 
     private fun updateLoadingState() {
         val isBusy = viewModel.isSendingVerification.value == true ||
-            viewModel.isCompletingSignUp.value == true
+                viewModel.isCompletingSignUp.value == true
         binding.buttonVerificationComplete.isEnabled = !isBusy
         binding.buttonVerifyEmail.isEnabled = !isBusy
         binding.buttonPrevious.isEnabled = !isBusy

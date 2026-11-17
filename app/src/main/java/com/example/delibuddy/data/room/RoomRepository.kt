@@ -26,7 +26,7 @@ class RoomRepository(
     suspend fun createRoom(room: RoomModel): String {
         val uid = requireUid()
         val ref = rooms.document()
-        val newRoom = room.copy (
+        val newRoom = room.copy(
             hostId = uid,
             participantIds = listOf(uid),
             status = RoomStatus.RECRUITING,
@@ -52,11 +52,13 @@ class RoomRepository(
         var query: Query = if (onlyJoinable) {
             rooms.whereEqualTo("status", RoomStatus.RECRUITING.name)
         } else {
-            rooms.whereIn("status", listOf(
-                RoomStatus.RECRUITING.name,
-                RoomStatus.FULL.name,
-                RoomStatus.ORDER_CONFIRMED.name,  // 참여자는 마감 후에도 계속 봐야 함
-            ))
+            rooms.whereIn(
+                "status", listOf(
+                    RoomStatus.RECRUITING.name,
+                    RoomStatus.FULL.name,
+                    RoomStatus.ORDER_CONFIRMED.name,  // 참여자는 마감 후에도 계속 봐야 함
+                )
+            )
         }
         if (mode != null) query = query.whereEqualTo("mode", mode.name)
         if (category != null) query = query.whereEqualTo("category", category.name)

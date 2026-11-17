@@ -1,4 +1,5 @@
 package com.example.delibuddy.ui.room.create
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +25,6 @@ import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
 import com.example.delibuddy.ui.room.create.CreateRoomViewModel.SubmitState
 
 
-
 /*
     * 방 만들기.
     * - 상단 < : 방 만들기 종료
@@ -35,9 +35,9 @@ class CreateRoomFragment : Fragment() {
 
     private var _binding: FragmentCreateRoomBinding? = null
     private val binding get() = _binding!!
-    private val viewModel : CreateRoomViewModel by viewModels()
+    private val viewModel: CreateRoomViewModel by viewModels()
 
-    private lateinit var backCallback : OnBackPressedCallback // 2단계 이상일 때만 켜져서 시스템 뒤로가기를 이전 단계로 바꿈
+    private lateinit var backCallback: OnBackPressedCallback // 2단계 이상일 때만 켜져서 시스템 뒤로가기를 이전 단계로 바꿈
 
     // 화면 레이아웃(ViewBinding) 생성
     override fun onCreateView(
@@ -164,10 +164,12 @@ class CreateRoomFragment : Fragment() {
                 showToast(R.string.create_success)
                 findNavController().popBackStack()
             }
+
             is SubmitState.Error -> {
                 showToast(state.message)
                 viewModel.clearSubmitError()
             }
+
             else -> Unit
         }
     }
@@ -189,12 +191,14 @@ class CreateRoomFragment : Fragment() {
     // 단계에 맞게 상단 1/4, 진행 막대, 보이는 페이지, 하단 버튼을 바꿈
     private fun renderStep(step: Int) {
         val last = CreateRoomViewModel.LAST_STEP
-        val progressBars = listOf(binding.progress1, binding.progress2, binding.progress3, binding.progress4)
-        val pages = listOf(binding.step1.root, binding.step2.root, binding.step3.root, binding.step4.root)
+        val progressBars =
+            listOf(binding.progress1, binding.progress2, binding.progress3, binding.progress4)
+        val pages =
+            listOf(binding.step1.root, binding.step2.root, binding.step3.root, binding.step4.root)
 
         binding.textStep.text = "$step/$last"
         progressBars.forEachIndexed { i, bar ->
-                bar.setBackgroundResource(if (i < step) R.drawable.bg_progress_on else R.drawable.bg_progress_off)
+            bar.setBackgroundResource(if (i < step) R.drawable.bg_progress_on else R.drawable.bg_progress_off)
         }
         pages.forEachIndexed { i, page ->
             page.visibility = if (i == step - 1) View.VISIBLE else View.GONE
@@ -254,14 +258,21 @@ class CreateRoomFragment : Fragment() {
             requireContext(), android.R.layout.simple_spinner_item, labels
         ).apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
 
-        binding.step2.spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            // 항목을 고르면 카테고리 저장 (0번 = 선택 안 함)
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                viewModel.setCategory(if (position == 0) null else categories[position - 1])
+        binding.step2.spinnerCategory.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                // 항목을 고르면 카테고리 저장 (0번 = 선택 안 함)
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    viewModel.setCategory(if (position == 0) null else categories[position - 1])
+                }
+
+                // 아무것도 안 골랐을 때는 처리 없음
+                override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             }
-            // 아무것도 안 골랐을 때는 처리 없음
-            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-        }
     }
 
     // 음식점 입력값 저장

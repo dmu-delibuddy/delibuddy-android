@@ -47,9 +47,11 @@ class ChatAdapter(
             TYPE_MINE -> MineHolder(
                 ItemChatMineBinding.inflate(inflater, parent, false)
             )
+
             TYPE_OTHER -> OtherHolder(
                 ItemChatOtherBinding.inflate(inflater, parent, false)
             )
+
             else -> SystemHolder(
                 ItemChatSystemBinding.inflate(inflater, parent, false)
             )
@@ -92,9 +94,13 @@ class ChatAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatItem.Bubble) = with(binding) {
-            val fallback = if (item.isFromHost) R.string.detail_host else R.string.chat_sender_participant
+            val fallback =
+                if (item.isFromHost) R.string.detail_host else R.string.chat_sender_participant
             textSender.text = item.senderNickname?.let { nickname ->
-                if (item.isFromHost) textSender.context.getString(R.string.chat_sender_host, nickname)
+                if (item.isFromHost) textSender.context.getString(
+                    R.string.chat_sender_host,
+                    nickname
+                )
                 else nickname
             } ?: textSender.context.getString(fallback)
             Glide.with(imageProfile)

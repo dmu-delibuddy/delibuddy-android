@@ -70,10 +70,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_back">
 
-        <View android:id="@+id/progress_1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" android:background="@drawable/bg_progress_on" />
-        <View android:id="@+id/progress_2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" android:background="@drawable/bg_progress_off" />
-        <View android:id="@+id/progress_3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" android:background="@drawable/bg_progress_off" />
-        <View android:id="@+id/progress_4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/bg_progress_off" />
+        <View
+            android:id="@+id/progress_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_progress_on" />
+
+        <View
+            android:id="@+id/progress_2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_progress_off" />
+
+        <View
+            android:id="@+id/progress_3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/bg_progress_off" />
+
+        <View
+            android:id="@+id/progress_4"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_progress_off" />
     </LinearLayout>
 
     <!-- 단계별 내용 (한 번에 하나만 보임) -->
@@ -92,10 +118,24 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <include android:id="@+id/step1" layout="@layout/layout_create_step1" />
-            <include android:id="@+id/step2" layout="@layout/layout_create_step2" android:visibility="gone" />
-            <include android:id="@+id/step3" layout="@layout/layout_create_step3" android:visibility="gone" />
-            <include android:id="@+id/step4" layout="@layout/layout_create_step4" android:visibility="gone" />
+            <include
+                android:id="@+id/step1"
+                layout="@layout/layout_create_step1" />
+
+            <include
+                android:id="@+id/step2"
+                layout="@layout/layout_create_step2"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/step3"
+                layout="@layout/layout_create_step3"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/step4"
+                layout="@layout/layout_create_step4"
+                android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

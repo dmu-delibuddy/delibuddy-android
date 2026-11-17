@@ -148,17 +148,26 @@ class ChatFragment : Fragment() {
                 val directory = File(requireContext().cacheDir, "chat_camera")
                 if (!directory.exists() && !directory.mkdirs()) throw IOException("Cannot create camera cache")
                 val file = File.createTempFile("photo_", ".jpg", directory)
-                val uri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", file)
+                val uri = FileProvider.getUriForFile(
+                    requireContext(),
+                    "${requireContext().packageName}.fileprovider",
+                    file
+                )
                 cameraPhotoUri = uri
                 try {
                     takePhoto.launch(uri)
                 } catch (e: ActivityNotFoundException) {
                     cameraPhotoUri = null
                     file.delete()
-                    Toast.makeText(requireContext(), R.string.chat_camera_unavailable, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.chat_camera_unavailable,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } catch (e: IOException) {
-                Toast.makeText(requireContext(), R.string.chat_camera_error, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.chat_camera_error, Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -260,7 +269,11 @@ class ChatFragment : Fragment() {
             binding.chatHeader.textRestaurant.text = room?.restaurant.orEmpty()
             binding.chatHeader.textRestaurant.isVisible = !room?.restaurant.isNullOrBlank()
             binding.chatHeader.textCount.text = room?.let {
-                getString(R.string.chat_header_participant_count, it.currentCount, it.maxParticipants)
+                getString(
+                    R.string.chat_header_participant_count,
+                    it.currentCount,
+                    it.maxParticipants
+                )
             }.orEmpty()
         }
     }
@@ -301,18 +314,19 @@ class ChatFragment : Fragment() {
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> uri?.let { sendImage(it) } }
 
-    private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        val uri = cameraPhotoUri
-        cameraPhotoUri = null
-        if (uri != null) {
-            if (success) {
-                viewModel.sendImage(uri)
-                if (_binding != null) scrollToBottom()
-            } else {
-                requireContext().contentResolver.delete(uri, null, null)
+    private val takePhoto =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            val uri = cameraPhotoUri
+            cameraPhotoUri = null
+            if (uri != null) {
+                if (success) {
+                    viewModel.sendImage(uri)
+                    if (_binding != null) scrollToBottom()
+                } else {
+                    requireContext().contentResolver.delete(uri, null, null)
+                }
             }
         }
-    }
 
     companion object {
         private const val STATE_CAMERA_URI = "camera_photo_uri"

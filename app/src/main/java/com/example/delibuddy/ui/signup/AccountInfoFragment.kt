@@ -45,7 +45,12 @@ class AccountInfoFragment : Fragment() {
         val selectedBank = banks.indexOf(viewModel.bankName.value)
         if (selectedBank >= 0) binding.spinnerBank.setSelection(selectedBank)
         binding.spinnerBank.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 viewModel.setBankName(banks[position])
             }
 
@@ -71,7 +76,10 @@ class AccountInfoFragment : Fragment() {
             binding.spinnerBank.isEnabled = !saving
             binding.editAccount.isEnabled = !saving
             if (saving) {
-                GlobalLoadingDialog.show(childFragmentManager, getString(R.string.signup_saving_profile))
+                GlobalLoadingDialog.show(
+                    childFragmentManager,
+                    getString(R.string.signup_saving_profile)
+                )
             } else {
                 GlobalLoadingDialog.hide(childFragmentManager)
             }

@@ -68,7 +68,8 @@ class ChatViewModel(
             roomRepository.observeRoom(id)
                 .catch { emit(null) }
         } ?: flowOf(null)
-    private val sharedRoom = room.shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000), replay = 1)
+    private val sharedRoom =
+        room.shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000), replay = 1)
 
     // 메시지 구독 실패 여부 (참여자가 아니면 규칙에 막힘)
     private val loadFailed = MutableStateFlow(false)
@@ -98,7 +99,8 @@ class ChatViewModel(
 
     // 이미 URL 을 요청한 이미지 ID (중복 요청 방지)
     private val requestedImageIds = mutableSetOf<String>()
-    private val profiles = MutableStateFlow<Map<Pair<String, ProfileType>, ProfileModel>>(emptyMap())
+    private val profiles =
+        MutableStateFlow<Map<Pair<String, ProfileType>, ProfileModel>>(emptyMap())
     private val requestedProfiles = mutableSetOf<Pair<String, ProfileType>>()
 
     // 내가 보낸 사진의 기기 주소 (URL 받기 전까지 이걸로 보여줌)
@@ -114,7 +116,12 @@ class ChatViewModel(
             requestProfileIds(ids, type)
             ids.map { id ->
                 val profile = cachedProfiles[id to type]
-                ChatParticipant(id, profile?.nickname.orEmpty(), profile?.imageUrl, id == currentRoom.hostId)
+                ChatParticipant(
+                    id,
+                    profile?.nickname.orEmpty(),
+                    profile?.imageUrl,
+                    id == currentRoom.hostId
+                )
             }
         }.asLiveData()
 
@@ -130,7 +137,13 @@ class ChatViewModel(
 
     // 화면에 보여줄 메시지 목록
     val items: LiveData<List<ChatItem>> =
-        combine(serverMessages, pending, sharedRoom, imageUrls, profiles) { server, local, room, urls, profiles ->
+        combine(
+            serverMessages,
+            pending,
+            sharedRoom,
+            imageUrls,
+            profiles
+        ) { server, local, room, urls, profiles ->
             if (room != null) requestProfiles(server, room.mode)
             buildItems(server, local, room, urls, profiles)
         }.asLiveData()

@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical">
+
         <TextView
             android:id="@+id/text_room_title"
             android:layout_width="match_parent"
@@ -33,6 +34,7 @@
             android:textSize="17sp"
             android:textStyle="bold"
             tools:text="같이 피자 먹어요" />
+
         <TextView
             android:id="@+id/text_restaurant"
             android:layout_width="match_parent"
@@ -52,11 +54,13 @@
         android:orientation="horizontal"
         android:paddingStart="8dp"
         android:paddingEnd="8dp">
+
         <ImageView
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:contentDescription="@null"
             android:src="@drawable/participants_icon" />
+
         <TextView
             android:id="@+id/text_count"
             android:layout_width="wrap_content"

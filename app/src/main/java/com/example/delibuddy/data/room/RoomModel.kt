@@ -29,41 +29,42 @@ enum class DeliveryApp { BAEMIN, COUPANG_EATS, YOGIYO, OTHER }
     * enum : Firestore 에 이름 문자열로 저장됨.
 */
 
-data class RoomModel (
-    @DocumentId val id : String = "",
+data class RoomModel(
+    @DocumentId val id: String = "",
     val title: String = "",
-    val hostId : String = "",
-    val maxParticipants : Int = 2,
-    val participantIds : List<String> = emptyList(),
-    val mode : RoomMode = RoomMode.PICKUP_ONLY,
-    val category : FoodCategory = FoodCategory.ETC,
-    val restaurant : String = "",
-    val deliveryApp : DeliveryApp = DeliveryApp.OTHER,  // 예전 방은 OTHER 로 읽힘
-    val deliveryAppName : String = "",                  // OTHER 일 때 직접 입력한 앱 이름
-    val location : GeoPoint? = null,
-    val minOrderAmount : Int = 0,
-    val estimatedDeliveryFee : Int = 0,
-    val foodCostSplitMethod : FoodCostSplitMethod = FoodCostSplitMethod.EQUAL_SPLIT,
-    val deliveryFeeSplitMethod : DeliveryFeeSplitMethod = DeliveryFeeSplitMethod.EQUAL_SPLIT,
-    val status : RoomStatus = RoomStatus.RECRUITING,
-    val createdAt : Timestamp? = null,
+    val hostId: String = "",
+    val maxParticipants: Int = 2,
+    val participantIds: List<String> = emptyList(),
+    val mode: RoomMode = RoomMode.PICKUP_ONLY,
+    val category: FoodCategory = FoodCategory.ETC,
+    val restaurant: String = "",
+    val deliveryApp: DeliveryApp = DeliveryApp.OTHER,  // 예전 방은 OTHER 로 읽힘
+    val deliveryAppName: String = "",                  // OTHER 일 때 직접 입력한 앱 이름
+    val location: GeoPoint? = null,
+    val minOrderAmount: Int = 0,
+    val estimatedDeliveryFee: Int = 0,
+    val foodCostSplitMethod: FoodCostSplitMethod = FoodCostSplitMethod.EQUAL_SPLIT,
+    val deliveryFeeSplitMethod: DeliveryFeeSplitMethod = DeliveryFeeSplitMethod.EQUAL_SPLIT,
+    val status: RoomStatus = RoomStatus.RECRUITING,
+    val createdAt: Timestamp? = null,
 ) {
     // 화면에서만 쓰는 값. Firestore 에 저장 X
 
     @get:Exclude
-    val currentCount : Int get() = participantIds.size
+    val currentCount: Int get() = participantIds.size
 
     // 1인당 예상 배달비 (현재 인원 기준, 최소 1명)
     @get:Exclude
-    val deliveryFeePerPerson : Int get() = estimatedDeliveryFee / maxOf(currentCount, 1)
+    val deliveryFeePerPerson: Int get() = estimatedDeliveryFee / maxOf(currentCount, 1)
 
     // 지금 새로 참여할 수 있는지
     @get:Exclude
-    val isJoinable : Boolean
+    val isJoinable: Boolean
         get() = status == RoomStatus.RECRUITING && currentCount < maxParticipants
 
     // 이 uid 가 방장인지
-    fun isHost(uid : String?) : Boolean = uid != null && uid == hostId
+    fun isHost(uid: String?): Boolean = uid != null && uid == hostId
+
     // 이 uid 가 참여자인지 (방장 포함)
-    fun isParticipant(uid : String?) : Boolean = uid != null && uid in participantIds
+    fun isParticipant(uid: String?): Boolean = uid != null && uid in participantIds
 }

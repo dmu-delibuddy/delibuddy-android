@@ -35,22 +35,23 @@ import kotlinx.coroutines.CancellationException
 
 class RoomDetailFragment : Fragment() {
 
-    private var _binding : FragmentRoomDetailBinding? = null
+    private var _binding: FragmentRoomDetailBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel : RoomDetailViewModel by viewModels()
+    private val viewModel: RoomDetailViewModel by viewModels()
 
     private var selectedImage: Uri? = null
     private var screenshotUrl: String? = null
     private var orderLoaded = false
     private val orderRepository = OrderRepository()
     private var participantRenderer: ParticipantRenderer? = null
-    private val photoPicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null && _binding != null) {
-            selectedImage = uri
-            Glide.with(this).load(uri).into(binding.order.imageOrderPreview)
+    private val photoPicker =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null && _binding != null) {
+                selectedImage = uri
+                Glide.with(this).load(uri).into(binding.order.imageOrderPreview)
+            }
         }
-    }
 
     // 화면 레이아웃(ViewBinding) 생성
     override fun onCreateView(
@@ -105,12 +106,12 @@ class RoomDetailFragment : Fragment() {
     }
 
     // 지금 화면에 보이는 방 (로드 전이면 null)
-    private fun currentRoom() : RoomModel? =
+    private fun currentRoom(): RoomModel? =
         (viewModel.state.value as? DetailState.Loaded)
             ?.room
 
     // 참여 여부에 따라 버튼 문구와 활성 여부를 설정한다.
-    private fun renderActionButton(room : RoomModel) {
+    private fun renderActionButton(room: RoomModel) {
         val joined = viewModel.canChat(room)
         binding.buttonAction.isVisible = true
         binding.buttonAction.isEnabled = (joined || room.isJoinable) &&
@@ -119,41 +120,45 @@ class RoomDetailFragment : Fragment() {
         binding.buttonAction.backgroundTintList = ContextCompat.getColorStateList(
             requireContext(), if (joined) R.color.mode_off else R.color.button_red
         )
-        binding.buttonAction.setTextColor(ContextCompat.getColor(
-            requireContext(), if (joined) R.color.black else R.color.white
-        ))
+        binding.buttonAction.setTextColor(
+            ContextCompat.getColor(
+                requireContext(), if (joined) R.color.black else R.color.white
+            )
+        )
     }
 
     // 처리 상태 : 버튼 갱신 + 결과 토스트
     private fun observeActionState() {
         viewModel.actionState
-            .observe(viewLifecycleOwner) {state ->
+            .observe(viewLifecycleOwner) { state ->
                 currentRoom()?.let { renderActionButton(it) }
                 handleActionResult(state)
             }
     }
 
     // 성공, 실패 안내 후 대기 상태로
-    private fun handleActionResult(state : ActionState) {
+    private fun handleActionResult(state: ActionState) {
         when (state) {
             ActionState.Done -> {
                 toast(getString(R.string.detail_done_join))
                 viewModel.clearActionState()
                 openChat()
             }
+
             is ActionState.Failed -> {
-                toast (
+                toast(
                     state.reason?.message
-                        ?:getString(R.string.detail_action_error)
+                        ?: getString(R.string.detail_action_error)
                 )
                 viewModel.clearActionState()
             }
+
             else -> Unit
         }
     }
 
     // 짧은 안내 토스트 띄우기
-    private fun toast(message : String) {
+    private fun toast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
@@ -169,6 +174,7 @@ class RoomDetailFragment : Fragment() {
                 is DetailState.Loaded -> renderRoom(state.room)
                 DetailState.NotFound -> binding.textMessage
                     .setText(R.string.detail_not_found)
+
                 DetailState.Error -> binding.textMessage
                     .setText(R.string.detail_load_error)
             }
@@ -176,36 +182,50 @@ class RoomDetailFragment : Fragment() {
     }
 
     // 방 정보(상태, 제목, 모드, 가게, 마감, 금액, 정산) + 참여자 + 버튼 표시
-    private fun renderRoom(room : RoomModel) = with(binding) {
+    private fun renderRoom(room: RoomModel) = with(binding) {
 
         textStatus.text = getString(statusLabel(room.status)) + " " +
                 getString(R.string.detail_count, room.currentCount, room.maxParticipants)
         textTitle.text = room.title
-        textMode.setText (
+        textMode.setText(
             if (room.mode == RoomMode.MEAL_BUDDY) R.string.mode_meal_buddy
             else R.string.mode_pickup
         )
 
-        information.textRestaurant.text = row(R.string.detail_restaurant,
-            room.restaurant)
+        information.textRestaurant.text = row(
+            R.string.detail_restaurant,
+            room.restaurant
+        )
 
-        information.textDeliveryApp.text = row(R.string.detail_delivery_app,
-            room.deliveryAppLabel(requireContext()))
+        information.textDeliveryApp.text = row(
+            R.string.detail_delivery_app,
+            room.deliveryAppLabel(requireContext())
+        )
 
 
-        information.textMinOrder.text = row(R.string.detail_min_order,
-            getString(R.string.detail_won, room.minOrderAmount))
+        information.textMinOrder.text = row(
+            R.string.detail_min_order,
+            getString(R.string.detail_won, room.minOrderAmount)
+        )
 
-        information.textDeliveryFee.text = row(R.string.detail_delivery_fee,
+        information.textDeliveryFee.text = row(
+            R.string.detail_delivery_fee,
             getString(R.string.detail_won, room.estimatedDeliveryFee) +
-                    " (" + getString(R.string.detail_fee_per_person,
-                room.deliveryFeePerPerson) + ")")
+                    " (" + getString(
+                R.string.detail_fee_per_person,
+                room.deliveryFeePerPerson
+            ) + ")"
+        )
 
-        information.textFoodSplit.text = row(R.string.detail_food_split,
-            getString(foodSplitLabel(room.foodCostSplitMethod)))
+        information.textFoodSplit.text = row(
+            R.string.detail_food_split,
+            getString(foodSplitLabel(room.foodCostSplitMethod))
+        )
 
-        information.textDeliverySplit.text = row(R.string.detail_delivery_split,
-            getString(deliverySplitLabel(room.deliveryFeeSplitMethod)))
+        information.textDeliverySplit.text = row(
+            R.string.detail_delivery_split,
+            getString(deliverySplitLabel(room.deliveryFeeSplitMethod))
+        )
 
         participantRenderer?.render(room)
         renderOrder(room)
@@ -213,7 +233,7 @@ class RoomDetailFragment : Fragment() {
     }
 
     // 라벨 값 한 줄
-    private fun row(@StringRes label : Int, value : String) =
+    private fun row(@StringRes label: Int, value: String) =
         "${getString(label)} $value"
 
     private fun renderOrder(room: RoomModel) {
@@ -235,8 +255,11 @@ class RoomDetailFragment : Fragment() {
                         Glide.with(this@RoomDetailFragment).load(screenshotUrl)
                             .into(binding.order.imageOrderPreview)
                     }
-                } catch (e: CancellationException) { throw e
-                } catch (e: Exception) { toast("주문 정보를 불러오지 못했습니다.") }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    toast("주문 정보를 불러오지 못했습니다.")
+                }
             }
         }
     }
@@ -252,7 +275,7 @@ class RoomDetailFragment : Fragment() {
 
     private fun renderOrderAvailability(room: RoomModel) {
         val editable = viewModel.canChat(room) &&
-            room.status in setOf(RoomStatus.RECRUITING, RoomStatus.FULL)
+                room.status in setOf(RoomStatus.RECRUITING, RoomStatus.FULL)
         val enabled = editable
         with(binding.order) {
             inputOrderPrice.isEnabled = enabled
@@ -268,7 +291,7 @@ class RoomDetailFragment : Fragment() {
 
     // 방 상태 => 화면 표시 문구 (모집 중 / 정원 마감 / 모집 마감 / 완료)
     @StringRes
-    private fun statusLabel(status : RoomStatus) = when (status) {
+    private fun statusLabel(status: RoomStatus) = when (status) {
         RoomStatus.RECRUITING -> R.string.detail_status_recruiting
         RoomStatus.FULL -> R.string.detail_status_full
         RoomStatus.ORDER_CONFIRMED -> R.string.detail_status_confirmed
@@ -277,7 +300,7 @@ class RoomDetailFragment : Fragment() {
 
     // 음식값 정산 방법 => 화면 표시 문구
     @StringRes
-    private fun foodSplitLabel(m : FoodCostSplitMethod) = when (m) {
+    private fun foodSplitLabel(m: FoodCostSplitMethod) = when (m) {
         FoodCostSplitMethod.HOST_PAYS -> R.string.split_host
         FoodCostSplitMethod.EQUAL_SPLIT -> R.string.split_equal
         FoodCostSplitMethod.PROPORTIONAL_SPLIT -> R.string.split_by_menu
@@ -286,7 +309,7 @@ class RoomDetailFragment : Fragment() {
 
     // 배달비 정산 방법 => 화면 표시 문구
     @StringRes
-    private fun deliverySplitLabel(m : DeliveryFeeSplitMethod) = when (m) {
+    private fun deliverySplitLabel(m: DeliveryFeeSplitMethod) = when (m) {
         DeliveryFeeSplitMethod.HOST_PAYS -> R.string.split_host
         DeliveryFeeSplitMethod.EQUAL_SPLIT -> R.string.split_equal
         DeliveryFeeSplitMethod.CUSTOM -> R.string.split_custom

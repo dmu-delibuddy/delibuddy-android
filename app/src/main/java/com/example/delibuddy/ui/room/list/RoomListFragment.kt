@@ -54,7 +54,7 @@ class RoomListFragment : Fragment() {
     // 카드 클릭 : 방 상세로 이동
     private fun setUpRoomList() {
         roomAdapter = RoomAdapter { roomId ->
-            findNavController().navigate (
+            findNavController().navigate(
                 R.id.action_home_to_room_detail,
                 bundleOf(RoomDetailViewModel.ARG_ROOM_ID to roomId)
             )
@@ -73,7 +73,7 @@ class RoomListFragment : Fragment() {
     // 모드 필터 (픽업만 / 밥친구)
     private fun setUpModeFilter() {
         binding.groupMode.setOnCheckedChangeListener { _, checkedId ->
-            viewModel.setMode (
+            viewModel.setMode(
                 if (checkedId == R.id.radio_meal_buddy) RoomMode.MEAL_BUDDY else RoomMode.PICKUP_ONLY
             )
         }
@@ -82,7 +82,7 @@ class RoomListFragment : Fragment() {
     // 카테고리 필터 (전체 = null)
     private fun setUpCategoryFilter() {
         binding.groupCategory.setOnCheckedChangeListener { _, checkedId ->
-            viewModel.setCategory (
+            viewModel.setCategory(
                 when (checkedId) {
                     R.id.radio_cat_kor -> FoodCategory.KOR
                     R.id.radio_cat_chn -> FoodCategory.CHN

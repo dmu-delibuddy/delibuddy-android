@@ -99,12 +99,36 @@
             android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
-            <RadioButton android:id="@+id/radio_cat_all"  style="@style/CategoryChip" android:checked="true" android:text="@string/category_all" />
-            <RadioButton android:id="@+id/radio_cat_kor"  style="@style/CategoryChip" android:text="@string/category_kor" />
-            <RadioButton android:id="@+id/radio_cat_chn"  style="@style/CategoryChip" android:text="@string/category_chn" />
-            <RadioButton android:id="@+id/radio_cat_jpn"  style="@style/CategoryChip" android:text="@string/category_jpn" />
-            <RadioButton android:id="@+id/radio_cat_west" style="@style/CategoryChip" android:text="@string/category_west" />
-            <RadioButton android:id="@+id/radio_cat_etc"  style="@style/CategoryChip" android:text="@string/category_etc" />
+            <RadioButton
+                android:id="@+id/radio_cat_all"
+                style="@style/CategoryChip"
+                android:checked="true"
+                android:text="@string/category_all" />
+
+            <RadioButton
+                android:id="@+id/radio_cat_kor"
+                style="@style/CategoryChip"
+                android:text="@string/category_kor" />
+
+            <RadioButton
+                android:id="@+id/radio_cat_chn"
+                style="@style/CategoryChip"
+                android:text="@string/category_chn" />
+
+            <RadioButton
+                android:id="@+id/radio_cat_jpn"
+                style="@style/CategoryChip"
+                android:text="@string/category_jpn" />
+
+            <RadioButton
+                android:id="@+id/radio_cat_west"
+                style="@style/CategoryChip"
+                android:text="@string/category_west" />
+
+            <RadioButton
+                android:id="@+id/radio_cat_etc"
+                style="@style/CategoryChip"
+                android:text="@string/category_etc" />
         </RadioGroup>
     </LinearLayout>
 

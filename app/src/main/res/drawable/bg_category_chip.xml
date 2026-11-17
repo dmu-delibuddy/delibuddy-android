@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 카테고리 버튼: 선택 = 주황, 아니면 흰색 -->
+<?xml version="1.0" encoding="utf-8"?><!-- 카테고리 버튼: 선택 = 주황, 아니면 흰색 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 선택됨 -->
     <item android:state_checked="true">

@@ -58,7 +58,10 @@ class MyPageFragment : Fragment() {
         observeBirthDate()
         profileViewModel.saving.observe(viewLifecycleOwner) { saving ->
             if (saving) {
-                GlobalLoadingDialog.show(childFragmentManager, getString(R.string.mypage_saving_profile))
+                GlobalLoadingDialog.show(
+                    childFragmentManager,
+                    getString(R.string.mypage_saving_profile)
+                )
             } else {
                 GlobalLoadingDialog.hide(childFragmentManager)
             }

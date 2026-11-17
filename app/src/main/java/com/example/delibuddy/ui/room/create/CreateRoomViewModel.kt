@@ -25,8 +25,8 @@ import kotlinx.coroutines.launch
     * 입력값도 앞으로 여기에 모아서 이전 으로 돌아가도 값이 유지되게 함.
 */
 
-class CreateRoomViewModel (
-    private val roomRepository : RoomRepository = RoomRepository()
+class CreateRoomViewModel(
+    private val roomRepository: RoomRepository = RoomRepository()
 ) : ViewModel() {
 
     // 방이 만들어지면 채팅방에 첫 안내를 남길 때 사용
@@ -34,20 +34,26 @@ class CreateRoomViewModel (
 
     private val _step = MutableLiveData(1)
     val step: LiveData<Int> = _step
+
     // 1단계 : 방 정보
     private val _title = MutableLiveData("")
-    val title : LiveData<String> = _title
+    val title: LiveData<String> = _title
 
     private val _maxParticipants = MutableLiveData(DEFAULT_PARTICIPANTS)
-    val maxParticipants : LiveData<Int> = _maxParticipants
+    val maxParticipants: LiveData<Int> = _maxParticipants
 
     private val _mode = MutableLiveData(RoomMode.PICKUP_ONLY)
-    val mode : LiveData<RoomMode> = _mode
+    val mode: LiveData<RoomMode> = _mode
 
     // 방 제목 저장
-    fun setTitle(value: String) { _title.value = value }
+    fun setTitle(value: String) {
+        _title.value = value
+    }
+
     // 모드 저장 (픽업만 / 밥친구)
-    fun setMode(value: RoomMode) { _mode.value = value }
+    fun setMode(value: RoomMode) {
+        _mode.value = value
+    }
 
     // 인원 +1 (최대 인원까지)
     fun increaseParticipants() {
@@ -63,53 +69,74 @@ class CreateRoomViewModel (
 
     // 2단계 : 음식 정보
     private val _category = MutableLiveData<FoodCategory?>(null) // null = 아직 선택 안 함
-    val category : LiveData<FoodCategory?> = _category
+    val category: LiveData<FoodCategory?> = _category
 
     private val _restaurant = MutableLiveData("")
-    val restaurant : LiveData<String> = _restaurant
+    val restaurant: LiveData<String> = _restaurant
 
     // 카테고리 저장 (null = 선택 안 함)
-    fun setCategory(value : FoodCategory?) { _category.value = value }
+    fun setCategory(value: FoodCategory?) {
+        _category.value = value
+    }
+
     // 음식점 저장
-    fun setRestaurant(value : String) { _restaurant.value = value }
+    fun setRestaurant(value: String) {
+        _restaurant.value = value
+    }
 
     // 3단계 : 장소, 배달 앱
     private val _deliveryApp = MutableLiveData<DeliveryApp?>(null) // null = 아직 선택 안 함
-    val deliveryApp : LiveData<DeliveryApp?> = _deliveryApp
+    val deliveryApp: LiveData<DeliveryApp?> = _deliveryApp
 
     private val _deliveryAppName = MutableLiveData("") // 직접 입력한 앱 이름
 
     // 배달 앱 저장
-    fun setDeliveryApp(value : DeliveryApp) { _deliveryApp.value = value }
+    fun setDeliveryApp(value: DeliveryApp) {
+        _deliveryApp.value = value
+    }
+
     // 직접 입력한 앱 이름 저장
-    fun setDeliveryAppName(value : String) { _deliveryAppName.value = value }
+    fun setDeliveryAppName(value: String) {
+        _deliveryAppName.value = value
+    }
 
     // 4단계 : 금액, 정산
     private val _minOrderAmount = MutableLiveData<Int?>(null) // null = 입력 안 함
-    val minOrderAmount : LiveData<Int?> = _minOrderAmount
+    val minOrderAmount: LiveData<Int?> = _minOrderAmount
 
     private val _deliveryFee = MutableLiveData<Int?>(null)
-    val deliveryFee : MutableLiveData<Int?> = _deliveryFee
+    val deliveryFee: MutableLiveData<Int?> = _deliveryFee
 
     private val _foodCostSplit = MutableLiveData(FoodCostSplitMethod.PROPORTIONAL_SPLIT) // 개인 메뉴
-    val foodCostSplit : LiveData<FoodCostSplitMethod> = _foodCostSplit
+    val foodCostSplit: LiveData<FoodCostSplitMethod> = _foodCostSplit
 
     private val _deliveryFeeSplit = MutableLiveData(DeliveryFeeSplitMethod.EQUAL_SPLIT) // 1/N
-    val deliveryFeeSplit : LiveData<DeliveryFeeSplitMethod> = _deliveryFeeSplit
+    val deliveryFeeSplit: LiveData<DeliveryFeeSplitMethod> = _deliveryFeeSplit
 
     // 최소 주문 금액 저장 (null = 입력 안 함)
-    fun setMinOrderAmount (value : Int?) { _minOrderAmount.value = value }
+    fun setMinOrderAmount(value: Int?) {
+        _minOrderAmount.value = value
+    }
+
     // 예상 배달비 저장 (null = 입력 안 함)
-    fun setDeliveryFee (value : Int?) { _deliveryFee.value = value }
+    fun setDeliveryFee(value: Int?) {
+        _deliveryFee.value = value
+    }
+
     // 음식값 정산 방법 저장
-    fun setFoodCostSplit (value : FoodCostSplitMethod) { _foodCostSplit.value = value }
+    fun setFoodCostSplit(value: FoodCostSplitMethod) {
+        _foodCostSplit.value = value
+    }
+
     // 배달비 정산 방법 저장
-    fun setDeliveryFeeSplit (value : DeliveryFeeSplitMethod) { _deliveryFeeSplit.value = value }
+    fun setDeliveryFeeSplit(value: DeliveryFeeSplitMethod) {
+        _deliveryFeeSplit.value = value
+    }
 
     // 개설 진행 상태 (대기 / 저장 중 / 성공 / 실패)
     private val _submitState =
         MutableLiveData<SubmitState>(SubmitState.Idle)
-    val submitState : LiveData<SubmitState> =
+    val submitState: LiveData<SubmitState> =
         _submitState
 
     // 다음 단계로 (마지막 단계면 그대로)
@@ -125,31 +152,35 @@ class CreateRoomViewModel (
     }
 
     // 검사에 걸린 단계로 바로 이동할 때 사용
-    fun goToStep(value : Int) {
+    fun goToStep(value: Int) {
         if (value in 1..LAST_STEP) _step.value = value
     }
 
     // 입력 검사
     // 단계별 필수값 검사. 문제 있으면 안내 문구 , 없으면 null
     @StringRes
-    fun validateStep(step : Int) : Int? = when(step) {
+    fun validateStep(step: Int): Int? = when (step) {
         1 -> if (_title.value.isNullOrBlank()) R.string.create_error_title else null
         2 -> when {
             _category.value == null -> R.string.create_error_category
             _restaurant.value.isNullOrBlank() -> R.string.create_error_restaurant
             else -> null
         }
+
         3 -> when {
             _deliveryApp.value == null -> R.string.create_error_delivery_app
             _deliveryApp.value == DeliveryApp.OTHER &&
-                _deliveryAppName.value.isNullOrBlank() -> R.string.create_error_delivery_app_name
+                    _deliveryAppName.value.isNullOrBlank() -> R.string.create_error_delivery_app_name
+
             else -> null
         }
+
         4 -> when {
             _minOrderAmount.value == null -> R.string.create_error_min_order
             _deliveryFee.value == null -> R.string.create_error_delivery_fee
             else -> null
         }
+
         else -> null
     }
 
@@ -189,14 +220,12 @@ class CreateRoomViewModel (
                 val id = roomRepository.createRoom(room)
                 notifyRoomCreated(id)
                 SubmitState.Success(id)
-            }
-            catch (e: CancellationException) {
+            } catch (e: CancellationException) {
                 throw e
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.w("CreateRoom", "createRoom 실패", e)
                 val notLoggedIn = e is RoomException &&
-                    e.reason == RoomException.Reason.NOT_LOGGED_IN
+                        e.reason == RoomException.Reason.NOT_LOGGED_IN
                 SubmitState.Error(
                     if (notLoggedIn) R.string.create_error_not_logged_in
                     else R.string.create_error_unknown
@@ -209,11 +238,9 @@ class CreateRoomViewModel (
     private suspend fun notifyRoomCreated(roomId: String) {
         try {
             chatRepository.sendSystem(roomId, SystemMessage.ROOM_CREATED)
-        }
-        catch (e: CancellationException) {
+        } catch (e: CancellationException) {
             throw e
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             Log.w(TAG, "시스템 메시지 실패 : $roomId", e)
         }
     }
@@ -265,11 +292,12 @@ class CreateRoomViewModel (
     sealed interface SubmitState {
         data object Idle : SubmitState
         data object Loading : SubmitState
-        data class Success (
-            val roomId : String
+        data class Success(
+            val roomId: String
         ) : SubmitState
-        data class Error (
-            @StringRes val message : Int
+
+        data class Error(
+            @StringRes val message: Int
         ) : SubmitState
     }
 }

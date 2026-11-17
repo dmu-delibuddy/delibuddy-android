@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 방 만들기 1단계 : 방 정보 (제목 · 인원 · 모드) -->
+<?xml version="1.0" encoding="utf-8"?><!-- 방 만들기 1단계 : 방 정보 (제목 · 인원 · 모드) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

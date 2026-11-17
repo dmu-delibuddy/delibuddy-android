@@ -27,10 +27,11 @@ class ParticipantRenderer(
     private val profileRepository = ProfileRepository()
     private fun Int.dp(): Int = (this * fragment.resources.displayMetrics.density).toInt()
 
-    fun render(room : RoomModel) {
+    fun render(room: RoomModel) {
         binding.textParticipantsTitle.text = fragment.getString(
             R.string.detail_participants,
-            room.currentCount, room.maxParticipants)
+            room.currentCount, room.maxParticipants
+        )
 
         val myUid = FirebaseAuth.getInstance().currentUser?.uid
         val ordered = listOf(room.hostId) +
@@ -45,10 +46,11 @@ class ParticipantRenderer(
                 row = LinearLayout(fragment.requireContext()).apply {
                     orientation = LinearLayout.HORIZONTAL
                 }
-                container.addView(row, LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { bottomMargin = 8.dp() })
+                container.addView(
+                    row, LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { bottomMargin = 8.dp() })
             }
             val cardRow = requireNotNull(row)
             val uid = ordered.getOrNull(index)
@@ -107,8 +109,11 @@ class ParticipantRenderer(
                 maxLines = 1
                 ellipsize = android.text.TextUtils.TruncateAt.END
             }
-            card.addView(name, LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+            card.addView(
+                name, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            )
             cardRow.addView(card, LinearLayout.LayoutParams(0, 100.dp(), 1f).apply {
                 if (index % 3 != 2) marginEnd = 8.dp()
             })

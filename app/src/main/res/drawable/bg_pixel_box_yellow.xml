@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 노란 바탕 + 검은 테두리 + 오른쪽 아래 픽셀 그림자 (마이페이지 송금 계좌 카드) -->
+<?xml version="1.0" encoding="utf-8"?><!-- 노란 바탕 + 검은 테두리 + 오른쪽 아래 픽셀 그림자 (마이페이지 송금 계좌 카드) -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 그림자 -->
     <item

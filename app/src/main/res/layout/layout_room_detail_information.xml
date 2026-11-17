@@ -10,16 +10,27 @@
     android:paddingEnd="17dp"
     android:paddingBottom="15dp">
 
-    <TextView android:id="@+id/text_restaurant"
+    <TextView
+        android:id="@+id/text_restaurant"
         style="@style/DetailRow" />
-    <TextView android:id="@+id/text_delivery_app"
+
+    <TextView
+        android:id="@+id/text_delivery_app"
         style="@style/DetailRow" />
-    <TextView android:id="@+id/text_min_order"
+
+    <TextView
+        android:id="@+id/text_min_order"
         style="@style/DetailRow" />
-    <TextView android:id="@+id/text_delivery_fee"
+
+    <TextView
+        android:id="@+id/text_delivery_fee"
         style="@style/DetailRow" />
-    <TextView android:id="@+id/text_food_split"
+
+    <TextView
+        android:id="@+id/text_food_split"
         style="@style/DetailRow" />
-    <TextView android:id="@+id/text_delivery_split"
+
+    <TextView
+        android:id="@+id/text_delivery_split"
         style="@style/DetailRow" />
 </LinearLayout>

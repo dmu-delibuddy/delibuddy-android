@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 방 만들기 4단계 : 금액 · 정산 방법 -->
+<?xml version="1.0" encoding="utf-8"?><!-- 방 만들기 4단계 : 금액 · 정산 방법 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -128,10 +127,26 @@
         android:baselineAligned="false"
         android:orientation="horizontal">
 
-        <RadioButton android:id="@+id/radio_food_host"    style="@style/SplitChip" android:text="@string/split_host" />
-        <RadioButton android:id="@+id/radio_food_equal"   style="@style/SplitChip" android:text="@string/split_equal" />
-        <RadioButton android:id="@+id/radio_food_by_menu" style="@style/SplitChip" android:text="@string/split_by_menu" android:checked="true" />
-        <RadioButton android:id="@+id/radio_food_custom"  style="@style/SplitChip" android:text="@string/split_custom" />
+        <RadioButton
+            android:id="@+id/radio_food_host"
+            style="@style/SplitChip"
+            android:text="@string/split_host" />
+
+        <RadioButton
+            android:id="@+id/radio_food_equal"
+            style="@style/SplitChip"
+            android:text="@string/split_equal" />
+
+        <RadioButton
+            android:id="@+id/radio_food_by_menu"
+            style="@style/SplitChip"
+            android:text="@string/split_by_menu"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/radio_food_custom"
+            style="@style/SplitChip"
+            android:text="@string/split_custom" />
     </RadioGroup>
 
     <TextView
@@ -161,8 +176,20 @@
         android:baselineAligned="false"
         android:orientation="horizontal">
 
-        <RadioButton android:id="@+id/radio_delivery_host"   style="@style/SplitChip" android:text="@string/split_host" />
-        <RadioButton android:id="@+id/radio_delivery_equal"  style="@style/SplitChip" android:text="@string/split_equal" android:checked="true" />
-        <RadioButton android:id="@+id/radio_delivery_custom" style="@style/SplitChip" android:text="@string/split_custom" />
+        <RadioButton
+            android:id="@+id/radio_delivery_host"
+            style="@style/SplitChip"
+            android:text="@string/split_host" />
+
+        <RadioButton
+            android:id="@+id/radio_delivery_equal"
+            style="@style/SplitChip"
+            android:text="@string/split_equal"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/radio_delivery_custom"
+            style="@style/SplitChip"
+            android:text="@string/split_custom" />
     </RadioGroup>
 </LinearLayout>

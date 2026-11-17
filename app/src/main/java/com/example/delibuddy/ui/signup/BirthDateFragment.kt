@@ -72,7 +72,15 @@ class BirthDateFragment : Fragment() {
             requireContext(),
             R.style.BirthDatePickerDialog,
             { _, year, month, day ->
-                viewModel.setBirthDate(String.format(Locale.ROOT, "%04d-%02d-%02d", year, month + 1, day))
+                viewModel.setBirthDate(
+                    String.format(
+                        Locale.ROOT,
+                        "%04d-%02d-%02d",
+                        year,
+                        month + 1,
+                        day
+                    )
+                )
             },
             initial.get(Calendar.YEAR),
             initial.get(Calendar.MONTH),

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 프로필 수정 창 : 사진 / 닉네임 / 한 줄 소개 / 생년월일 -->
+<?xml version="1.0" encoding="utf-8"?><!-- 프로필 수정 창 : 사진 / 닉네임 / 한 줄 소개 / 생년월일 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

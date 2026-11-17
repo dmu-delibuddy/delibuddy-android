@@ -21,8 +21,8 @@ import com.example.delibuddy.ui.room.deliveryAppLabel
     * 카드를 누르면 onClick 으로 roomId 를 넘김
 */
 
-class RoomAdapter (
-    private val onClick : (roomId : String) -> Unit
+class RoomAdapter(
+    private val onClick: (roomId: String) -> Unit
 ) : ListAdapter<RoomModel, RoomAdapter.RoomViewHolder>(DIFF) {
 
     // 방 카드 한 칸(item_room) 만들기
@@ -36,14 +36,15 @@ class RoomAdapter (
         holder.bind(getItem(position))
     }
 
-    inner class RoomViewHolder (
+    inner class RoomViewHolder(
         private val binding: ItemRoomBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // 방 정보 → 카드 화면 (배지, 배달비, 제목, 태그) + 클릭 연결
-        fun bind(room : RoomModel) = with(binding) {
+        fun bind(room: RoomModel) = with(binding) {
             // 모집 배지 = 상태 + 인원
-            textStatus.text = "${statusLabel(room.status)} ${room.currentCount}/${room.maxParticipants}명"
+            textStatus.text =
+                "${statusLabel(room.status)} ${room.currentCount}/${room.maxParticipants}명"
 
             // 배달비
             textDeliveryFee.text = "배달비 1인당 %,d원".format(room.deliveryFeePerPerson)

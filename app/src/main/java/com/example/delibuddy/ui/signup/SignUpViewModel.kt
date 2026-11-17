@@ -112,6 +112,7 @@ class SignUpViewModel : ViewModel() {
                     is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
                     is SignUpSessionMissingException,
                     is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+
                     is EmailNotVerifiedException -> R.string.signup_email_not_verified
                     else -> R.string.signup_completion_failed
                 }
@@ -163,6 +164,7 @@ class SignUpViewModel : ViewModel() {
                     is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
                     is SignUpSessionMissingException,
                     is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+
                     else -> R.string.signup_completion_failed
                 }
             } finally {

@@ -58,8 +58,8 @@ class RoomDetailViewModel(
         data object Idle : ActionState
         data object Loading : ActionState
         data object Done : ActionState
-        data class Failed (
-            val reason : RoomException.Reason? // reason == null : 네트워크 등 알 수 없는 실패
+        data class Failed(
+            val reason: RoomException.Reason? // reason == null : 네트워크 등 알 수 없는 실패
         ) : ActionState
     }
 
@@ -71,7 +71,7 @@ class RoomDetailViewModel(
     private val _actionState =
         MutableLiveData<ActionState>(ActionState.Idle)
 
-    val actionState : LiveData<ActionState> =
+    val actionState: LiveData<ActionState> =
         _actionState
 
     // 참여 성공 시 채팅방에 시스템 안내를 남긴다.
@@ -90,9 +90,9 @@ class RoomDetailViewModel(
                 ActionState.Done
             } catch (e: CancellationException) {
                 throw e
-            } catch (e : RoomException) {
+            } catch (e: RoomException) {
                 ActionState.Failed(e.reason)
-            } catch (e : Exception) {
+            } catch (e: Exception) {
                 Log.e(TAG, "참여 실패 : $roomId", e)
                 ActionState.Failed(null)
             }
@@ -121,7 +121,7 @@ class RoomDetailViewModel(
     }
 
     // 채팅방에 들어갈 수 있는지 (방장 / 참여자만)
-    fun canChat(room : RoomModel) : Boolean =
+    fun canChat(room: RoomModel): Boolean =
         room.isHost(myUid) || room.isParticipant(myUid)
 
     // 토스트 보여준 뒤 대기 상태로
