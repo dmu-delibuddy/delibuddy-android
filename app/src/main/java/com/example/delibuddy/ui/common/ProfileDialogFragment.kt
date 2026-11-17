@@ -7,10 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import com.example.delibuddy.R
 import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.databinding.DialogProfileBinding
 
@@ -37,9 +39,21 @@ class ProfileDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpListeners()
+        observeProfile()
+        loadProfile()
+    }
 
+    private fun setUpListeners() {
         binding.buttonClose.setOnClickListener { dismiss() }
+    }
+
+    private fun observeProfile() {
         viewModel.state.observe(viewLifecycleOwner) { render(it) }
+    }
+
+    // show()로 넘겨받은 userId와 프로필 모드로 불러온다
+    private fun loadProfile() {
         val args = requireArguments()
         viewModel.load(
             args.getString(ARG_USER_ID).orEmpty(),
@@ -57,32 +71,49 @@ class ProfileDialogFragment : DialogFragment() {
     }
 
     private fun render(state: ProfileUiState) {
+        // 불러오는 동안에는 전역 로딩 UI(GlobalLoadingDialog)를 쓰고, 모달 본체는 잠깐 숨김
+        val loading = state is ProfileUiState.Loading
+        if (loading) {
+            GlobalLoadingDialog.show(childFragmentManager)
+        } else {
+            GlobalLoadingDialog.hide(childFragmentManager)
+        }
+
         with(binding) {
-            progress.isVisible = state is ProfileUiState.Loading
+            root.isInvisible = loading
             layoutContent.isVisible = state is ProfileUiState.Success
             textMessage.isVisible = state is ProfileUiState.NotFound || state is ProfileUiState.Error
 
             when (state) {
                 is ProfileUiState.Success -> {
                     val profile = state.profile
-                    textNickname.text = profile.nickname.ifBlank { "이름 없음" }
-                    textMode.text = when (profile.type) {
-                        ProfileType.PICKUP_ONLY -> "픽업 모드"
-                        ProfileType.MEAL_BUDDY -> "밥친구 모드"
-                    }
-                    textBio.text = profile.bio.orEmpty().ifBlank { "소개가 없어요" }
+                    textNickname.text = profile.nickname.ifBlank { getString(R.string.profile_modal_nickname_empty) }
+                    textMode.setText(
+                        when (profile.type) {
+                            ProfileType.PICKUP_ONLY -> R.string.mode_pickup
+                            ProfileType.MEAL_BUDDY -> R.string.mode_meal_buddy
+                        }
+                    )
+                    // ProfileModel 의 bio / imageUrl 은 String? 이라 orEmpty() 로 null 처리
+                    textBio.text = profile.bio.orEmpty().ifBlank { getString(R.string.profile_modal_bio_empty) }
                     // TODO: 리뷰(reviews) 기능이 생기면 받은 리뷰 평균 별점으로 교체
-                    textManner.text = "매너 점수  -"
-                    // TODO: imageUrl 이미지 로딩 (이미지 라이브러리 결정 후)
+                    textManner.text = getString(R.string.profile_modal_manner, getString(R.string.mypage_count_empty))
+                    // 사진이 없으면 레이아웃의 기본 사진(mypage_icon)을 그대로 둔다
+                    val imageUrl = profile.imageUrl.orEmpty()
+                    if (imageUrl.isNotBlank()) {
+                        imageProfile.loadImage(imageUrl)
+                    }
                 }
-                is ProfileUiState.NotFound -> textMessage.text = "프로필이 없는 사용자예요"
-                is ProfileUiState.Error -> textMessage.text = "불러오지 못했어요.\n잠시 후 다시 시도해 주세요"
+                is ProfileUiState.NotFound -> textMessage.setText(R.string.profile_modal_not_found)
+                is ProfileUiState.Error -> textMessage.setText(R.string.mypage_load_error)
                 is ProfileUiState.Loading -> Unit
             }
         }
     }
 
     override fun onDestroyView() {
+        // 로딩 중에 닫히면 취소 불가능한 로딩 창이 남지 않도록 정리
+        GlobalLoadingDialog.hide(childFragmentManager)
         super.onDestroyView()
         _binding = null
     }
