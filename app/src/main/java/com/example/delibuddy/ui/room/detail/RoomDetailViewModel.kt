@@ -14,6 +14,7 @@ import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
 import com.example.delibuddy.data.user.UserRepository
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -87,6 +88,8 @@ class RoomDetailViewModel(
                 roomRepository.joinRoom(roomId)
                 notifyChat()
                 ActionState.Done
+            } catch (e: CancellationException) {
+                throw e
             } catch (e : RoomException) {
                 ActionState.Failed(e.reason)
             } catch (e : Exception) {
@@ -110,6 +113,8 @@ class RoomDetailViewModel(
     private suspend fun notifyChat() {
         try {
             chatRepository.sendSystem(roomId, SystemMessage.JOINED)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.w(TAG, "참여 시스템 메시지 실패", e)
         }

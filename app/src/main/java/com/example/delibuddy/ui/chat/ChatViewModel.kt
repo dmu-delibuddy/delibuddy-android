@@ -292,6 +292,8 @@ class ChatViewModel(
                     chatRepository.sendText(id, sending.id, sending.content.orEmpty())
                 }
                 pending.update { it - sending.id }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Log.e(TAG, "메시지 전송 실패: ${sending.id}", e)
                 // 업로드까지 끝났다면 이미지 ID가 담긴 최신 값을 실패로 남김

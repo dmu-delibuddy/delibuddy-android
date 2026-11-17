@@ -17,6 +17,7 @@ import com.example.delibuddy.data.room.FoodCostSplitMethod
 import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 /*
@@ -189,6 +190,9 @@ class CreateRoomViewModel (
                 notifyRoomCreated(id)
                 SubmitState.Success(id)
             }
+            catch (e: CancellationException) {
+                throw e
+            }
             catch (e: Exception) {
                 Log.w("CreateRoom", "createRoom 실패", e)
                 val notLoggedIn = e is RoomException &&
@@ -205,6 +209,9 @@ class CreateRoomViewModel (
     private suspend fun notifyRoomCreated(roomId: String) {
         try {
             chatRepository.sendSystem(roomId, SystemMessage.ROOM_CREATED)
+        }
+        catch (e: CancellationException) {
+            throw e
         }
         catch (e: Exception) {
             Log.w(TAG, "시스템 메시지 실패 : $roomId", e)
