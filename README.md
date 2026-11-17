@@ -1,8 +1,6 @@
 # Delibuddy
 
-## 프로젝트 규칙
-
-### git
+## git
 
 브랜치 전략은 GitHub Flow를 따른다.
 `main`은 항상 배포 가능한 상태로 유지한다.
@@ -47,7 +45,7 @@ chore/update-dependencies
 docs/branch-convention
 ```
 
-### architecture
+## architecture
 
 ```text
 com.example.delibuddy/
@@ -64,4 +62,30 @@ com.example.delibuddy/
 
 - 데이터 코드는 `data/<기능>` 패키지에 두고 모델과 저장소 한다.
 - 화면 코드는 `ui/<화면>` 패키지에 두고 Fragment와 ViewModel을 함께 둔다.
-- 차후 변경될 수 있음.
+
+### Fragment 코드 스타일
+
+`onViewCreated()`에는 화면 초기화 순서가 보이도록 설정과 상태 관찰 함수를 호출한다.
+뷰의 리스너 등록은 `setUpListeners()`처럼 화면이나 기능 단위로 묶는다.
+입력값 설정 등 관련 초기화가 함께 필요한 경우에는 해당 기능의 설정 함수에 작성한다.
+
+- 리스너 안의 동작이 짧고 의도가 분명하면 그대로 작성한다.
+- 동작이 길거나 여러 곳에서 사용한다면 이름을 붙여 별도 함수로 분리한다.
+- 리스너마다 함수를 하나씩 만들기보다 관련된 리스너를 함께 묶는다.
+
+```kotlin
+override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    setUpListeners()
+    observeBirthDate()
+}
+
+private fun setUpListeners() {
+    binding.buttonBirthDate.setOnClickListener { showDatePicker() }
+    binding.buttonSkip.setOnClickListener {
+        viewModel.setBirthDate(null)
+        navigateToAccountInfo()
+    }
+    binding.buttonNext.setOnClickListener { navigateToAccountInfo() }
+}
+```
