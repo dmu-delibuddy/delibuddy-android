@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 /*
     * 마이페이지 프로필 도메인 (프로필 카드 + 프로필 수정 창이 함께 씀)
@@ -88,7 +87,7 @@ class ProfileViewModel(
         val id = userId ?: return
         viewModelScope.launch {
             try {
-                _birthDate.value = userRepository.getById(id).await()
+                _birthDate.value = userRepository.getById(id)
                     ?.birthDate
                     ?.takeIf { it.isNotBlank() }
             } catch (e: CancellationException) {
@@ -140,7 +139,7 @@ class ProfileViewModel(
                 ),
             )
             if (birthDate != _birthDate.value) {
-                userRepository.updateBirthDate(id, birthDate).await()
+                userRepository.updateBirthDate(id, birthDate)
                 _birthDate.value = birthDate
             }
         }

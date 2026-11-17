@@ -18,7 +18,6 @@ import com.example.delibuddy.databinding.LayoutRoomDetailParticipantsBinding
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class ParticipantRenderer(
     private val fragment: Fragment,
@@ -125,7 +124,7 @@ class ParticipantRenderer(
                             RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
                             RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
                         }
-                        profileRepository.getById(uid, profileType).await()
+                        profileRepository.getById(uid, profileType)
                     } catch (e: CancellationException) {
                         throw e
                     } catch (_: Exception) {

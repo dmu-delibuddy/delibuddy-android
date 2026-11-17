@@ -8,7 +8,6 @@ import com.example.delibuddy.R
 import com.example.delibuddy.data.auth.AuthRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class SignInViewModel : ViewModel() {
 
@@ -43,7 +42,7 @@ class SignInViewModel : ViewModel() {
         val email = "$id@dongyang.ac.kr"
         viewModelScope.launch {
             try {
-                authRepository.signIn(email, password).await()
+                authRepository.signIn(email, password)
                 _isLoggedIn.value = authRepository.isLoggedIn()
                 if (isLoggedIn.value != true) {
                     _message.value = R.string.signin_signup_incomplete

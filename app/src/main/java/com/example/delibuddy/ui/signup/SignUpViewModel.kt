@@ -15,7 +15,6 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 class SignUpViewModel : ViewModel() {
 
@@ -99,7 +98,7 @@ class SignUpViewModel : ViewModel() {
         _isSavingProfile.value = true
         viewModelScope.launch {
             try {
-                authRepository.completeSignUp(profile).await()
+                authRepository.completeSignUp(profile)
                 if (skipAccount) {
                     _bankName.value = ""
                     _account.value = ""
@@ -150,7 +149,7 @@ class SignUpViewModel : ViewModel() {
                         univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
                         birthDate = null,
                     )
-                ).await()
+                )
                 if (authRepository.isLoggedIn()) {
                     _isReadyForBirthDate.value = true
                 } else {

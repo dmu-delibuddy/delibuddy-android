@@ -18,7 +18,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 /*
     * 방 상세 화면. roomId 는 Navigation 인자로 받아 SavedStateHandle 에서 꺼냄
@@ -103,7 +102,7 @@ class RoomDetailViewModel(
     // 회원가입에서 계좌 입력을 건너뛸 수 있어서 참여 직전에 확인
     private suspend fun requireAccount() {
         val uid = myUid ?: throw RoomException(RoomException.Reason.NOT_LOGGED_IN)
-        val user = userRepository.getById(uid).await()
+        val user = userRepository.getById(uid)
         if (user?.bankName.isNullOrBlank() || user?.account.isNullOrBlank()) {
             throw RoomException(RoomException.Reason.ACCOUNT_REQUIRED)
         }

@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.tasks.await
 
 /*
     * 채팅방 화면
@@ -220,7 +219,7 @@ class ChatViewModel(
             .forEach { key ->
                 viewModelScope.launch {
                     try {
-                        profileRepository.getById(key.first, key.second).await()?.let { profile ->
+                        profileRepository.getById(key.first, key.second)?.let { profile ->
                             profiles.update { it + (key to profile) }
                         }
                     } catch (e: CancellationException) {

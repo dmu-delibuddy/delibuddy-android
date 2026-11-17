@@ -11,7 +11,6 @@ import com.example.delibuddy.data.user.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 /*
     * 마이페이지 송금 계좌 도메인 (계좌 카드 + 계좌 변경 창이 함께 씀)
@@ -55,7 +54,7 @@ class AccountViewModel(
         val id = userId ?: return
         viewModelScope.launch {
             try {
-                val user = userRepository.getById(id).await()
+                val user = userRepository.getById(id)
                 _account.value = Account(
                     bankName = user?.bankName.orEmpty(),
                     number = user?.account.orEmpty(),
@@ -85,7 +84,7 @@ class AccountViewModel(
         _saving.value = true
         viewModelScope.launch {
             try {
-                userRepository.updateAccount(id, updated.bankName, updated.number).await()
+                userRepository.updateAccount(id, updated.bankName, updated.number)
                 _account.value = updated
                 _message.value = R.string.mypage_account_saved
             } catch (e: CancellationException) {

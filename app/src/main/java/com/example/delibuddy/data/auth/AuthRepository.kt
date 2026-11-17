@@ -1,7 +1,5 @@
 package com.example.delibuddy.data.auth
 
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.example.delibuddy.data.user.UserModel
@@ -33,54 +31,40 @@ class AuthRepository {
         val currentUser = auth.currentUser
         if (currentUser?.email.equals(email, ignoreCase = true)) {
             // 계정 생성 후 발송에 실패했거나 재발송하는 경우 비밀번호를 확인하고 재시도
-            val user = signIn(email, password).await().user
+            val user = signIn(email, password).user
                 ?: error("사용자를 찾을 수 없습니다.")
             user.sendEmailVerification().await()
         } else {
-            signUp(email, password).await()
+            signUp(email, password)
         }
     }
 
-    fun signIn(email: String, password: String): Task<AuthResult> =
-        auth.signInWithEmailAndPassword(email, password)
+    suspend fun signIn(email: String, password: String): AuthResult =
+        auth.signInWithEmailAndPassword(email, password).await()
 
 
-    fun completeSignUp(userData: UserModel): Task<Void> {
+    suspend fun completeSignUp(userData: UserModel) {
         val user = auth.currentUser
-            ?: return Tasks.forException(SignUpSessionMissingException())
+            ?: throw SignUpSessionMissingException()
 
-        return user.reload().continueWithTask { reloadTask ->
-            reloadTask.getResult(Exception::class.java)
-            if (!user.isEmailVerified) {
-                return@continueWithTask Tasks.forException(
-                    EmailNotVerifiedException()
-                )
-            }
-
-            // reload는 사용자 정보만 갱신하므로, 보안 규칙에 전달할 인증 토큰도 갱신한다.
-            user.getIdToken(true).continueWithTask { tokenTask ->
-                tokenTask.getResult(Exception::class.java)
-                userRepository.create(
-                    user.uid,
-                    userData.copy(univEmail = user.email ?: userData.univEmail)
-                ).continueWithTask { userTask ->
-                    userTask.getResult(Exception::class.java)
-                    profileRepository.createInitialProfiles(user.uid)
-                }
-            }
+        user.reload().await()
+        if (!user.isEmailVerified) {
+            throw EmailNotVerifiedException()
         }
+
+        // reload는 사용자 정보만 갱신하므로, 보안 규칙에 전달할 인증 토큰도 갱신한다.
+        user.getIdToken(true).await()
+        userRepository.create(
+            user.uid,
+            userData.copy(univEmail = user.email ?: userData.univEmail)
+        )
+        profileRepository.createInitialProfiles(user.uid)
     }
 
-    private fun signUp(email: String, password: String): Task<AuthResult> =
-        auth.createUserWithEmailAndPassword(email, password)
-            .continueWithTask { createTask ->
-                val result = createTask.getResult(Exception::class.java)
-                val user = result.user
-                    ?: throw IllegalStateException("회원가입 사용자를 찾을 수 없습니다.")
-
-                user.sendEmailVerification().continueWith { verificationTask ->
-                    verificationTask.getResult(Exception::class.java)
-                    result
-                }
-            }
+    private suspend fun signUp(email: String, password: String) {
+        val result = auth.createUserWithEmailAndPassword(email, password).await()
+        val user = result.user
+            ?: throw IllegalStateException("회원가입 사용자를 찾을 수 없습니다.")
+        user.sendEmailVerification().await()
+    }
 }

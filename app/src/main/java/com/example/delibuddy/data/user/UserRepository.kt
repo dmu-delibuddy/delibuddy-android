@@ -1,6 +1,5 @@
 package com.example.delibuddy.data.user
 
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
@@ -11,15 +10,14 @@ class UserRepository {
     suspend fun exists(userId: String): Boolean =
         users.document(userId).get(Source.SERVER).await().exists()
 
-    fun create(userId: String, user: UserModel): Task<Void> =
-        users.document(userId).set(user)
+    suspend fun create(userId: String, user: UserModel) {
+        users.document(userId).set(user).await()
+    }
 
-    fun getById(userId: String): Task<UserModel?> =
-        users.document(userId).get().continueWith { task ->
-            task.result?.toObject(UserModel::class.java)
-        }
+    suspend fun getById(userId: String): UserModel? =
+        users.document(userId).get().await().toObject(UserModel::class.java)
 
-    fun update(userId: String, user: UserModel): Task<Void> =
+    suspend fun update(userId: String, user: UserModel) {
         users.document(userId).update(
             mapOf(
                 "univEmail" to user.univEmail,
@@ -27,21 +25,25 @@ class UserRepository {
                 "bankName" to user.bankName,
                 "account" to user.account
             )
-        )
+        ).await()
+    }
 
     // 생년월일만 수정 (다른 필드는 건드리지 않음)
-    fun updateBirthDate(userId: String, birthDate: String?): Task<Void> =
-        users.document(userId).update("birthDate", birthDate)
+    suspend fun updateBirthDate(userId: String, birthDate: String?) {
+        users.document(userId).update("birthDate", birthDate).await()
+    }
 
     // 송금 계좌(은행, 계좌번호)만 수정 (다른 필드는 건드리지 않음)
-    fun updateAccount(userId: String, bankName: String, account: String): Task<Void> =
+    suspend fun updateAccount(userId: String, bankName: String, account: String) {
         users.document(userId).update(
             mapOf(
                 "bankName" to bankName,
                 "account" to account,
             )
-        )
+        ).await()
+    }
 
-    fun delete(userId: String): Task<Void> =
-        users.document(userId).delete()
+    suspend fun delete(userId: String) {
+        users.document(userId).delete().await()
+    }
 }

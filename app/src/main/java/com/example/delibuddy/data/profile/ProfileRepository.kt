@@ -1,6 +1,5 @@
 package com.example.delibuddy.data.profile
 
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +13,7 @@ class ProfileRepository {
     private fun profileDocument(userId: String, type: ProfileType) =
         users.document(userId).collection("profiles").document(type.name)
 
-    fun createInitialProfiles(userId: String): Task<Void> {
+    suspend fun createInitialProfiles(userId: String) {
         val initialProfiles = ProfileType.values().map { type ->
             profileDocument(userId, type) to ProfileModel(
                 type = type,
@@ -22,7 +21,7 @@ class ProfileRepository {
             )
         }
 
-        return firestore.runTransaction<Void> { transaction ->
+        firestore.runTransaction<Void> { transaction ->
             val snapshots = initialProfiles.map { (document, _) ->
                 transaction.get(document)
             }
@@ -32,15 +31,13 @@ class ProfileRepository {
                 }
             }
             null
-        }
+        }.await()
     }
 
-    fun getById(userId: String, type: ProfileType): Task<ProfileModel?> =
-        profileDocument(userId, type).get().continueWith { task ->
-            task.getResult(Exception::class.java).toObject(ProfileModel::class.java)
-        }
+    suspend fun getById(userId: String, type: ProfileType): ProfileModel? =
+        profileDocument(userId, type).get().await().toObject(ProfileModel::class.java)
 
-    fun update(userId: String, profile: ProfileModel): Task<Void> =
+    suspend fun update(userId: String, profile: ProfileModel) {
         profileDocument(userId, profile.type).update(
             mapOf(
                 "type" to profile.type.name,
@@ -48,7 +45,8 @@ class ProfileRepository {
                 "bio" to profile.bio,
                 "imageUrl" to profile.imageUrl
             )
-        )
+        ).await()
+    }
 
     // 모드별 프로필 실시간 구독 (마이페이지). 문서가 없으면 null
     fun observe(userId: String, type: ProfileType): Flow<ProfileModel?> = callbackFlow {
