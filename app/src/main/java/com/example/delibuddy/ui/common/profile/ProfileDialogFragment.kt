@@ -1,4 +1,4 @@
-package com.example.delibuddy.ui.common
+package com.example.delibuddy.ui.common.profile
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -15,6 +15,8 @@ import androidx.fragment.app.viewModels
 import com.example.delibuddy.R
 import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.databinding.DialogProfileBinding
+import com.example.delibuddy.ui.common.GlobalLoadingDialog
+import com.example.delibuddy.ui.common.loadImage
 
 /*
     * 다른 사용자의 프로필을 보여주는 모달.

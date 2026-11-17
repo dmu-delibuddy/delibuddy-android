@@ -1,4 +1,4 @@
-package com.example.delibuddy.ui.common
+package com.example.delibuddy.ui.common.profile
 
 import android.util.Log
 import androidx.lifecycle.LiveData

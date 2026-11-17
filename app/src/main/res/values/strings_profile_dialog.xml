@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 다른 사용자 프로필 모달 (ui/common/ProfileDialogFragment) -->
+<!-- 다른 사용자 프로필 모달 (ui/common/profile/ProfileDialogFragment) -->
 <resources>
     <string name="profile_dialog_nickname_empty">닉네임 없음</string>
     <string name="profile_dialog_bio_empty">아직 한 줄 소개가 없어요</string>
