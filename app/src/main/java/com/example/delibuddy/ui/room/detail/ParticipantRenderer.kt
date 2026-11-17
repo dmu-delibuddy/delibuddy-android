@@ -2,10 +2,9 @@ package com.example.delibuddy.ui.room.detail
 
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.widget.ImageView
+import android.view.LayoutInflater
 import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -15,6 +14,8 @@ import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.databinding.LayoutRoomDetailParticipantsBinding
+import com.example.delibuddy.databinding.ItemRoomDetailParticipantBinding
+import com.example.delibuddy.ui.common.profile.ProfileDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -33,6 +34,10 @@ class ParticipantRenderer(
         )
 
         val myUid = FirebaseAuth.getInstance().currentUser?.uid
+        val profileType = when (room.mode) {
+            RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
+            RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
+        }
         val ordered = listOf(room.hostId) +
                 room.participantIds.filter { it != room.hostId }
 
@@ -54,35 +59,31 @@ class ParticipantRenderer(
             val cardRow = requireNotNull(row)
             val uid = ordered.getOrNull(index)
             val isMine = uid != null && uid == myUid
+            val isHost = uid != null && uid == room.hostId
             val isEmptySlot = uid == null && index < room.maxParticipants
             val isUnavailable = uid == null && !isEmptySlot
             val fallbackName = when {
-                uid == room.hostId -> "방장"
-                uid == myUid && uid != null -> "나"
+                isHost -> "방장"
                 uid != null -> "참여자 ${index + 1}"
                 index < room.maxParticipants -> "빈자리"
                 else -> "모집 안 함"
             }
-            val card = LinearLayout(fragment.requireContext()).apply {
-                orientation = LinearLayout.VERTICAL
-                gravity = android.view.Gravity.CENTER
-                setPadding(4.dp(), 10.dp(), 4.dp(), 10.dp())
+            val item = ItemRoomDetailParticipantBinding.inflate(
+                LayoutInflater.from(fragment.requireContext()), cardRow, false
+            )
+            val card = item.root.apply {
                 background = GradientDrawable().apply {
                     setColor(if (isUnavailable) Color.rgb(235, 237, 240) else Color.WHITE)
                     cornerRadius = 8.dp().toFloat()
-                    val strokeColor = if (isMine) {
-                        ContextCompat.getColor(context, R.color.point_orange)
-                    } else {
-                        Color.rgb(120, 129, 145)
-                    }
+                    val strokeColor = Color.rgb(120, 129, 145)
                     if (isEmptySlot) {
                         setStroke(1.dp(), strokeColor, 4.dp().toFloat(), 3.dp().toFloat())
                     } else {
-                        setStroke(if (isMine) 2.dp() else 1.dp(), strokeColor)
+                        setStroke(1.dp(), strokeColor)
                     }
                 }
             }
-            val avatar = ImageView(fragment.requireContext()).apply {
+            val avatar = item.imageProfile.apply {
                 setImageResource(
                     when {
                         isEmptySlot -> R.drawable.question_mark_icon
@@ -90,40 +91,27 @@ class ParticipantRenderer(
                         else -> R.drawable.mypage_icon
                     }
                 )
-                scaleType = ImageView.ScaleType.CENTER_CROP
                 contentDescription = if (uid != null) "$fallbackName 프로필 사진" else null
-                background = GradientDrawable().apply {
-                    setColor(Color.rgb(245, 246, 248))
-                    cornerRadius = 24.dp().toFloat()
-                }
-                clipToOutline = true
             }
-            card.addView(avatar, LinearLayout.LayoutParams(48.dp(), 48.dp()))
-            val name = TextView(fragment.requireContext()).apply {
+            val name = item.textName.apply {
                 text = fallbackName
-                textSize = 15f
-                gravity = android.view.Gravity.CENTER
                 setTextColor(if (uid == null) Color.GRAY else Color.BLACK)
-                setPadding(0, 6.dp(), 0, 0)
-                maxLines = 1
-                ellipsize = android.text.TextUtils.TruncateAt.END
             }
-            card.addView(
-                name, LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-            )
-            cardRow.addView(card, LinearLayout.LayoutParams(0, 100.dp(), 1f).apply {
+            item.imageHost.isVisible = isHost
+            item.textMe.isVisible = isMine
+            cardRow.addView(card, LinearLayout.LayoutParams(0, 120.dp(), 1f).apply {
                 if (index % 3 != 2) marginEnd = 8.dp()
             })
 
             if (uid != null) {
+                card.setOnClickListener {
+                    val manager = fragment.childFragmentManager
+                    if (!manager.isStateSaved && manager.findFragmentByTag(ProfileDialogFragment.TAG) == null) {
+                        ProfileDialogFragment.show(manager, uid, profileType)
+                    }
+                }
                 fragment.viewLifecycleOwner.lifecycleScope.launch {
                     val profile = try {
-                        val profileType = when (room.mode) {
-                            RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
-                            RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
-                        }
                         profileRepository.getById(uid, profileType)
                     } catch (e: CancellationException) {
                         throw e

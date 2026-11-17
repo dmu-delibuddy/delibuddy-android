@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.data.profile.ProfileModel
 import com.example.delibuddy.data.profile.ProfileRepository
 import com.example.delibuddy.data.profile.ProfileType
-import com.example.delibuddy.data.user.UserRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -22,13 +21,11 @@ sealed class ProfileUiState {
 
 /*
     * 프로필 모달(ProfileDialogFragment)용 ViewModel
-    * - users/{uid} 문서가 없으면 없는 사용자(NotFound) : UserRepository
-    * - 그 모드의 프로필 문서가 없으면 빈 프로필로 보여줌 (마이페이지와 같은 규칙) : ProfileRepository
+    * - 선택한 사용자의 모드별 프로필을 불러온다.
 */
 class ProfileViewModel : ViewModel() {
 
     private val profileRepository = ProfileRepository()
-    private val userRepository = UserRepository()
 
     private val _state = MutableLiveData<ProfileUiState>(ProfileUiState.Loading)
     val state: LiveData<ProfileUiState> = _state
@@ -46,13 +43,8 @@ class ProfileViewModel : ViewModel() {
         _state.value = ProfileUiState.Loading
         viewModelScope.launch {
             _state.value = try {
-                val user = userRepository.getById(userId)
-                if (user == null) {
-                    ProfileUiState.NotFound
-                } else {
-                    val profile = profileRepository.getById(userId, type)
-                    ProfileUiState.Success(profile ?: ProfileModel(type = type))
-                }
+                val profile = profileRepository.getById(userId, type)
+                if (profile == null) ProfileUiState.NotFound else ProfileUiState.Success(profile)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
