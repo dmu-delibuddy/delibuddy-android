@@ -33,8 +33,7 @@ class StartupFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpLoadingContent()
-        setUpRetryButton()
-        setUpLoginButton()
+        setUpListeners()
         observeStartupState()
     }
 
@@ -48,13 +47,10 @@ class StartupFragment : Fragment() {
         )
     }
 
-    private fun setUpRetryButton() {
+    private fun setUpListeners() {
         binding.buttonRetry.setOnClickListener {
             viewModel.checkLoginStatus()
         }
-    }
-
-    private fun setUpLoginButton() {
         binding.buttonLogin.setOnClickListener {
             navigate(R.id.action_startup_to_auth_entry)
         }
