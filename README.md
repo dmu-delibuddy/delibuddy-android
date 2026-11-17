@@ -63,6 +63,20 @@ com.example.delibuddy/
 - 데이터 코드는 `data/<기능>` 패키지에 두고 모델과 저장소 한다.
 - 화면 코드는 `ui/<화면>` 패키지에 두고 Fragment와 ViewModel을 함께 둔다.
 
+### Repository 비동기 처리
+
+- Firebase `Task`는 Repository 안에서 `await()`로 기다리고 결과를 반환한다.
+- 데이터 변경을 계속 관찰하는 작업은 `Flow`로 제공한다.
+
+```kotlin
+// Repository
+suspend fun getById(userId: String): UserModel? =
+    users.document(userId).get().await().toObject(UserModel::class.java)
+
+// ViewModel
+val user = userRepository.getById(userId)
+```
+
 ### Fragment 코드 스타일
 
 `onViewCreated()`에는 화면 초기화 순서가 보이도록 설정과 상태 관찰 함수를 호출한다.
