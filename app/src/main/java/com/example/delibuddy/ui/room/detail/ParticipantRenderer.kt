@@ -92,11 +92,6 @@ class ParticipantRenderer(
                 )
                 scaleType = ImageView.ScaleType.CENTER_CROP
                 contentDescription = if (uid != null) "$fallbackName 프로필 사진" else null
-                background = GradientDrawable().apply {
-                    setColor(Color.rgb(245, 246, 248))
-                    cornerRadius = 24.dp().toFloat()
-                }
-                clipToOutline = true
             }
             card.addView(avatar, LinearLayout.LayoutParams(48.dp(), 48.dp()))
             val name = TextView(fragment.requireContext()).apply {
