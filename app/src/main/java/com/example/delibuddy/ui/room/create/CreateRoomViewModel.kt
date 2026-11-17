@@ -105,7 +105,7 @@ class CreateRoomViewModel(
     val minOrderAmount: LiveData<Int?> = _minOrderAmount
 
     private val _deliveryFee = MutableLiveData<Int?>(null)
-    val deliveryFee: MutableLiveData<Int?> = _deliveryFee
+    val deliveryFee: LiveData<Int?> = _deliveryFee
 
     private val _foodCostSplit = MutableLiveData(FoodCostSplitMethod.PROPORTIONAL_SPLIT) // 개인 메뉴
     val foodCostSplit: LiveData<FoodCostSplitMethod> = _foodCostSplit
