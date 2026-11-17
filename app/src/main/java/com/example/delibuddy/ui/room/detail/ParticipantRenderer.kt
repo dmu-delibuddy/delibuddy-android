@@ -15,6 +15,7 @@ import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.databinding.LayoutRoomDetailParticipantsBinding
+import com.example.delibuddy.ui.common.profile.ProfileDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -33,6 +34,10 @@ class ParticipantRenderer(
         )
 
         val myUid = FirebaseAuth.getInstance().currentUser?.uid
+        val profileType = when (room.mode) {
+            RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
+            RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
+        }
         val ordered = listOf(room.hostId) +
                 room.participantIds.filter { it != room.hostId }
 
@@ -113,12 +118,14 @@ class ParticipantRenderer(
             })
 
             if (uid != null) {
+                card.setOnClickListener {
+                    val manager = fragment.childFragmentManager
+                    if (!manager.isStateSaved && manager.findFragmentByTag(ProfileDialogFragment.TAG) == null) {
+                        ProfileDialogFragment.show(manager, uid, profileType)
+                    }
+                }
                 fragment.viewLifecycleOwner.lifecycleScope.launch {
                     val profile = try {
-                        val profileType = when (room.mode) {
-                            RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
-                            RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
-                        }
                         profileRepository.getById(uid, profileType)
                     } catch (e: CancellationException) {
                         throw e

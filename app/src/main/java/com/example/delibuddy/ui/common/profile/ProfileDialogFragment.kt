@@ -129,7 +129,7 @@ class ProfileDialogFragment : DialogFragment() {
         fun show(fragmentManager: FragmentManager, userId: String, type: ProfileType) {
             ProfileDialogFragment().apply {
                 arguments = bundleOf(ARG_USER_ID to userId, ARG_TYPE to type.name)
-            }.show(fragmentManager, TAG)
+            }.showNow(fragmentManager, TAG)
         }
     }
 }
