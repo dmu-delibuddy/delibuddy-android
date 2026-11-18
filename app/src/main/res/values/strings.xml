@@ -99,6 +99,9 @@
     <string name="create_category_hint">카테고리를 선택해주세요</string>
     <string name="create_restaurant_label">2. 음식점</string>
     <string name="create_restaurant_hint">예) 맘스터치 동양미래대점</string>
+    <string name="create_exit_title">방 만들기를 그만둘까요?</string>
+    <string name="create_exit_desc">입력한 내용은 저장되지 않아요.</string>
+    <string name="create_exit_confirm">그만두기</string>
     <!-- FoodCategory 순서와 같아야 함 : KOR, CHN, JPN, WEST, ETC -->
     <string-array name="create_category_labels">
         <item>한식</item>

@@ -22,6 +22,7 @@ import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.FoodCostSplitMethod
 import com.example.delibuddy.data.room.DeliveryApp
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import com.example.delibuddy.ui.room.create.CreateRoomViewModel.SubmitState
 
 
@@ -90,9 +91,23 @@ class CreateRoomFragment : Fragment() {
             .addCallback(viewLifecycleOwner, enabled = false) { viewModel.prev() }
     }
 
-    // 상단 < 버튼 : 방 만들기 종료
+    // 상단 < 버튼 : 확인 후 방 만들기 종료
     private fun setUpTopBar() {
-        binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
+        childFragmentManager.setFragmentResultListener(
+            REQUEST_EXIT, viewLifecycleOwner
+        ) { _, _ -> findNavController().popBackStack() }
+        binding.buttonBack.setOnClickListener {
+            GlobalAlertDialog.show(
+                fragmentManager = childFragmentManager,
+                type = GlobalAlertDialog.Type.DANGER,
+                title = getString(R.string.create_exit_title),
+                description = getString(
+                    R.string.create_exit_desc),
+                confirmLabel = getString(
+                    R.string.create_exit_confirm),
+                requestKey = REQUEST_EXIT,
+            )
+        }
     }
 
     // 하단 이전 / 다음(개설) 버튼 클릭 연결
@@ -377,5 +392,9 @@ class CreateRoomFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val REQUEST_EXIT = "exit_create"
     }
 }
