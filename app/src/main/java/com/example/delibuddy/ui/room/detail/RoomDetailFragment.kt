@@ -30,6 +30,8 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.example.delibuddy.data.order.OrderRepository
 import com.bumptech.glide.Glide
+import com.example.delibuddy.data.room.RoomException
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 
@@ -146,10 +148,22 @@ class RoomDetailFragment : Fragment() {
             }
 
             is ActionState.Failed -> {
-                toast(
-                    state.reason?.message
-                        ?: getString(R.string.detail_action_error)
-                )
+                if (state.reason ==
+                    RoomException.Reason.ACCOUNT_REQUIRED
+                ) {
+                    GlobalAlertDialog.show(
+                        fragmentManager = childFragmentManager,
+                        type = GlobalAlertDialog.Type.INFO,
+                        title = getString(
+                            R.string.detail_account_required_title),
+                        description = state.reason.message,
+                    )
+                } else {
+                    toast(
+                        state.reason?.message
+                            ?: getString(R.string.detail_action_error)
+                    )
+                }
                 viewModel.clearActionState()
             }
 
