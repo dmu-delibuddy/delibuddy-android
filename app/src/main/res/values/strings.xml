@@ -6,6 +6,8 @@
     <string name="chat_menu_camera">카메라</string>
     <string name="chat_menu_order">내 주문</string>
     <string name="chat_menu_leave_room">방 나가기</string>
+    <string name="chat_leave_room_title">채팅방에서 나갈까요?</string>
+    <string name="chat_leave_room_description">나가면 이 방의 채팅을 볼 수 없어요.</string>
     <string name="chat_leave_room_error">방에서 나가지 못했습니다. 다시 시도해 주세요.</string>
     <string name="chat_panel_menu">메뉴</string>
     <string name="chat_panel_participants">참여자</string>
