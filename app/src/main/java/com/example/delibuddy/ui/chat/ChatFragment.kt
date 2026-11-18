@@ -31,6 +31,10 @@ import com.example.delibuddy.ui.chat.ChatViewModel.ScreenState
 import com.example.delibuddy.ui.common.loadImage
 import java.io.File
 import java.io.IOException
+import androidx.appcompat.app.AlertDialog
+import androidx.annotation.StringRes
+import com.example.delibuddy.data.room.RoomModel
+import com.example.delibuddy.data.room.RoomStatus
 
 /*
     * 채팅방
@@ -86,6 +90,8 @@ class ChatFragment : Fragment() {
         observeScreenState()
         observeRoomHeader()
         observeMessages()
+        setUpNotice()
+        observeStatusError()
     }
 
     private fun setUpHeader() {
@@ -275,6 +281,138 @@ class ChatFragment : Fragment() {
                     it.maxParticipants
                 )
             }.orEmpty()
+            renderNotice(room)
+        }
+    }
+
+    // 상태 공지 펼치기/접기, 방장 버튼
+    private fun setUpNotice() = with(binding.chatNotice) {
+        rowSummary.setOnClickListener {
+            val open = !layoutExpanded.isVisible
+            layoutExpanded.isVisible = open
+            imageExpand.rotation = if (open) 180f else 0f
+        }
+        buttonAction.setOnClickListener {
+            confirmAdvance()
+        }
+    }
+
+    // 되돌릴 수 없어서 한 번 더 확인
+    private fun confirmAdvance() {
+        AlertDialog.Builder(requireContext())
+            .setMessage(R.string.notice_confirm_message)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                viewModel.advanceStatus()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    // 방 상태에 맞게 문구, 단계, 버튼 표시
+    private fun renderNotice(room: RoomModel?) {
+        binding.chatNotice.root.isVisible = room != null
+        if (room == null) return
+        val status = room.status
+        with(binding.chatNotice) {
+            textBadge.setText(noticeBadge(status))
+            textSummary.text = noticeSummary(room)
+            textHint.setText(noticeHint(status))
+            val action = noticeAction(status)
+            buttonAction.isVisible =
+                action != null && viewModel.isHost(room)
+            action?.let { buttonAction.setText(it) }
+        }
+        renderSteps(status)
+    }
+
+    // 지난 단계는 체크, 지금 단계 노랑, 남은 단계 회색
+    private fun renderSteps(status: RoomStatus) =
+        with(binding.chatNotice) {
+            val now =
+                if (status == RoomStatus.COMPLETED) 4
+                else status.ordinal
+            listOf(step1, step2, step3, step4)
+                .forEachIndexed { i, circle ->
+                    circle.text =
+                        if (i < now) "✓" else "${i + 1}"
+                    circle.setBackgroundResource(
+                        when {
+                            i < now -> R.drawable.bg_step_done
+                            i == now -> R.drawable.bg_step_now
+                            else -> R.drawable.bg_step_todo
+                        }
+                    )
+                }
+            listOf(line1, line2, line3)
+                .forEachIndexed { i, line ->
+                    line.setBackgroundResource(
+                        if (i < now) R.color.point_orange
+                        else R.color.mode_off
+                    )
+                }
+        }
+
+    @StringRes
+    private fun noticeBadge(status: RoomStatus) =
+        when (status) {
+            RoomStatus.RECRUITING ->
+                R.string.notice_badge_recruiting
+            RoomStatus.FULL -> R.string.notice_badge_full
+            RoomStatus.ORDER_CONFIRMED ->
+                R.string.notice_badge_ordered
+            RoomStatus.COMPLETED ->
+                R.string.notice_badge_completed
+        }
+
+    private fun noticeSummary(room: RoomModel): String {
+        val now = room.currentCount
+        val max = room.maxParticipants
+        return when (room.status) {
+            RoomStatus.RECRUITING -> getString(
+                R.string.notice_summary_recruiting,
+                now, max, max - now
+            )
+            RoomStatus.FULL -> getString(
+                R.string.notice_summary_full, now, max
+            )
+            RoomStatus.ORDER_CONFIRMED ->
+                getString(R.string.notice_summary_ordered)
+            RoomStatus.COMPLETED ->
+                getString(R.string.notice_summary_completed)
+        }
+    }
+
+    @StringRes
+    private fun noticeHint(status: RoomStatus) =
+        when (status) {
+            RoomStatus.RECRUITING ->
+                R.string.notice_hint_recruiting
+            RoomStatus.FULL -> R.string.notice_hint_full
+            RoomStatus.ORDER_CONFIRMED ->
+                R.string.notice_hint_ordered
+            RoomStatus.COMPLETED ->
+                R.string.notice_hint_completed
+        }
+
+    // 방장 버튼 문구 (없으면 버튼 숨김)
+    @StringRes
+    private fun noticeAction(status: RoomStatus): Int? =
+        when (status) {
+            RoomStatus.RECRUITING, RoomStatus.FULL ->
+                R.string.notice_action_confirm
+            RoomStatus.ORDER_CONFIRMED ->
+                R.string.notice_action_complete
+            RoomStatus.COMPLETED -> null
+        }
+
+    // 상태 변경 실패 안내
+    private fun observeStatusError() {
+        viewModel.statusError.observe(viewLifecycleOwner) { msg ->
+            msg ?: return@observe
+            Toast.makeText(
+                requireContext(), msg, Toast.LENGTH_SHORT
+            ).show()
+            viewModel.clearStatusError()
         }
     }
 
