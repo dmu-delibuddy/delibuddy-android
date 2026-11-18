@@ -12,6 +12,7 @@
     <string name="chat_panel_menu">메뉴</string>
     <string name="chat_panel_participants">참여자</string>
     <string name="mypage_logout">로그아웃</string>
+    <string name="mypage_logout_title">로그아웃할까요?</string>
     <string name="signup_account_info_description">배달비와 음식값 정산에 사용될 계좌예요.</string>
     <string name="signup_finish">회원가입 완료</string>
     <string name="signup_account_required">은행명과 계좌번호를 입력해 주세요. 등록하지 않으려면 건너뛰기를 눌러 주세요.</string>

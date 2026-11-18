@@ -15,6 +15,7 @@ import com.example.delibuddy.R
 import com.example.delibuddy.data.profile.ProfileModel
 import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.databinding.FragmentMypageBinding
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import com.example.delibuddy.ui.common.GlobalLoadingDialog
 import com.example.delibuddy.ui.mypage.account.AccountViewModel
 import com.example.delibuddy.ui.mypage.account.EditAccountDialogFragment
@@ -176,24 +177,44 @@ class MyPageFragment : Fragment() {
         }
     }
 
-    // 로그아웃 : 첫 화면으로 이동하고 이전 화면 기록 지우기
+// 로그아웃 : 확인 후 첫 화면으로 이동
     private fun setUpLogoutButton() {
+        childFragmentManager.setFragmentResultListener(
+            REQUEST_LOGOUT, viewLifecycleOwner
+        ) { _, _ -> logout() }
         binding.buttonLogout.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            findNavController().navigate(
-                R.id.navigation_auth_entry,
-                null,
-                navOptions {
-                    popUpTo(R.id.mobile_navigation) { inclusive = false }
-                    launchSingleTop = true
-                },
+            GlobalAlertDialog.show(
+                fragmentManager = childFragmentManager,
+                type = GlobalAlertDialog.Type.CONFIRM,
+                title = getString(R.string.mypage_logout_title),
+                confirmLabel = getString(R.string.mypage_logout),
+                requestKey = REQUEST_LOGOUT,
             )
         }
+    }
+
+    // 기존 로그아웃 코드를 그대로 옮김
+    private fun logout() {
+        FirebaseAuth.getInstance().signOut()
+        findNavController().navigate(
+            R.id.navigation_auth_entry,
+            null,
+            navOptions {
+                popUpTo(R.id.mobile_navigation) {
+                    inclusive = false
+                }
+                launchSingleTop = true
+            },
+        )
     }
 
     // 화면이 사라질 때 binding 해제 (메모리 누수 방지)
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val REQUEST_LOGOUT = "logout"
     }
 }
