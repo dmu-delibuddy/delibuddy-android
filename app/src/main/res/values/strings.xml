@@ -262,6 +262,8 @@
     <string name="notice_hint_completed">함께해 주셔서 고마워요</string>
     <string name="notice_action_confirm">주문 확정하기</string>
     <string name="notice_action_complete">완료하기</string>
+    <string name="notice_confirm_order_title">주문을 확정할까요?</string>
+    <string name="notice_confirm_complete_title">공동 주문을 완료할까요?</string>
     <string name="notice_confirm_message">다음 단계로 넘기면 되돌릴 수 없어요. 진행할까요?</string>
     <string name="notice_action_failed">상태를 바꾸지 못했어요. 다시 시도해 주세요</string>
     <string name="notice_expand_desc">공지 펼치기</string>

@@ -30,7 +30,6 @@ import com.example.delibuddy.ui.common.FullscreenImageDialogFragment
 import com.example.delibuddy.ui.common.GlobalAlertDialog
 import java.io.File
 import java.io.IOException
-import androidx.appcompat.app.AlertDialog
 import androidx.annotation.StringRes
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomStatus
@@ -307,20 +306,32 @@ class ChatFragment : Fragment() {
             layoutExpanded.isVisible = open
             imageExpand.rotation = if (open) 180f else 0f
         }
+
+        childFragmentManager.setFragmentResultListener(
+            REQUEST_ADVANCE_STATUS, viewLifecycleOwner
+        ) { _, _ -> viewModel.advanceStatus() }
         buttonAction.setOnClickListener {
             confirmAdvance()
         }
     }
-
-    // 되돌릴 수 없어서 한 번 더 확인
+    // 되돌릴 수 없어서 공용 경고창으로 한 번 더 확인
     private fun confirmAdvance() {
-        AlertDialog.Builder(requireContext())
-            .setMessage(R.string.notice_confirm_message)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                viewModel.advanceStatus()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+        val status =
+            viewModel.roomHeader.value?.status ?: return
+        val title =
+            if (status == RoomStatus.ORDER_CONFIRMED)
+                R.string.notice_confirm_complete_title
+            else R.string.notice_confirm_order_title
+        GlobalAlertDialog.show(
+            fragmentManager = childFragmentManager,
+            type = GlobalAlertDialog.Type.CONFIRM,
+            title = getString(title),
+            description = getString(
+                R.string.notice_confirm_message),
+            confirmLabel = binding.chatNotice
+                .buttonAction.text.toString(),
+            requestKey = REQUEST_ADVANCE_STATUS,
+        )
     }
 
     // 방 상태에 맞게 문구, 단계, 버튼 표시
@@ -484,6 +495,8 @@ class ChatFragment : Fragment() {
     companion object {
         private const val STATE_CAMERA_URI = "camera_photo_uri"
         private const val REQUEST_LEAVE_ROOM = "leave_room"
+        private const val REQUEST_ADVANCE_STATUS = "advance_status"
+
     }
 
 }
