@@ -1,8 +1,6 @@
 package com.example.delibuddy.ui.chat
 
-import android.app.Dialog
 import android.content.ActivityNotFoundException
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,8 +24,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentChatBinding
+import com.example.delibuddy.ui.chat.ChatViewModel.LeaveRoomState
 import com.example.delibuddy.ui.chat.ChatViewModel.ScreenState
-import com.example.delibuddy.ui.common.loadImage
+import com.example.delibuddy.ui.common.FullscreenImageDialogFragment
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import java.io.File
 import java.io.IOException
 import androidx.appcompat.app.AlertDialog
@@ -84,6 +83,7 @@ class ChatFragment : Fragment() {
         setUpSendButton()
         setUpPhotoButton()
         setUpCameraButton()
+        setUpLeaveRoomButton()
         setUpPanelButton()
         observeKeyboard()
         observeParticipants()
@@ -92,6 +92,38 @@ class ChatFragment : Fragment() {
         observeMessages()
         setUpNotice()
         observeStatusError()
+        observeLeaveRoomState()
+    }
+
+    private fun setUpLeaveRoomButton() {
+        childFragmentManager.setFragmentResultListener(REQUEST_LEAVE_ROOM, viewLifecycleOwner) { _, _ ->
+            viewModel.leaveRoom()
+        }
+        binding.chatPanel.menuLeaveRoom.setOnClickListener {
+            GlobalAlertDialog.show(
+                fragmentManager = childFragmentManager,
+                type = GlobalAlertDialog.Type.DANGER,
+                title = getString(R.string.chat_leave_room_title),
+                description = getString(R.string.chat_leave_room_description),
+                confirmLabel = getString(R.string.chat_menu_leave_room),
+                requestKey = REQUEST_LEAVE_ROOM,
+            )
+        }
+    }
+
+    private fun observeLeaveRoomState() {
+        viewModel.leaveRoomState.observe(viewLifecycleOwner) { state ->
+            binding.chatPanel.menuLeaveRoom.isEnabled = state == LeaveRoomState.Idle
+            when (state) {
+                LeaveRoomState.Done -> findNavController().navigateUp()
+                is LeaveRoomState.Failed -> {
+                    val message = state.reason?.message ?: getString(R.string.chat_leave_room_error)
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    viewModel.clearLeaveRoomFailure()
+                }
+                else -> Unit
+            }
+        }
     }
 
     private fun setUpHeader() {
@@ -102,7 +134,7 @@ class ChatFragment : Fragment() {
     private fun setUpMessageList() {
         chatAdapter = ChatAdapter(
             onRetryClick = { id -> viewModel.retry(id) },
-            onImageClick = { url -> showImageFullScreen(url) },
+            onImageClick = { url -> FullscreenImageDialogFragment.show(childFragmentManager, url) },
         )
         binding.recyclerMessages.layoutManager =
             LinearLayoutManager(requireContext()).apply {
@@ -230,23 +262,6 @@ class ChatFragment : Fragment() {
     private fun sendImage(uri: Uri) {
         viewModel.sendImage(uri)
         scrollToBottom()
-    }
-
-    // 사진을 검은 배경 전체 화면으로 크게 보기. 누르면 닫힘
-    private fun showImageFullScreen(url: String) {
-        val dialog = Dialog(
-            requireContext(),
-            android.R.style.Theme_Black_NoTitleBar_Fullscreen,
-        )
-        val imageView = ImageView(requireContext()).apply {
-            setBackgroundColor(Color.BLACK)
-            scaleType = ImageView.ScaleType.FIT_CENTER
-            contentDescription = getString(R.string.chat_image_desc)
-            setOnClickListener { dialog.dismiss() }
-            loadImage(url)
-        }
-        dialog.setContentView(imageView)
-        dialog.show()
     }
 
     // 방 없음 / 실패면 안내 문구, 정상이면 목록 + 입력창
@@ -468,6 +483,7 @@ class ChatFragment : Fragment() {
 
     companion object {
         private const val STATE_CAMERA_URI = "camera_photo_uri"
+        private const val REQUEST_LEAVE_ROOM = "leave_room"
     }
 
 }

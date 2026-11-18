@@ -5,6 +5,10 @@
     <string name="chat_menu_photo">사진</string>
     <string name="chat_menu_camera">카메라</string>
     <string name="chat_menu_order">내 주문</string>
+    <string name="chat_menu_leave_room">방 나가기</string>
+    <string name="chat_leave_room_title">채팅방에서 나갈까요?</string>
+    <string name="chat_leave_room_description">나가면 이 방의 채팅을 볼 수 없어요.</string>
+    <string name="chat_leave_room_error">방에서 나가지 못했습니다. 다시 시도해 주세요.</string>
     <string name="chat_panel_menu">메뉴</string>
     <string name="chat_panel_participants">참여자</string>
     <string name="mypage_logout">로그아웃</string>
@@ -261,4 +265,6 @@
     <string name="notice_confirm_message">다음 단계로 넘기면 되돌릴 수 없어요. 진행할까요?</string>
     <string name="notice_action_failed">상태를 바꾸지 못했어요. 다시 시도해 주세요</string>
     <string name="notice_expand_desc">공지 펼치기</string>
+    <string name="alert_confirm">확인</string>
+    <string name="alert_cancel">취소</string>
 </resources>
