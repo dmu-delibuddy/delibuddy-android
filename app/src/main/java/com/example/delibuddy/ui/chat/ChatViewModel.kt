@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,7 @@ import com.example.delibuddy.data.image.ImageRepository
 import com.example.delibuddy.data.profile.ProfileModel
 import com.example.delibuddy.data.profile.ProfileRepository
 import com.example.delibuddy.data.profile.ProfileType
+import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
@@ -51,6 +53,46 @@ class ChatViewModel(
 
     // 화면 상태 : 방 없음 / 정상 / 불러오기 실패
     enum class ScreenState { NO_ROOM, READY, ERROR }
+
+    sealed interface LeaveRoomState {
+        data object Idle : LeaveRoomState
+        data object Loading : LeaveRoomState
+        data object Done : LeaveRoomState
+        data class Failed(val reason: RoomException.Reason?) : LeaveRoomState
+    }
+
+    private val _leaveRoomState = MutableLiveData<LeaveRoomState>(LeaveRoomState.Idle)
+    val leaveRoomState: LiveData<LeaveRoomState> = _leaveRoomState
+
+    fun leaveRoom() {
+        if (_leaveRoomState.value != LeaveRoomState.Idle) return
+        val id = roomId
+        if (id == null) {
+            _leaveRoomState.value = LeaveRoomState.Failed(RoomException.Reason.NOT_FOUND)
+            return
+        }
+
+        _leaveRoomState.value = LeaveRoomState.Loading
+        viewModelScope.launch {
+            _leaveRoomState.value = try {
+                roomRepository.leaveRoom(id)
+                LeaveRoomState.Done
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: RoomException) {
+                LeaveRoomState.Failed(e.reason)
+            } catch (e: Exception) {
+                Log.e(TAG, "방 나가기 실패: $id", e)
+                LeaveRoomState.Failed(null)
+            }
+        }
+    }
+
+    fun clearLeaveRoomFailure() {
+        if (_leaveRoomState.value is LeaveRoomState.Failed) {
+            _leaveRoomState.value = LeaveRoomState.Idle
+        }
+    }
 
     // 아직 서버 저장이 끝나지 않은 내 메시지
     private data class PendingMessage(
