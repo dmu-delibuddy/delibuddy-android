@@ -20,6 +20,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/camera_file_paths" />
         </provider>
+        <meta-data
+            android:name="com.naver.maps.map.NCP_KEY_ID"
+            android:value="5tk53m416f" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
