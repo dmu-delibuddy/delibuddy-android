@@ -78,7 +78,7 @@ class RoomRepository(
                         null
                     }
                 }
-                .sortedBy { it.createdAt?.seconds ?: 0L }
+                .sortedByDescending { it.createdAt?.seconds ?: 0L }
             trySend(list)
         }
         awaitClose { registration.remove() }
