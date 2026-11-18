@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="globalAlertIcon" format="reference" />
+    <attr name="globalAlertButtonFill" format="color" />
+    <attr name="globalAlertConfirmTextColor" format="color" />
+
+    <style name="GlobalAlertDialogTheme">
+        <item name="globalAlertIcon">@drawable/question_mark_icon</item>
+        <item name="globalAlertButtonFill">@color/point_orange</item>
+        <item name="globalAlertConfirmTextColor">@color/navy</item>
+    </style>
+
+    <style name="GlobalAlertDialogDangerTheme" parent="GlobalAlertDialogTheme">
+        <item name="globalAlertIcon">@drawable/x_mark_icon</item>
+        <item name="globalAlertButtonFill">@color/button_red</item>
+        <item name="globalAlertConfirmTextColor">@color/white</item>
+    </style>
+
+    <style name="GlobalAlertDialogCancelButtonTheme">
+        <item name="globalAlertButtonFill">@color/mode_off</item>
+    </style>
+</resources>

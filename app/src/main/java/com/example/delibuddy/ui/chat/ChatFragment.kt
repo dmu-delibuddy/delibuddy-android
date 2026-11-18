@@ -27,6 +27,7 @@ import com.example.delibuddy.databinding.FragmentChatBinding
 import com.example.delibuddy.ui.chat.ChatViewModel.LeaveRoomState
 import com.example.delibuddy.ui.chat.ChatViewModel.ScreenState
 import com.example.delibuddy.ui.common.FullscreenImageDialogFragment
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import java.io.File
 import java.io.IOException
 
@@ -78,6 +79,7 @@ class ChatFragment : Fragment() {
         setUpSendButton()
         setUpPhotoButton()
         setUpCameraButton()
+        setUpLeaveRoomButton()
         setUpPanelButton()
         observeKeyboard()
         observeParticipants()
@@ -85,6 +87,22 @@ class ChatFragment : Fragment() {
         observeRoomHeader()
         observeMessages()
         observeLeaveRoomState()
+    }
+
+    private fun setUpLeaveRoomButton() {
+        childFragmentManager.setFragmentResultListener(REQUEST_LEAVE_ROOM, viewLifecycleOwner) { _, _ ->
+            viewModel.leaveRoom()
+        }
+        binding.chatPanel.menuLeaveRoom.setOnClickListener {
+            GlobalAlertDialog.show(
+                fragmentManager = childFragmentManager,
+                type = GlobalAlertDialog.Type.DANGER,
+                title = getString(R.string.chat_leave_room_title),
+                description = getString(R.string.chat_leave_room_description),
+                confirmLabel = getString(R.string.chat_menu_leave_room),
+                requestKey = REQUEST_LEAVE_ROOM,
+            )
+        }
     }
 
     private fun observeLeaveRoomState() {
@@ -327,6 +345,7 @@ class ChatFragment : Fragment() {
 
     companion object {
         private const val STATE_CAMERA_URI = "camera_photo_uri"
+        private const val REQUEST_LEAVE_ROOM = "leave_room"
     }
 
 }
