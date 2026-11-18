@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentChatBinding
+import com.example.delibuddy.ui.chat.ChatViewModel.LeaveRoomState
 import com.example.delibuddy.ui.chat.ChatViewModel.ScreenState
 import com.example.delibuddy.ui.common.FullscreenImageDialogFragment
 import java.io.File
@@ -83,6 +84,22 @@ class ChatFragment : Fragment() {
         observeScreenState()
         observeRoomHeader()
         observeMessages()
+        observeLeaveRoomState()
+    }
+
+    private fun observeLeaveRoomState() {
+        viewModel.leaveRoomState.observe(viewLifecycleOwner) { state ->
+            binding.chatPanel.menuLeaveRoom.isEnabled = state == LeaveRoomState.Idle
+            when (state) {
+                LeaveRoomState.Done -> findNavController().navigateUp()
+                is LeaveRoomState.Failed -> {
+                    val message = state.reason?.message ?: getString(R.string.chat_leave_room_error)
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    viewModel.clearLeaveRoomFailure()
+                }
+                else -> Unit
+            }
+        }
     }
 
     private fun setUpHeader() {

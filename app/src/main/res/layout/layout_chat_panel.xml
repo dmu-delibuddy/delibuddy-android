@@ -138,10 +138,29 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
-            <Space
+            <LinearLayout
+                android:id="@+id/menu_leave_room"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:padding="3dp"
+                    android:src="@drawable/leave_room_icon"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@string/chat_menu_leave_room"
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <Space
