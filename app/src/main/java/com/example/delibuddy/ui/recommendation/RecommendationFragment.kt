@@ -12,6 +12,8 @@ import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 
+import java.util.Locale
+
 class RecommendationFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentRecommendationBinding? = null
@@ -44,6 +46,7 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(naverMap: NaverMap) {
         this.naverMap = naverMap
+        naverMap.locale = Locale.KOREAN
     }
 
     override fun onDestroyView() {
