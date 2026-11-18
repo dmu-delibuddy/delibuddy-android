@@ -4,17 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@bg_pixel_box"
+    android:background="@drawable/bg_pixel_box"
     android:paddingStart="24dp"
     android:paddingTop="28dp"
-    android:paddingEnd="28dp"
-    android:paddingBottom="28dp">
+    android:paddingEnd="24dp"
+    android:paddingBottom="28dp"
+    tools:theme="@style/GlobalAlertDialogTheme">
 
     <ImageView
         android:id="@+id/image_icon"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:contentDescription="알림 아이콘"
+        android:importantForAccessibility="no"
+        android:src="?attr/globalAlertIcon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -26,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:textColor="#212130"
+        android:textColor="@color/navy"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textColor="#666666"
+        android:textColor="@color/alert_description"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -53,35 +55,38 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_description">
+        app:layout_constraintTop_toBottomOf="@id/text_description"
+        app:layout_goneMarginTop="24dp">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_cancel"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:background="@bg_pixel_box"
-            android:backgroundTint="#F5E3B3"
-            android:text="취소"
-            android:textColor="#212130"
+            android:background="@drawable/bg_pixel_button"
+            android:text="@string/alert_cancel"
+            android:textColor="@color/navy"
+            android:theme="@style/GlobalAlertDialogCancelButtonTheme"
             android:textSize="15sp"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_confirm"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_weight="1"
-            android:background="@bg_pixel_box"
-            android:backgroundTint="#F49A36"
-            android:text="확인"
-            android:textColor="#212130"
+            android:background="@drawable/bg_pixel_button"
+            android:text="@string/alert_confirm"
+            android:textColor="?attr/globalAlertConfirmTextColor"
             android:textSize="15sp"
             android:textStyle="bold"
-            tools:text="확인" />
+            tools:text="@string/alert_confirm" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

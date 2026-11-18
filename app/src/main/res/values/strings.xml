@@ -242,4 +242,6 @@
         <item>우리은행</item>
         <item>수협은행</item>
     </string-array>
+    <string name="alert_confirm">확인</string>
+    <string name="alert_cancel">취소</string>
 </resources>
