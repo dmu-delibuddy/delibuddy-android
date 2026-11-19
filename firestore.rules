@@ -27,7 +27,7 @@ service cloud.firestore {
           let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
           return isParticipant()
                  && request.auth.uid == userId
-                 && room.status in ['RECRUITING', 'FULL'];
+                 && room.status == 'RECRUITING';
         }
 
         allow read: if isParticipant();

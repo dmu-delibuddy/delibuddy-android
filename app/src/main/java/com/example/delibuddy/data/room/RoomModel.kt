@@ -5,8 +5,13 @@ import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.GeoPoint
 
-// 방 상태 : 모집 중 -> 정원 마감 -> 모집 마갑(주문 확정) -> 완료
-enum class RoomStatus { RECRUITING, FULL, ORDER_CONFIRMED, COMPLETED }
+// 방 상태 : 모집 중 -> 주문 확정 -> 주문 완료 -> 음식 수령 완료 -> 완료
+enum class RoomStatus {
+    RECRUITING, ORDER_CONFIRMED, ORDERED, RECEIVED, COMPLETED;
+
+    val next : RoomStatus?
+        get() = entries.getOrNull(ordinal + 1)
+}
 
 // 방 모드 : 픽업 / 밥친구
 enum class RoomMode { PICKUP_ONLY, MEAL_BUDDY }
@@ -57,10 +62,14 @@ data class RoomModel(
     @get:Exclude
     val deliveryFeePerPerson: Int get() = estimatedDeliveryFee / maxOf(currentCount, 1)
 
+    @get:Exclude
+    val isFull : Boolean
+        get() = currentCount >= maxParticipants
+
     // 지금 새로 참여할 수 있는지
     @get:Exclude
     val isJoinable: Boolean
-        get() = status == RoomStatus.RECRUITING && currentCount < maxParticipants
+        get() = status == RoomStatus.RECRUITING && !isFull
 
     // 이 uid 가 방장인지
     fun isHost(uid: String?): Boolean = uid != null && uid == hostId
