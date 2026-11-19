@@ -1,4 +1,13 @@
 <resources>
+    <string name="profile_view_order">메뉴 확인</string>
+    <string name="profile_remove_participant">강제 퇴장</string>
+    <string name="profile_remove_participant_title">이 참여자를 내보낼까요?</string>
+    <string name="profile_remove_participant_error">참여자를 내보내지 못했습니다.</string>
+    <string name="profile_order_empty">등록한 메뉴가 없어요.</string>
+    <string name="profile_order_summary">주문 금액: %1$,d원\n메모: %2$s</string>
+    <string name="profile_order_no_memo">없음</string>
+    <string name="profile_order_photo">장바구니 사진</string>
+    <string name="profile_order_error">주문 정보를 불러오지 못했습니다.</string>
     <string name="chat_header_participant_count">%1$d/%2$d</string>
     <string name="chat_camera_unavailable">사용할 수 있는 카메라 앱이 없습니다.</string>
     <string name="chat_camera_error">카메라를 준비하지 못했습니다.</string>

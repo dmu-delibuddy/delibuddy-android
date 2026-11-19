@@ -85,7 +85,9 @@ class GlobalAlertDialog : DialogFragment() {
             val requestKey = requireArguments().getString(ARG_REQUEST_KEY)
             val manager = parentFragmentManager
             dismiss()
-            if (requestKey != null) manager.setFragmentResult(requestKey, Bundle.EMPTY)
+            if (requestKey != null) {
+                manager.setFragmentResult(requestKey, requireArguments().getBundle(ARG_RESULT) ?: Bundle.EMPTY)
+            }
         }
     }
 
@@ -96,6 +98,7 @@ class GlobalAlertDialog : DialogFragment() {
         private const val ARG_DESCRIPTION = "description"
         private const val ARG_CONFIRM_LABEL = "confirm_label"
         private const val ARG_REQUEST_KEY = "request_key"
+        private const val ARG_RESULT = "result"
 
         fun show(
             fragmentManager: FragmentManager,
@@ -104,6 +107,7 @@ class GlobalAlertDialog : DialogFragment() {
             description: String? = null,
             confirmLabel: String? = null,
             requestKey: String? = null,
+            result: Bundle? = null,
         ) {
             if (fragmentManager.isStateSaved || fragmentManager.findFragmentByTag(TAG) != null) return
             GlobalAlertDialog().apply {
@@ -113,6 +117,7 @@ class GlobalAlertDialog : DialogFragment() {
                     ARG_DESCRIPTION to description,
                     ARG_CONFIRM_LABEL to confirmLabel,
                     ARG_REQUEST_KEY to requestKey,
+                    ARG_RESULT to result,
                 )
             }.showNow(fragmentManager, TAG)
         }

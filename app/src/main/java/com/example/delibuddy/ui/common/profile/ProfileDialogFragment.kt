@@ -49,12 +49,26 @@ class ProfileDialogFragment : DialogFragment() {
 
     private fun setUpListeners() {
         binding.buttonClose.setOnClickListener { dismiss() }
+        val args = requireArguments()
+        binding.layoutHostActions.isVisible = args.getBoolean(ARG_HOST_ACTIONS)
+        val canRemove = args.getBoolean(ARG_CAN_REMOVE)
+        binding.buttonRemoveParticipant.isEnabled = canRemove
+        binding.buttonRemoveParticipant.alpha = if (canRemove) 1f else 0.5f
+        binding.buttonViewOrder.setOnClickListener { sendAction(REQUEST_VIEW_ORDER) }
+        binding.buttonRemoveParticipant.setOnClickListener { sendAction(REQUEST_REMOVE_PARTICIPANT) }
         binding.imageProfile.setOnClickListener {
             val imageUrl = (viewModel.state.value as? ProfileUiState.Success)
                 ?.profile?.imageUrl?.takeIf { it.isNotBlank() }
                 ?: return@setOnClickListener
             FullscreenImageDialogFragment.show(childFragmentManager, imageUrl)
         }
+    }
+
+    private fun sendAction(request: String) {
+        val manager = parentFragmentManager
+        val userId = requireArguments().getString(ARG_USER_ID) ?: return
+        dismiss()
+        manager.setFragmentResult(request, bundleOf(RESULT_USER_ID to userId))
     }
 
     private fun observeProfile() {
@@ -131,11 +145,27 @@ class ProfileDialogFragment : DialogFragment() {
         const val TAG = "ProfileDialog"
         private const val ARG_USER_ID = "userId"
         private const val ARG_TYPE = "type"
+        private const val ARG_HOST_ACTIONS = "hostActions"
+        private const val ARG_CAN_REMOVE = "canRemove"
+        const val REQUEST_VIEW_ORDER = "profile_view_order"
+        const val REQUEST_REMOVE_PARTICIPANT = "profile_remove_participant"
+        const val RESULT_USER_ID = "profile_user_id"
 
         // type : 보여줄 프로필 모드 (사용자는 모드별로 프로필이 따로 있음)
-        fun show(fragmentManager: FragmentManager, userId: String, type: ProfileType) {
+        fun show(
+            fragmentManager: FragmentManager,
+            userId: String,
+            type: ProfileType,
+            hostActions: Boolean = false,
+            canRemove: Boolean = false,
+        ) {
             ProfileDialogFragment().apply {
-                arguments = bundleOf(ARG_USER_ID to userId, ARG_TYPE to type.name)
+                arguments = bundleOf(
+                    ARG_USER_ID to userId,
+                    ARG_TYPE to type.name,
+                    ARG_HOST_ACTIONS to hostActions,
+                    ARG_CAN_REMOVE to canRemove,
+                )
             }.showNow(fragmentManager, TAG)
         }
     }

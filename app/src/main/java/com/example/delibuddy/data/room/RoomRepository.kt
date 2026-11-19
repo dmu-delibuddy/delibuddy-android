@@ -145,6 +145,23 @@ class RoomRepository(
         }.await()
     }
 
+    suspend fun removeParticipant(roomId: String, participantId: String) {
+        val uid = requireUid()
+        val ref = rooms.document(roomId)
+        db.runTransaction { tx ->
+            val room = tx.get(ref).toObject(RoomModel::class.java)
+                ?: throw RoomException(RoomException.Reason.NOT_FOUND)
+            if (!room.isHost(uid)) throw RoomException(RoomException.Reason.NOT_HOST)
+            if (participantId == uid || !room.isParticipant(participantId)) {
+                throw RoomException(RoomException.Reason.INVALID_STATE)
+            }
+            if (room.status != RoomStatus.RECRUITING && room.status != RoomStatus.COMPLETED) {
+                throw RoomException(RoomException.Reason.CANNOT_LEAVE_IN_PROGRESS)
+            }
+            tx.update(ref, "participantIds", FieldValue.arrayRemove(participantId))
+        }.await()
+    }
+
     suspend fun advanceStatus (roomId : String, from : RoomStatus) {
         val to = from.next ?: throw RoomException (
             RoomException.Reason.INVALID_STATE)

@@ -19,6 +19,14 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.example.delibuddy.data.order.OrderRepository
+import com.example.delibuddy.data.room.RoomRepository
+import com.example.delibuddy.data.room.RoomException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager
@@ -80,6 +88,7 @@ class ChatFragment : Fragment() {
         setUpMessageList()
         setUpHeader()
         setUpParticipantList()
+        setUpProfileActions()
         setUpPanelTabs()
         setUpMessageInput()
         setUpSendButton()
@@ -155,7 +164,94 @@ class ChatFragment : Fragment() {
             RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
             RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
         }
-        ProfileDialogFragment.show(childFragmentManager, userId, type)
+        val hostActions = canManageParticipant(userId)
+        ProfileDialogFragment.show(
+            childFragmentManager, userId, type,
+            hostActions = hostActions,
+            canRemove = hostActions && canRemoveParticipant(),
+        )
+    }
+
+    private fun canManageParticipant(userId: String): Boolean {
+        val room = viewModel.roomHeader.value ?: return false
+        return viewModel.isHost(room) && room.hostId != userId && room.isParticipant(userId)
+    }
+
+    private fun canRemoveParticipant(): Boolean =
+        when (viewModel.roomHeader.value?.status) {
+            RoomStatus.RECRUITING, RoomStatus.COMPLETED -> true
+            else -> false
+        }
+
+    private fun setUpProfileActions() {
+        val userKey = ProfileDialogFragment.RESULT_USER_ID
+        childFragmentManager.setFragmentResultListener(
+            ProfileDialogFragment.REQUEST_VIEW_ORDER, viewLifecycleOwner,
+        ) { _, result ->
+            result.getString(userKey)?.let(::showParticipantOrder)
+        }
+        childFragmentManager.setFragmentResultListener(
+            ProfileDialogFragment.REQUEST_REMOVE_PARTICIPANT, viewLifecycleOwner,
+        ) { _, result ->
+            val userId = result.getString(userKey) ?: return@setFragmentResultListener
+            if (!canManageParticipant(userId) || !canRemoveParticipant()) return@setFragmentResultListener
+            GlobalAlertDialog.show(
+                fragmentManager = childFragmentManager,
+                type = GlobalAlertDialog.Type.DANGER,
+                title = getString(R.string.profile_remove_participant_title),
+                confirmLabel = getString(R.string.profile_remove_participant),
+                requestKey = REQUEST_CONFIRM_REMOVE,
+                result = bundleOf(userKey to userId),
+            )
+        }
+        childFragmentManager.setFragmentResultListener(REQUEST_CONFIRM_REMOVE, viewLifecycleOwner) { _, result ->
+            val userId = result.getString(userKey) ?: return@setFragmentResultListener
+            val roomId = viewModel.roomId ?: return@setFragmentResultListener
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    RoomRepository().removeParticipant(roomId, userId)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    val message = (e as? RoomException)?.reason?.message
+                        ?: getString(R.string.profile_remove_participant_error)
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun showParticipantOrder(userId: String) {
+        val roomId = viewModel.roomId ?: return
+        if (!canManageParticipant(userId)) return
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val order = OrderRepository().getOrder(roomId, userId)
+                if (!canManageParticipant(userId) || childFragmentManager.isStateSaved) return@launch
+                val message = if (order == null) {
+                    getString(R.string.profile_order_empty)
+                } else {
+                    getString(
+                        R.string.profile_order_summary, order.price,
+                        order.memo.orEmpty().ifBlank { getString(R.string.profile_order_no_memo) },
+                    )
+                }
+                val dialog = MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.profile_view_order)
+                    .setMessage(message)
+                    .setPositiveButton(R.string.profile_dialog_close, null)
+                order?.cartScreenshotUrl?.takeIf { it.isNotBlank() }?.let { url ->
+                    dialog.setNeutralButton(R.string.profile_order_photo) { _, _ ->
+                        FullscreenImageDialogFragment.show(childFragmentManager, url)
+                    }
+                }
+                dialog.show()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), R.string.profile_order_error, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setUpParticipantList() {
@@ -535,6 +631,7 @@ class ChatFragment : Fragment() {
     companion object {
         private const val STATE_CAMERA_URI = "camera_photo_uri"
         private const val REQUEST_LEAVE_ROOM = "leave_room"
+        private const val REQUEST_CONFIRM_REMOVE = "confirm_remove_participant"
         private const val REQUEST_ADVANCE_STATUS = "advance_status"
 
     }
