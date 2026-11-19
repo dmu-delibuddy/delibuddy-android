@@ -247,8 +247,6 @@ class CreateRoomFragment : Fragment() {
             step1.textParticipants.text = "${n}명"
             step1.buttonMinus.isEnabled = n > CreateRoomViewModel.MIN_PARTICIPANTS
             step1.buttonPlus.isEnabled = n < CreateRoomViewModel.MAX_PARTICIPANTS
-            step1.buttonMinus.alpha = if (step1.buttonMinus.isEnabled) 1f else 0.3f
-            step1.buttonPlus.alpha = if (step1.buttonPlus.isEnabled) 1f else 0.3f
         }
     }
 

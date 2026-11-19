@@ -53,7 +53,6 @@ class ProfileDialogFragment : DialogFragment() {
         binding.layoutHostActions.isVisible = args.getBoolean(ARG_HOST_ACTIONS)
         val canRemove = args.getBoolean(ARG_CAN_REMOVE)
         binding.buttonRemoveParticipant.isEnabled = canRemove
-        binding.buttonRemoveParticipant.alpha = if (canRemove) 1f else 0.5f
         binding.buttonViewOrder.setOnClickListener { sendAction(REQUEST_VIEW_ORDER) }
         binding.buttonRemoveParticipant.setOnClickListener { sendAction(REQUEST_REMOVE_PARTICIPANT) }
         binding.imageProfile.setOnClickListener {

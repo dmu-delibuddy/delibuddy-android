@@ -1,7 +1,5 @@
 package com.example.delibuddy.ui.room.detail
 
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
@@ -25,7 +23,6 @@ class ParticipantRenderer(
     private val binding: LayoutRoomDetailParticipantsBinding,
 ) {
     private val profileRepository = ProfileRepository()
-    private fun Int.dp(): Int = (this * fragment.resources.displayMetrics.density).toInt()
 
     fun render(room: RoomModel) {
         binding.textParticipantsTitle.text = fragment.getString(
@@ -44,17 +41,13 @@ class ParticipantRenderer(
         val container = binding.layoutParticipants
         container.removeAllViews()
         val slots = maxOf(6, room.currentCount, room.maxParticipants)
+        val inflater = LayoutInflater.from(container.context)
+        val spacing = container.resources.getDimensionPixelSize(R.dimen.participant_card_spacing)
         var row: LinearLayout? = null
         for (index in 0 until slots) {
             if (index % 3 == 0) {
-                row = LinearLayout(fragment.requireContext()).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                }
-                container.addView(
-                    row, LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply { bottomMargin = 8.dp() })
+                row = inflater.inflate(R.layout.row_room_detail_participants, container, false) as LinearLayout
+                container.addView(row)
             }
             val cardRow = requireNotNull(row)
             val uid = ordered.getOrNull(index)
@@ -68,21 +61,15 @@ class ParticipantRenderer(
                 index < room.maxParticipants -> "빈자리"
                 else -> "모집 안 함"
             }
-            val item = ItemRoomDetailParticipantBinding.inflate(
-                LayoutInflater.from(fragment.requireContext()), cardRow, false
-            )
-            val card = item.root.apply {
-                background = GradientDrawable().apply {
-                    setColor(if (isUnavailable) Color.rgb(235, 237, 240) else Color.WHITE)
-                    cornerRadius = 8.dp().toFloat()
-                    val strokeColor = Color.rgb(120, 129, 145)
-                    if (isEmptySlot) {
-                        setStroke(1.dp(), strokeColor, 4.dp().toFloat(), 3.dp().toFloat())
-                    } else {
-                        setStroke(1.dp(), strokeColor)
-                    }
+            val item = ItemRoomDetailParticipantBinding.inflate(inflater, cardRow, false)
+            val card = item.root
+            card.setBackgroundResource(
+                when {
+                    isEmptySlot -> R.drawable.bg_participant_empty
+                    isUnavailable -> R.drawable.bg_participant_unavailable
+                    else -> R.drawable.bg_participant_occupied
                 }
-            }
+            )
             val avatar = item.imageProfile.apply {
                 setImageResource(
                     when {
@@ -95,13 +82,13 @@ class ParticipantRenderer(
             }
             val name = item.textName.apply {
                 text = fallbackName
-                setTextColor(if (uid == null) Color.GRAY else Color.BLACK)
+                isEnabled = uid != null
             }
             item.imageHost.isVisible = isHost
             item.textMe.isVisible = isMine
-            cardRow.addView(card, LinearLayout.LayoutParams(0, 120.dp(), 1f).apply {
-                if (index % 3 != 2) marginEnd = 8.dp()
-            })
+            val params = card.layoutParams as LinearLayout.LayoutParams
+            if (index % 3 != 2) params.marginEnd = spacing
+            cardRow.addView(card, params)
 
             if (uid != null) {
                 card.setOnClickListener {
