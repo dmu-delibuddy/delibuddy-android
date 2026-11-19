@@ -20,7 +20,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/question_mark_icon" />
+        tools:src="@drawable/alert_question" />
 
     <TextView
         android:id="@+id/text_title"

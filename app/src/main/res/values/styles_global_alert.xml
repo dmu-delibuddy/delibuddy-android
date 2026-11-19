@@ -5,15 +5,19 @@
     <attr name="globalAlertConfirmTextColor" format="color" />
 
     <style name="GlobalAlertDialogTheme">
-        <item name="globalAlertIcon">@drawable/question_mark_icon</item>
+        <item name="globalAlertIcon">@drawable/alert_question</item>
         <item name="globalAlertButtonFill">@color/point_orange</item>
         <item name="globalAlertConfirmTextColor">@color/navy</item>
     </style>
 
     <style name="GlobalAlertDialogDangerTheme" parent="GlobalAlertDialogTheme">
-        <item name="globalAlertIcon">@drawable/x_mark_icon</item>
+        <item name="globalAlertIcon">@drawable/alert_warning</item>
         <item name="globalAlertButtonFill">@color/button_red</item>
         <item name="globalAlertConfirmTextColor">@color/white</item>
+    </style>
+
+    <style name="GlobalAlertDialogInfoTheme" parent="GlobalAlertDialogTheme">
+        <item name="globalAlertIcon">@drawable/alert_info</item>
     </style>
 
     <style name="GlobalAlertDialogCancelButtonTheme">

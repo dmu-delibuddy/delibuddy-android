@@ -36,10 +36,10 @@ class GlobalAlertDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val theme = if (alertType == Type.DANGER) {
-            R.style.GlobalAlertDialogDangerTheme
-        } else {
-            R.style.GlobalAlertDialogTheme
+        val theme = when (alertType) {
+            Type.CONFIRM -> R.style.GlobalAlertDialogTheme
+            Type.DANGER -> R.style.GlobalAlertDialogDangerTheme
+            Type.INFO -> R.style.GlobalAlertDialogInfoTheme
         }
         val context = ContextThemeWrapper(inflater.context, theme)
         _binding = DialogGlobalAlertBinding.inflate(inflater.cloneInContext(context), container, false)
