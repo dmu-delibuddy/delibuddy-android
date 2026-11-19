@@ -15,6 +15,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.data.chat.ChatModel
 import com.example.delibuddy.data.chat.ChatRepository
 import com.example.delibuddy.data.chat.MessageType
+import com.example.delibuddy.data.order.OrderModel
+import com.example.delibuddy.data.order.OrderRepository
 import com.example.delibuddy.data.image.ImageRepository
 import com.example.delibuddy.data.profile.ProfileModel
 import com.example.delibuddy.data.profile.ProfileRepository
@@ -52,6 +54,7 @@ class ChatViewModel(
     private val chatRepository = ChatRepository()
     private val imageRepository = ImageRepository()
     private val roomRepository = RoomRepository()
+    private val orderRepository = OrderRepository()
     private val profileRepository = ProfileRepository()
 
     // 넘어온 방 id (없으면 null)
@@ -162,6 +165,34 @@ class ChatViewModel(
     private var changingStatus = false
 
     fun isHost(room : RoomModel) : Boolean = room.isHost(chatRepository.myUid)
+
+    suspend fun loadParticipantOrder(userId: String): Result<OrderModel?> {
+        val id = roomId ?: return Result.failure(RoomException(RoomException.Reason.NOT_FOUND))
+        return try {
+            Result.success(orderRepository.getOrder(id, userId))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w(TAG, "참여자 주문 조회 실패", e)
+            Result.failure(e)
+        }
+    }
+
+    // 성공하면 별도 안내가 필요 없고 참여자 목록은 실시간 구독으로 갱신된다.
+    suspend fun removeParticipant(userId: String): String? {
+        val id = roomId ?: return RoomException.Reason.NOT_FOUND.message
+        return try {
+            roomRepository.removeParticipant(id, userId)
+            null
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: RoomException) {
+            e.reason.message
+        } catch (e: Exception) {
+            Log.w(TAG, "참여자 강제 퇴장 실패", e)
+            getApplication<Application>().getString(R.string.profile_remove_participant_error)
+        }
+    }
 
     fun advanceStatus() {
         val id = roomId ?: return

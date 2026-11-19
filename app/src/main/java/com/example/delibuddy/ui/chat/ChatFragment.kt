@@ -24,9 +24,6 @@ import androidx.fragment.app.viewModels
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.example.delibuddy.data.order.OrderRepository
-import com.example.delibuddy.data.room.RoomRepository
-import com.example.delibuddy.data.room.RoomException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import androidx.navigation.fragment.findNavController
@@ -209,15 +206,8 @@ class ChatFragment : Fragment() {
         }
         childFragmentManager.setFragmentResultListener(REQUEST_CONFIRM_REMOVE, viewLifecycleOwner) { _, result ->
             val userId = result.getString(userKey) ?: return@setFragmentResultListener
-            val roomId = viewModel.roomId ?: return@setFragmentResultListener
             viewLifecycleOwner.lifecycleScope.launch {
-                try {
-                    RoomRepository().removeParticipant(roomId, userId)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    val message = (e as? RoomException)?.reason?.message
-                        ?: getString(R.string.profile_remove_participant_error)
+                viewModel.removeParticipant(userId)?.let { message ->
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }
             }
@@ -225,35 +215,32 @@ class ChatFragment : Fragment() {
     }
 
     private fun showParticipantOrder(userId: String) {
-        val roomId = viewModel.roomId ?: return
         if (!canManageParticipant(userId)) return
         viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val order = OrderRepository().getOrder(roomId, userId)
-                if (!canManageParticipant(userId) || childFragmentManager.isStateSaved) return@launch
-                val message = if (order == null) {
-                    getString(R.string.profile_order_empty)
-                } else {
-                    getString(
-                        R.string.profile_order_summary, order.price,
-                        order.memo.orEmpty().ifBlank { getString(R.string.profile_order_no_memo) },
-                    )
-                }
-                val dialog = MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.profile_view_order)
-                    .setMessage(message)
-                    .setPositiveButton(R.string.profile_dialog_close, null)
-                order?.cartScreenshotUrl?.takeIf { it.isNotBlank() }?.let { url ->
-                    dialog.setNeutralButton(R.string.profile_order_photo) { _, _ ->
-                        FullscreenImageDialogFragment.show(childFragmentManager, url)
-                    }
-                }
-                dialog.show()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
+            val result = viewModel.loadParticipantOrder(userId)
+            if (!canManageParticipant(userId) || childFragmentManager.isStateSaved) return@launch
+            val order = result.getOrElse {
                 Toast.makeText(requireContext(), R.string.profile_order_error, Toast.LENGTH_SHORT).show()
+                return@launch
             }
+            val message = if (order == null) {
+                getString(R.string.profile_order_empty)
+            } else {
+                getString(
+                    R.string.profile_order_summary, order.price,
+                    order.memo.orEmpty().ifBlank { getString(R.string.profile_order_no_memo) },
+                )
+            }
+            val dialog = MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.profile_view_order)
+                .setMessage(message)
+                .setPositiveButton(R.string.profile_dialog_close, null)
+            order?.cartScreenshotUrl?.takeIf { it.isNotBlank() }?.let { url ->
+                dialog.setNeutralButton(R.string.profile_order_photo) { _, _ ->
+                    FullscreenImageDialogFragment.show(childFragmentManager, url)
+                }
+            }
+            dialog.show()
         }
     }
 
