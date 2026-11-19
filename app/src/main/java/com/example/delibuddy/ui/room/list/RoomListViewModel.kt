@@ -53,8 +53,7 @@ class RoomListViewModel(
     private fun isVisible(room: RoomModel): Boolean {
         val mine = room.isHost(myUid) ||
                 room.isParticipant(myUid)
-        val open = (room.status == RoomStatus.RECRUITING ||
-                room.status == RoomStatus.FULL)
+        val open = room.status == RoomStatus.RECRUITING
         return open || mine
     }
 

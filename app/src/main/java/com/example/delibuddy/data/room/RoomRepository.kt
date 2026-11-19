@@ -55,8 +55,9 @@ class RoomRepository(
             rooms.whereIn(
                 "status", listOf(
                     RoomStatus.RECRUITING.name,
-                    RoomStatus.FULL.name,
-                    RoomStatus.ORDER_CONFIRMED.name,  // 참여자는 마감 후에도 계속 봐야 함
+                    RoomStatus.ORDER_CONFIRMED.name,
+                    RoomStatus.ORDERED.name,
+                    RoomStatus.RECEIVED.name,
                 )
             )
         }
@@ -110,21 +111,14 @@ class RoomRepository(
             val room = tx.get(ref).toObject(RoomModel::class.java)
                 ?: throw RoomException(RoomException.Reason.NOT_FOUND)
             when {
-                room.isParticipant(uid) -> throw RoomException(RoomException.Reason.ALREADY_JOINED)
-                room.status == RoomStatus.FULL || room.currentCount >= room.maxParticipants ->
-                    throw RoomException(RoomException.Reason.FULL)
-
+                room.isParticipant(uid) ->
+                    throw RoomException(RoomException.Reason.ALREADY_JOINED)
                 room.status != RoomStatus.RECRUITING ->
                     throw RoomException(RoomException.Reason.CLOSED)
+                room.isFull ->
+                    throw RoomException (RoomException.Reason.FULL)
             }
-            val nextStatus =
-                if (room.currentCount + 1 >= room.maxParticipants) RoomStatus.FULL else RoomStatus.RECRUITING
-            tx.update(
-                ref, mapOf(
-                    "participantIds" to FieldValue.arrayUnion(uid),
-                    "status" to nextStatus.name,
-                )
-            )
+            tx.update(ref, "participantIds", FieldValue.arrayUnion(uid))
         }.await()
     }
 
@@ -135,32 +129,21 @@ class RoomRepository(
         db.runTransaction { tx ->
             val room = tx.get(ref).toObject(RoomModel::class.java)
                 ?: throw RoomException(RoomException.Reason.NOT_FOUND)
-            if (room.isHost(uid)) throw RoomException(RoomException.Reason.HOST_CANNOT_LEAVE)
-            if (!room.isParticipant(uid)) return@runTransaction
-            if (room.status != RoomStatus.RECRUITING && room.status != RoomStatus.FULL)
-                throw RoomException(RoomException.Reason.CLOSED)   // 모집 마감 후에는 취소 불가
-            tx.update(
-                ref, mapOf(
-                    "participantIds" to FieldValue.arrayRemove(uid),
-                    "status" to RoomStatus.RECRUITING.name,
-                )
-            )
+            if (room.isHost(uid))
+                throw RoomException(RoomException.Reason.HOST_CANNOT_LEAVE)
+            if (!room.isParticipant(uid))
+                return@runTransaction
+            if (room.status != RoomStatus.RECRUITING)
+                throw RoomException(RoomException.Reason.CLOSED)
+            tx.update(ref, "participantIds", FieldValue.arrayRemove(uid))
         }.await()
     }
 
-    // 방장이 모집 마감: 모집 중이거나 정원 마감일 때만
-    suspend fun closeRecruiting(roomId: String) = changeStatusAsHost(
-        roomId,
-        from = setOf(RoomStatus.RECRUITING, RoomStatus.FULL),
-        to = RoomStatus.ORDER_CONFIRMED,
-    )
-
-    // 방장이 공동 주문 완료: 모집 마감(주문 확정) 상태일 때만
-    suspend fun completeRoom(roomId: String) = changeStatusAsHost(
-        roomId,
-        from = setOf(RoomStatus.ORDER_CONFIRMED),
-        to = RoomStatus.COMPLETED,
-    )
+    suspend fun advanceStatus (roomId : String, from : RoomStatus) {
+        val to = from.next ?: throw RoomException (
+            RoomException.Reason.INVALID_STATE)
+        changeStatusAsHost(roomId, setOf(from), to)
+    }
 
     // 방장만, 허용된 상태(from)일 때만 방 상태를 to 로 변경 (트랜잭션)
     private suspend fun changeStatusAsHost(roomId: String, from: Set<RoomStatus>, to: RoomStatus) {
@@ -187,8 +170,13 @@ class RoomRepository(
                 }
                 val list = snapshot?.documents.orEmpty()
                     .mapNotNull { it.toObject(RoomModel::class.java) }
-                    .filter { it.status != RoomStatus.COMPLETED }
-                    .sortedByDescending { it.createdAt?.seconds ?: 0L }
+                    .sortedWith (
+                        compareBy<RoomModel> {
+                            it.status == RoomStatus.COMPLETED
+                        }.thenByDescending {
+                            it.createdAt?.seconds ?: 0L
+                        }
+                    )
                 trySend(list)
             }
         awaitClose { registration.remove() }

@@ -162,24 +162,15 @@ class ChatViewModel(
     fun advanceStatus() {
         val id = roomId ?: return
         val status = roomHeader.value?.status ?: return
+        val next = status.next ?: return
         if (changingStatus)
             return
         changingStatus = true
         viewModelScope.launch {
             try {
-                when (status) {
-                    RoomStatus.RECRUITING,
-                    RoomStatus.FULL -> {
-                        roomRepository.closeRecruiting(id)
-                        chatRepository.sendSystem(
-                            id, SystemMessage.CLOSED)
-                    }
-                    RoomStatus.ORDER_CONFIRMED -> {
-                        roomRepository.completeRoom(id)
-                        chatRepository.sendSystem(
-                            id, SystemMessage.COMPLETED)
-                    }
-                    RoomStatus.COMPLETED -> Unit
+                roomRepository.advanceStatus(id, status)
+                SystemMessage.forStatus(next)?.let {
+                    chatRepository.sendSystem(id, it)
                 }
             } catch (e : CancellationException) {
                 throw e

@@ -34,7 +34,7 @@ class OrderRepository(
             val room = transaction.get(roomRef).toObject(RoomModel::class.java)
             checkNotNull(room) { "방을 찾을 수 없습니다." }
             check(room.isParticipant(uid)) { "방 참여자만 주문을 변경할 수 있습니다." }
-            check(room.status in setOf(RoomStatus.RECRUITING, RoomStatus.FULL)) {
+            check(room.status == RoomStatus.RECRUITING) {
                 "모집 마감 후에는 주문을 변경할 수 없습니다."
             }
             if (order == null) {
