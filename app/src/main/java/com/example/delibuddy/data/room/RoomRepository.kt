@@ -135,10 +135,13 @@ class RoomRepository(
                 throw RoomException(RoomException.Reason.CANNOT_LEAVE_IN_PROGRESS)
 
             val remaining = room.participantIds.filterNot { it == uid }
-            val updates = mutableMapOf<String, Any>("participantIds" to remaining)
-            if (room.isHost(uid)) updates["hostId"] = remaining.firstOrNull() ?: ""
-            if (remaining.isEmpty()) updates["status"] = RoomStatus.COMPLETED.name
-            tx.update(ref, updates)
+            if (remaining.isEmpty()) {
+                tx.delete(ref)
+            } else {
+                val updates = mutableMapOf<String, Any>("participantIds" to remaining)
+                if (room.isHost(uid)) updates["hostId"] = remaining.first()
+                tx.update(ref, updates)
+            }
         }.await()
     }
 
