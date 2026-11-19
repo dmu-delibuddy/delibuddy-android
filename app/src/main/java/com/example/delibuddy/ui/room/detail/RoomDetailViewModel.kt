@@ -1,5 +1,13 @@
 package com.example.delibuddy.ui.room.detail
 
+import android.content.ContentResolver
+import android.net.Uri
+import com.example.delibuddy.data.image.ImageRepository
+import com.example.delibuddy.data.order.OrderModel
+import com.example.delibuddy.data.order.OrderRepository
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -77,14 +85,44 @@ class RoomDetailViewModel(
     private val chatRepository = ChatRepository()
 
     // 버튼 동작 실행 -> 성공 | 실패 상태 전달
-    fun joinRoom() {
+    fun joinRoom(price: Long, photo: Uri, memo: String?, resolver: ContentResolver) {
+        require(price > 0)
         if (_actionState.value == ActionState.Loading)
             return // 중복 클릭 방지
         _actionState.value = ActionState.Loading
         viewModelScope.launch {
             _actionState.value = try {
                 requireAccount()
-                roomRepository.joinRoom(roomId)
+                val images = ImageRepository()
+                val image = images.uploadImage(photo, resolver)
+                try {
+                    withContext(NonCancellable) {
+                        roomRepository.joinRoom(roomId)
+                        try {
+                            OrderRepository().saveMyOrder(roomId, OrderModel(
+                                price = price,
+                                cartScreenshotUrl = image.url,
+                                memo = memo,
+                            ))
+                        } catch (orderError: Exception) {
+                            try {
+                                roomRepository.leaveRoom(roomId)
+                            } catch (rollbackError: Exception) {
+                                orderError.addSuppressed(rollbackError)
+                            }
+                            throw orderError
+                        }
+                    }
+                } catch (e: RoomException) {
+                    try {
+                        images.deleteImage(image.id)
+                    } catch (cleanupError: CancellationException) {
+                        throw cleanupError
+                    } catch (cleanupError: Exception) {
+                        Log.w(TAG, "참여 실패 후 이미지 정리 실패", cleanupError)
+                    }
+                    throw e
+                }
                 notifyChat()
                 ActionState.Done
             } catch (e: CancellationException) {

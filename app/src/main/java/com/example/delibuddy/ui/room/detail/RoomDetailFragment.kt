@@ -96,7 +96,18 @@ class RoomDetailFragment : Fragment() {
         if (viewModel.canChat(room)) {
             openChat()
         } else {
-            viewModel.joinRoom()
+            val price = binding.order.inputOrderPrice.text.toString().trim().toLongOrNull()
+            if (price == null || price <= 0) {
+                toast(getString(R.string.detail_join_price_required))
+                return
+            }
+            val photo = selectedImage
+            if (photo == null) {
+                toast(getString(R.string.detail_join_cart_required))
+                return
+            }
+            val memo = binding.order.inputOrderMemo.text.toString().trim().ifEmpty { null }
+            viewModel.joinRoom(price, photo, memo, requireContext().contentResolver)
         }
     }
 
@@ -288,8 +299,8 @@ class RoomDetailFragment : Fragment() {
     }
 
     private fun renderOrderAvailability(room: RoomModel) {
-        val editable = viewModel.canChat(room) &&
-                room.status == RoomStatus.RECRUITING
+        val joined = viewModel.canChat(room)
+        val editable = if (joined) room.status == RoomStatus.RECRUITING else room.isJoinable
         val enabled = editable
         with(binding.order) {
             inputOrderPrice.isEnabled = enabled
@@ -297,7 +308,7 @@ class RoomDetailFragment : Fragment() {
             imageOrderPreview.isEnabled = enabled
         }
         binding.order.textOrderMessage.text = when {
-            !viewModel.canChat(room) -> "방에 참여한 후 주문을 입력할 수 있습니다."
+            !joined && editable -> getString(R.string.detail_join_order_required)
             !editable -> "모집이 마감되어 주문을 변경할 수 없습니다."
             else -> ""
         }
