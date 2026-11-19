@@ -181,8 +181,6 @@ class RoomRepository(
         }.await()
     }
 
-    // 내가 방장 / 참여자인 방 실시간 구독 (완료된 방 제외, 최근 만든 순)
-    // 방장도 participantIds 에 들어 있어서 한 조건으로 찾을 수 있음
     fun observeMyRooms(uid: String): Flow<List<RoomModel>> = callbackFlow {
         val registration = rooms
             .whereArrayContains("participantIds", uid)
