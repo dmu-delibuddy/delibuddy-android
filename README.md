@@ -104,6 +104,12 @@ private fun setUpListeners() {
 }
 ```
 
+### 스타일링
+
+- 색상, 크기, 여백, 배경, 글꼴 등 스타일에 관련된 내용은 최대한 XML에 작성한다.
+- 여러 화면에서 사용하는 스타일은 공용 리소스로 분리하고, 눌림이나 비활성화에 따른 모양은 XML selector로 정의한다.
+- Kotlin에서는 화면 상태에 따라 리소스와 표시 여부를 선택하는 코드만 작성한다.
+
 ### 코루틴 예외 처리
 
 viewModel 코루틴에서 `Exception`을 처리할 때 `CancellationException`을 먼저 던져 취소가 전달되도록 한다.
