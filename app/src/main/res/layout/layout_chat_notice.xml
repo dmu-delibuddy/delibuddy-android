@@ -108,6 +108,13 @@
                 android:id="@+id/step_4"
                 style="@style/NoticeStepCircle"
                 app:layout_constraintStart_toEndOf="@id/step_3"
+                app:layout_constraintEnd_toStartOf="@id/step_5"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/step_5"
+                style="@style/NoticeStepCircle"
+                app:layout_constraintStart_toEndOf="@id/step_4"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -138,6 +145,15 @@
                 app:layout_constraintBottom_toBottomOf=
                     "@id/step_3" />
 
+            <View
+                android:id="@+id/line_4"
+                style="@style/NoticeStepLine"
+                app:layout_constraintStart_toEndOf="@id/step_4"
+                app:layout_constraintEnd_toStartOf="@id/step_5"
+                app:layout_constraintTop_toTopOf="@id/step_4"
+                app:layout_constraintBottom_toBottomOf=
+                    "@id/step_4" />
+
             <TextView
                 style="@style/NoticeStepLabel"
                 android:text="@string/notice_step_recruiting"
@@ -147,7 +163,7 @@
 
             <TextView
                 style="@style/NoticeStepLabel"
-                android:text="@string/notice_step_full"
+                android:text="@string/notice_step_confirmed"
                 app:layout_constraintStart_toStartOf="@id/step_2"
                 app:layout_constraintEnd_toEndOf="@id/step_2"
                 app:layout_constraintTop_toBottomOf="@id/step_2" />
@@ -161,10 +177,17 @@
 
             <TextView
                 style="@style/NoticeStepLabel"
-                android:text="@string/notice_step_completed"
+                android:text="@string/notice_step_received"
                 app:layout_constraintStart_toStartOf="@id/step_4"
                 app:layout_constraintEnd_toEndOf="@id/step_4"
                 app:layout_constraintTop_toBottomOf="@id/step_4" />
+
+            <TextView
+                style="@style/NoticeStepLabel"
+                android:text="@string/notice_step_completed"
+                app:layout_constraintStart_toStartOf="@id/step_5"
+                app:layout_constraintEnd_toEndOf="@id/step_5"
+                app:layout_constraintTop_toBottomOf="@id/step_5" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView

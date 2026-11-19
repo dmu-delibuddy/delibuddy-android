@@ -318,10 +318,19 @@ class ChatFragment : Fragment() {
     private fun confirmAdvance() {
         val status =
             viewModel.roomHeader.value?.status ?: return
-        val title =
-            if (status == RoomStatus.ORDER_CONFIRMED)
-                R.string.notice_confirm_complete_title
-            else R.string.notice_confirm_order_title
+        val title = when (status) {
+            RoomStatus.RECRUITING ->
+                R.string.notice_confirm_title_confirm
+            RoomStatus.ORDER_CONFIRMED ->
+                R.string.notice_confirm_title_ordered
+            RoomStatus.ORDERED ->
+                R.string.notice_confirm_title_received
+            RoomStatus.RECEIVED ->
+                R.string.notice_confirm_title_complete
+            RoomStatus.COMPLETED ->
+                return
+        }
+
         GlobalAlertDialog.show(
             fragmentManager = childFragmentManager,
             type = GlobalAlertDialog.Type.CONFIRM,
@@ -355,9 +364,9 @@ class ChatFragment : Fragment() {
     private fun renderSteps(status: RoomStatus) =
         with(binding.chatNotice) {
             val now =
-                if (status == RoomStatus.COMPLETED) 4
+                if (status == RoomStatus.COMPLETED) 5
                 else status.ordinal
-            listOf(step1, step2, step3, step4)
+            listOf(step1, step2, step3, step4, step5)
                 .forEachIndexed { i, circle ->
                     circle.text =
                         if (i < now) "✓" else "${i + 1}"
@@ -369,7 +378,7 @@ class ChatFragment : Fragment() {
                         }
                     )
                 }
-            listOf(line1, line2, line3)
+            listOf(line1, line2, line3, line4)
                 .forEachIndexed { i, line ->
                     line.setBackgroundResource(
                         if (i < now) R.color.point_orange
@@ -383,9 +392,12 @@ class ChatFragment : Fragment() {
         when (status) {
             RoomStatus.RECRUITING ->
                 R.string.notice_badge_recruiting
-            RoomStatus.FULL -> R.string.notice_badge_full
             RoomStatus.ORDER_CONFIRMED ->
+                R.string.notice_badge_confirmed
+            RoomStatus.ORDERED ->
                 R.string.notice_badge_ordered
+            RoomStatus.RECEIVED ->
+                R.string.notice_badge_received
             RoomStatus.COMPLETED ->
                 R.string.notice_badge_completed
         }
@@ -394,15 +406,20 @@ class ChatFragment : Fragment() {
         val now = room.currentCount
         val max = room.maxParticipants
         return when (room.status) {
-            RoomStatus.RECRUITING -> getString(
-                R.string.notice_summary_recruiting,
-                now, max, max - now
-            )
-            RoomStatus.FULL -> getString(
-                R.string.notice_summary_full, now, max
-            )
+            RoomStatus.RECRUITING ->
+                if (room.isFull) getString(
+                    R.string.notice_summary_recruiting_full,
+                    now, max
+                ) else getString(
+                    R.string.notice_summary_recruiting,
+                    now, max, max - now
+                )
             RoomStatus.ORDER_CONFIRMED ->
+                getString(R.string.notice_summary_confirmed)
+            RoomStatus.ORDERED ->
                 getString(R.string.notice_summary_ordered)
+            RoomStatus.RECEIVED ->
+                getString(R.string.notice_summary_received)
             RoomStatus.COMPLETED ->
                 getString(R.string.notice_summary_completed)
         }
@@ -413,20 +430,27 @@ class ChatFragment : Fragment() {
         when (status) {
             RoomStatus.RECRUITING ->
                 R.string.notice_hint_recruiting
-            RoomStatus.FULL -> R.string.notice_hint_full
             RoomStatus.ORDER_CONFIRMED ->
+                R.string.notice_hint_confirmed
+            RoomStatus.ORDERED ->
                 R.string.notice_hint_ordered
+            RoomStatus.RECEIVED ->
+                R.string.notice_hint_received
             RoomStatus.COMPLETED ->
                 R.string.notice_hint_completed
         }
 
-    // 방장 버튼 문구 (없으면 버튼 숨김)
+    // 방장 버튼 문구 (완료면 버튼 숨김)
     @StringRes
     private fun noticeAction(status: RoomStatus): Int? =
         when (status) {
-            RoomStatus.RECRUITING, RoomStatus.FULL ->
+            RoomStatus.RECRUITING ->
                 R.string.notice_action_confirm
             RoomStatus.ORDER_CONFIRMED ->
+                R.string.notice_action_ordered
+            RoomStatus.ORDERED ->
+                R.string.notice_action_received
+            RoomStatus.RECEIVED ->
                 R.string.notice_action_complete
             RoomStatus.COMPLETED -> null
         }
