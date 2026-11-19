@@ -322,10 +322,10 @@ class CreateRoomFragment : Fragment() {
 
     // 4단계 : 금액, 정산
     private fun setUpAmountInputs() {
-        binding.step4.editMinOrder.doAfterTextChanged {
+        binding.step4.minOrderAmount.editText.doAfterTextChanged {
             viewModel.setMinOrderAmount(it?.toString()?.toIntOrNull())
         }
-        binding.step4.editDeliveryFee.doAfterTextChanged {
+        binding.step4.deliveryFeeAmount.editText.doAfterTextChanged {
             viewModel.setDeliveryFee(it?.toString()?.toIntOrNull())
         }
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!-- 방 만들기 4단계 : 금액 · 정산 방법 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -29,36 +30,15 @@
         android:textColor="@color/black"
         android:textSize="14sp" />
 
-    <LinearLayout
+    <com.example.delibuddy.ui.common.PriceInput
+        android:id="@+id/min_order_amount"
+        style="@style/PriceInputStyle"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="6dp"
-        android:background="@drawable/bg_pixel_box"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingEnd="18dp">
-
-        <EditText
-            android:id="@+id/edit_min_order"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@null"
-            android:hint="@string/create_min_order_hint"
-            android:importantForAutofill="no"
-            android:inputType="number"
-            android:maxLength="7"
-            android:maxLines="1"
-            android:textSize="14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/create_won"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-    </LinearLayout>
+        android:hint="@string/create_min_order_hint"
+        android:maxLength="7"
+        app:amountEditId="@+id/edit_min_order" />
 
     <!-- 2. 예상 배달비 -->
     <TextView
@@ -69,36 +49,15 @@
         android:textColor="@color/black"
         android:textSize="14sp" />
 
-    <LinearLayout
+    <com.example.delibuddy.ui.common.PriceInput
+        android:id="@+id/delivery_fee_amount"
+        style="@style/PriceInputStyle"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="6dp"
-        android:background="@drawable/bg_pixel_box"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingEnd="18dp">
-
-        <EditText
-            android:id="@+id/edit_delivery_fee"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@null"
-            android:hint="@string/create_delivery_fee_hint"
-            android:importantForAutofill="no"
-            android:inputType="number"
-            android:maxLength="7"
-            android:maxLines="1"
-            android:textSize="14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/create_won"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-    </LinearLayout>
+        android:hint="@string/create_delivery_fee_hint"
+        android:maxLength="7"
+        app:amountEditId="@+id/edit_delivery_fee" />
 
     <!-- 1인당 예상 배달비 안내 (코드에서 채움) -->
     <TextView

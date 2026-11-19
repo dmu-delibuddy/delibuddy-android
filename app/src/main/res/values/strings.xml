@@ -142,7 +142,8 @@
     <string name="create_min_order_hint">예) 15000</string>
     <string name="create_delivery_fee_label">2. 예상 배달비</string>
     <string name="create_delivery_fee_hint">예) 3000</string>
-    <string name="create_won">원</string>
+    <string name="currency_won">원</string>
+    <string name="order_amount_hint">0</string>
     <string name="create_fee_note_equal">참여자 %1$d명 기준 1인당 예상 배달비 %2$s원</string>
     <string name="create_fee_note_host">방장이 배달비를 모두 부담해요</string>
     <string name="create_fee_note_custom">1인당 배달비는 참여자별로 직접 정해요</string>

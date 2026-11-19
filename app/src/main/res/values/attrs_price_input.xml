@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PriceInput">
+        <attr name="android:hint" />
+        <attr name="android:maxLength" />
+        <attr name="amountEditId" format="reference" />
+    </declare-styleable>
+</resources>

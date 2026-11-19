@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PriceInputStyle">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">@drawable/bg_pixel_box</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:paddingBottom">0dp</item>
+    </style>
+</resources>

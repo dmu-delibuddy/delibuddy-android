@@ -96,7 +96,7 @@ class RoomDetailFragment : Fragment() {
         if (viewModel.canChat(room)) {
             openChat()
         } else {
-            val price = binding.order.inputOrderPrice.text.toString().trim().toLongOrNull()
+            val price = binding.order.orderPriceAmount.editText.text.toString().trim().toLongOrNull()
             val photo = selectedImage
             if (price == null || price <= 0 || photo == null) {
                 GlobalAlertDialog.show(
@@ -271,7 +271,7 @@ class RoomDetailFragment : Fragment() {
                     val order = orderRepository.getOrder(viewModel.roomId, uid) ?: return@launch
                     if (_binding == null) return@launch
                     // 복원 시 진행 중인 입력은 유지한다.
-                    val price = binding.order.inputOrderPrice
+                    val price = binding.order.orderPriceAmount.editText
                     val memo = binding.order.inputOrderMemo
                     if (price.text.isEmpty()) price.setText(order.price.toString())
                     if (memo.text.isEmpty()) memo.setText(order.memo.orEmpty())
@@ -303,7 +303,7 @@ class RoomDetailFragment : Fragment() {
         val editable = if (joined) room.status == RoomStatus.RECRUITING else room.isJoinable
         val enabled = editable
         with(binding.order) {
-            inputOrderPrice.isEnabled = enabled
+            orderPriceAmount.editText.isEnabled = enabled
             inputOrderMemo.isEnabled = enabled
             imageOrderPreview.isEnabled = enabled
         }
