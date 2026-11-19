@@ -92,18 +92,18 @@
   {
     "id": "loc_11",
     "name": "동양미래대학교 정문",
-    "desription": "동양미래대학교 정문",
+    "description": "동양미래대학교 정문",
     "lat": 37.4998,
-    "lot": 126.8685,
+    "lon": 126.8685,
     "imagePath": "recommend-locations/maindoor.jpg",
     "mode": "PICKUP_ONLY"
   },
   {
     "id": "loc_12",
     "name": "동양미래대학교 후문",
-    "desription": "동양미래대학교 후문",
+    "description": "동양미래대학교 후문",
     "lat": 37.5006,
-    "lot": 126.8665,
+    "lon": 126.8665,
     "imagePath": "recommend-locations/backdoor.jpg",
     "mode": "PICKUP_ONLY"
   }

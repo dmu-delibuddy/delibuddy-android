@@ -83,6 +83,11 @@ class ImageRepository(
         return images.document(imageId).get().await().toObject(ImageModel::class.java)
     }
 
+    suspend fun getImageUrl(storagePath: String): String {
+        require(storagePath.isNotBlank()) { "이미지 저장 경로가 비어 있습니다." }
+        return storage.reference.child(storagePath).downloadUrl.await().toString()
+    }
+
     // 파일이 이미 삭제된 경우에도 메타데이터 삭제를 진행해 재시도할 수 있다.
     suspend fun deleteImage(imageId: String) {
         val image = getImage(imageId) ?: return

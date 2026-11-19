@@ -2,6 +2,10 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /recommend-locations/{locationId} {
+      allow read: if true;
+    }
+
     match /rooms/{roomId} {
       allow read: if true;
       allow write: if request.auth != null;
