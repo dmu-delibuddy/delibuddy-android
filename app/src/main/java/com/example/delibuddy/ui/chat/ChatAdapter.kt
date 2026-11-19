@@ -104,13 +104,8 @@ class ChatAdapter(
         fun bind(item: ChatItem.Bubble) = with(binding) {
             val fallback =
                 if (item.isFromHost) R.string.detail_host else R.string.chat_sender_participant
-            textSender.text = item.senderNickname?.let { nickname ->
-                if (item.isFromHost) textSender.context.getString(
-                    R.string.chat_sender_host,
-                    nickname
-                )
-                else nickname
-            } ?: textSender.context.getString(fallback)
+            textSender.text = item.senderNickname ?: textSender.context.getString(fallback)
+            imageSenderCrown.isVisible = item.isFromHost
             Glide.with(imageProfile)
                 .load(item.senderImageUrl)
                 .placeholder(R.drawable.mypage_icon)
