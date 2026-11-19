@@ -97,13 +97,13 @@ class RoomDetailFragment : Fragment() {
             openChat()
         } else {
             val price = binding.order.inputOrderPrice.text.toString().trim().toLongOrNull()
-            if (price == null || price <= 0) {
-                toast(getString(R.string.detail_join_price_required))
-                return
-            }
             val photo = selectedImage
-            if (photo == null) {
-                toast(getString(R.string.detail_join_cart_required))
+            if (price == null || price <= 0 || photo == null) {
+                GlobalAlertDialog.show(
+                    fragmentManager = childFragmentManager,
+                    type = GlobalAlertDialog.Type.INFO,
+                    title = getString(R.string.detail_join_order_alert),
+                )
                 return
             }
             val memo = binding.order.inputOrderMemo.text.toString().trim().ifEmpty { null }
@@ -308,7 +308,7 @@ class RoomDetailFragment : Fragment() {
             imageOrderPreview.isEnabled = enabled
         }
         binding.order.textOrderMessage.text = when {
-            !joined && editable -> getString(R.string.detail_join_order_required)
+            !joined && editable -> getString(R.string.detail_join_order_alert)
             !editable -> "모집이 마감되어 주문을 변경할 수 없습니다."
             else -> ""
         }

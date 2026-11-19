@@ -1,7 +1,5 @@
 <resources>
-    <string name="detail_join_order_required">음식값과 장바구니 사진을 등록해야 참여할 수 있어요.</string>
-    <string name="detail_join_price_required">음식값을 1원 이상 입력해 주세요.</string>
-    <string name="detail_join_cart_required">장바구니 사진을 선택해 주세요.</string>
+    <string name="detail_join_order_alert">음식값과 장바구니 사진을 등록해야 참여할 수 있어요.</string>
     <string name="chat_menu_share_account">내 계좌 공유</string>
     <string name="chat_share_account_title">이 방에 계좌번호를 공유할까요?</string>
     <string name="chat_share_account_preview">%1$s\n%2$s\n이 방의 참여자가 계좌번호를 볼 수 있어요.</string>

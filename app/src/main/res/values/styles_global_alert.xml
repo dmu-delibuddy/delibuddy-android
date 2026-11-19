@@ -18,6 +18,7 @@
 
     <style name="GlobalAlertDialogInfoTheme" parent="GlobalAlertDialogTheme">
         <item name="globalAlertIcon">@drawable/alert_info</item>
+        <item name="globalAlertButtonFill">@color/mode_off</item>
     </style>
 
     <style name="GlobalAlertDialogCancelButtonTheme">
