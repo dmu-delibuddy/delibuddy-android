@@ -1,4 +1,11 @@
 <resources>
+    <string name="chat_menu_share_account">내 계좌 공유</string>
+    <string name="chat_share_account_title">이 방에 계좌번호를 공유할까요?</string>
+    <string name="chat_share_account_preview">%1$s\n%2$s\n이 방의 참여자가 계좌번호를 볼 수 있어요.</string>
+    <string name="chat_share_account_missing">마이페이지에서 계좌를 먼저 등록해 주세요.</string>
+    <string name="chat_share_account_error">계좌 정보를 불러오지 못했습니다.</string>
+    <string name="chat_copy_account">복사하기</string>
+    <string name="chat_account_copied">계좌번호를 복사했어요.</string>
     <string name="profile_view_order">메뉴 확인</string>
     <string name="profile_remove_participant">강제 퇴장</string>
     <string name="profile_remove_participant_title">이 참여자를 내보낼까요?</string>

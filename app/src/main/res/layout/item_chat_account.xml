@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_pixel_box"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:visibility="gone">
+
+    <TextView
+        android:id="@+id/text_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:textColor="@color/navy"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_copy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:minHeight="48dp"
+        android:background="@drawable/bg_pixel_button"
+        android:theme="@style/GlobalAlertDialogDangerTheme"
+        android:text="@string/chat_copy_account"
+        android:textColor="@color/white" />
+</LinearLayout>

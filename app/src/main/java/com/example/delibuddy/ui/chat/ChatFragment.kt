@@ -1,5 +1,7 @@
 package com.example.delibuddy.ui.chat
 
+import com.example.delibuddy.data.chat.SharedAccount
+
 import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.os.Bundle
@@ -90,6 +92,7 @@ class ChatFragment : Fragment() {
         setUpParticipantList()
         setUpProfileActions()
         setUpPanelTabs()
+        setUpShareAccountButton()
         setUpMessageInput()
         setUpSendButton()
         setUpPhotoButton()
@@ -258,6 +261,44 @@ class ChatFragment : Fragment() {
         binding.chatPanel.panelParticipants.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.chatPanel.panelParticipants.adapter = participantAdapter
         showPanel(false)
+    }
+
+    private fun setUpShareAccountButton() {
+        childFragmentManager.setFragmentResultListener(
+            REQUEST_SHARE_ACCOUNT, viewLifecycleOwner,
+        ) { _, result ->
+            val bank = result.getString(RESULT_BANK_NAME) ?: return@setFragmentResultListener
+            val number = result.getString(RESULT_ACCOUNT_NUMBER) ?: return@setFragmentResultListener
+            viewModel.sendAccount(SharedAccount(bank, number))
+        }
+        val button = binding.chatPanel.menuShareAccount
+        button.setOnClickListener {
+            button.isEnabled = false
+            viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    val account = viewModel.getMySharedAccount()
+                    if (account == null) {
+                        Toast.makeText(requireContext(), R.string.chat_share_account_missing, Toast.LENGTH_SHORT).show()
+                        return@launch
+                    }
+                    GlobalAlertDialog.show(
+                        fragmentManager = childFragmentManager,
+                        type = GlobalAlertDialog.Type.CONFIRM,
+                        title = getString(R.string.chat_share_account_title),
+                        description = getString(R.string.chat_share_account_preview, account.bankName, account.number),
+                        confirmLabel = getString(R.string.chat_menu_share_account),
+                        requestKey = REQUEST_SHARE_ACCOUNT,
+                        result = bundleOf(RESULT_BANK_NAME to account.bankName, RESULT_ACCOUNT_NUMBER to account.number),
+                    )
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), R.string.chat_share_account_error, Toast.LENGTH_SHORT).show()
+                } finally {
+                    button.isEnabled = true
+                }
+            }
+        }
     }
 
     private fun setUpPanelTabs() {
@@ -631,6 +672,9 @@ class ChatFragment : Fragment() {
     companion object {
         private const val STATE_CAMERA_URI = "camera_photo_uri"
         private const val REQUEST_LEAVE_ROOM = "leave_room"
+        private const val REQUEST_SHARE_ACCOUNT = "share_account"
+        private const val RESULT_BANK_NAME = "bank_name"
+        private const val RESULT_ACCOUNT_NUMBER = "account_number"
         private const val REQUEST_CONFIRM_REMOVE = "confirm_remove_participant"
         private const val REQUEST_ADVANCE_STATUS = "advance_status"
 

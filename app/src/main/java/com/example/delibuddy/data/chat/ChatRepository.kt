@@ -57,13 +57,16 @@ class ChatRepository(
     }
 
     // 일반 메시지 전송 (텍스트)
-    suspend fun sendText(roomId: String, messageId: String, content: String) {
+    suspend fun sendText(
+        roomId: String, messageId: String, content: String, sharedAccount: SharedAccount? = null,
+    ) {
         val uid = myUid ?: throw IllegalStateException("로그인이 필요합니다.")
         messages(roomId).document(messageId).set(
             ChatModel(
                 senderId = uid,
                 type = MessageType.NORMAL,
                 content = content,
+                sharedAccount = sharedAccount,
             )
         ).await()
     }

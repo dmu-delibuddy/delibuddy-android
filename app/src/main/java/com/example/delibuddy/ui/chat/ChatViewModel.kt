@@ -1,5 +1,8 @@
 package com.example.delibuddy.ui.chat
 
+import com.example.delibuddy.data.chat.SharedAccount
+import com.example.delibuddy.data.user.UserRepository
+
 import android.app.Application
 import android.net.Uri
 import android.util.Log
@@ -104,6 +107,7 @@ class ChatViewModel(
         val imageUri: Uri? = null,          // 보내려는 기기 사진
         val imageId: String? = null,        // 업로드한 이미지 ID (재전송 때 재사용)
         val failed: Boolean = false,
+        val sharedAccount: SharedAccount? = null,
     )
 
     // 방 정보 실시간 구독 (방장 판단, 상단 제목)
@@ -279,6 +283,7 @@ class ChatViewModel(
             senderNickname = profile?.nickname?.takeIf { it.isNotBlank() },
             senderImageUrl = profile?.imageUrl?.takeIf { it.isNotBlank() },
             senderId = message.senderId?.takeIf { it.isNotBlank() },
+            sharedAccount = message.sharedAccount,
         )
     }
 
@@ -328,6 +333,7 @@ class ChatViewModel(
             deleted = false,
             hasImage = message.imageUri != null,
             imageUrl = message.imageUri?.toString(),
+            sharedAccount = message.sharedAccount,
         )
 
     // 사진이 붙은 메시지마다 다운로드 URL 을 한 번씩 받아 둠
@@ -368,6 +374,24 @@ class ChatViewModel(
         save(PendingMessage(messageId, imageUri = uri))
     }
 
+    suspend fun getMySharedAccount(): SharedAccount? {
+        val uid = chatRepository.myUid ?: return null
+        val user = UserRepository().getById(uid) ?: return null
+        val bank = user.bankName.orEmpty().trim()
+        val number = user.account.orEmpty().trim()
+        if (bank.isBlank() || number.isBlank()) return null
+        return SharedAccount(bank, number)
+    }
+
+    fun sendAccount(account: SharedAccount) {
+        val id = roomId ?: return
+        save(PendingMessage(
+            id = chatRepository.newMessageId(id),
+            content = "${account.bankName} ${account.number}",
+            sharedAccount = account,
+        ))
+    }
+
     // 실패한 메시지를 같은 id 로 다시 저장 (중복 방지)
     fun retry(messageId: String) {
         val message = pending.value[messageId] ?: return
@@ -384,7 +408,7 @@ class ChatViewModel(
                 if (sending.imageUri != null) {
                     sendImageMessage(id, sending, sending.imageUri)
                 } else {
-                    chatRepository.sendText(id, sending.id, sending.content.orEmpty())
+                    chatRepository.sendText(id, sending.id, sending.content.orEmpty(), sending.sharedAccount)
                 }
                 pending.update { it - sending.id }
             } catch (e: CancellationException) {

@@ -1,16 +1,22 @@
 package com.example.delibuddy.ui.chat
 
 import android.content.Context
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.os.Build
+import android.os.PersistableBundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.ItemChatMineBinding
+import com.example.delibuddy.databinding.ItemChatAccountBinding
 import com.example.delibuddy.databinding.ItemChatOtherBinding
 import com.example.delibuddy.databinding.ItemChatSystemBinding
 import com.example.delibuddy.ui.common.loadImage
@@ -78,11 +84,12 @@ class ChatAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatItem.Bubble) = with(binding) {
-            bindContent(textContent, imageAttachment, item)
+            bindContent(textContent, imageAttachment, accountCard, item)
             textTime.text = timeText(item)
             val alpha = if (item.sendState == SendState.SENDING) 0.5f else 1f
             textContent.alpha = alpha
             imageAttachment.alpha = alpha
+            accountCard.root.alpha = alpha
             textFailed.isVisible =
                 item.sendState == SendState.FAILED
             textFailed.setOnClickListener { onRetryClick(item.id) }
@@ -115,7 +122,7 @@ class ChatAdapter(
                 item.senderId?.let(onProfileClick)
             }
             imageProfile.isEnabled = item.senderId != null
-            bindContent(textContent, imageAttachment, item)
+            bindContent(textContent, imageAttachment, accountCard, item)
             textTime.text = timeText(item)
         }
     }
@@ -134,11 +141,20 @@ class ChatAdapter(
     private fun bindContent(
         textView: TextView,
         imageView: ImageView,
+        accountCard: ItemChatAccountBinding,
         item: ChatItem.Bubble,
     ) {
+        val account = item.sharedAccount?.takeIf {
+            !item.deleted && it.bankName.isNotBlank() && it.number.isNotBlank()
+        }
+        accountCard.root.isVisible = account != null
+        accountCard.textAccount.text = account?.let { "${it.bankName} ${it.number}" }.orEmpty()
+        accountCard.buttonCopy.setOnClickListener {
+            account?.let { copyAccount(it.number, accountCard.root.context) }
+        }
         val text = contentText(textView.context, item)
         textView.text = text
-        textView.isVisible = text.isNotEmpty()
+        textView.isVisible = account == null && text.isNotEmpty()
 
         val showImage = item.hasImage && !item.deleted
         imageView.isVisible = showImage
@@ -150,6 +166,18 @@ class ChatAdapter(
             // 주소를 받기 전이면 빈 칸 (재사용된 칸의 예전 사진 지우기)
             Glide.with(imageView).clear(imageView)
             imageView.setOnClickListener(null)
+        }
+    }
+
+    private fun copyAccount(number: String, context: Context) {
+        val clipboard = context.getSystemService(ClipboardManager::class.java) ?: return
+        val clip = ClipData.newPlainText(context.getString(R.string.chat_menu_share_account), number)
+        clip.description.extras = PersistableBundle().apply {
+            putBoolean("android.content.extra.IS_SENSITIVE", true)
+        }
+        clipboard.setPrimaryClip(clip)
+        if (Build.VERSION.SDK_INT < 33) {
+            Toast.makeText(context, R.string.chat_account_copied, Toast.LENGTH_SHORT).show()
         }
     }
 

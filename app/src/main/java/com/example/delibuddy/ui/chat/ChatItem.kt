@@ -1,6 +1,7 @@
 package com.example.delibuddy.ui.chat
 
 import com.google.firebase.Timestamp
+import com.example.delibuddy.data.chat.SharedAccount
 
 // 전송 상태 : 저장 완료 / 보내는 중 / 실패
 enum class SendState { SENT, SENDING, FAILED }
@@ -32,5 +33,6 @@ sealed interface ChatItem {
         val senderNickname: String? = null,
         val senderImageUrl: String? = null,
         val senderId: String? = null,
+        val sharedAccount: SharedAccount? = null,
     ) : ChatItem
 }
