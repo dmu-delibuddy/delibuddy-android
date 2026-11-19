@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="@color/nav_selected" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 그림자 -->
+    <item
+        android:left="@dimen/pixel_shadow_small"
+        android:top="@dimen/pixel_shadow_small">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/black" />
+        </shape>
+    </item>
+    <!-- 본체 -->
+    <item
+        android:right="@dimen/pixel_shadow_small"
+        android:bottom="@dimen/pixel_shadow_small">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/nav_selected" />
+            <stroke
+                android:width="@dimen/pixel_stroke_small"
+                android:color="@color/black" />
+        </shape>
+    </item>
+</layer-list>
