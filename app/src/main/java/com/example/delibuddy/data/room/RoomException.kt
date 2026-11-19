@@ -8,7 +8,7 @@ class RoomException(val reason: Reason) : Exception(reason.message) {
         FULL("정원이 가득 찼습니다."),
         ALREADY_JOINED("이미 참여 중인 방입니다."),
         NOT_HOST("방장만 할 수 있습니다."),
-        HOST_CANNOT_LEAVE("방장은 참여를 취소할 수 없습니다."),
+        CANNOT_LEAVE_IN_PROGRESS("모집 중이거나 완료된 방에서만 나갈 수 있습니다."),
         INVALID_STATE("지금 상태에서는 할 수 없습니다."),
         ACCOUNT_REQUIRED("송금 계좌를 등록해야 참여할 수 있어요. 마이페이지에서 등록해 주세요."),
     }

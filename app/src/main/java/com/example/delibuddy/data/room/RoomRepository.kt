@@ -122,20 +122,23 @@ class RoomRepository(
         }.await()
     }
 
-    // 참여 취소. 정원 마감 상태였으면 다시 모집 중으로 돌림
+    // 모집 중이거나 완료된 방에서 나가고, 방장이 나가면 남은 첫 참여자에게 승계한다.
     suspend fun leaveRoom(roomId: String) {
         val uid = requireUid()
         val ref = rooms.document(roomId)
         db.runTransaction { tx ->
             val room = tx.get(ref).toObject(RoomModel::class.java)
                 ?: throw RoomException(RoomException.Reason.NOT_FOUND)
-            if (room.isHost(uid))
-                throw RoomException(RoomException.Reason.HOST_CANNOT_LEAVE)
             if (!room.isParticipant(uid))
                 return@runTransaction
-            if (room.status != RoomStatus.RECRUITING)
-                throw RoomException(RoomException.Reason.CLOSED)
-            tx.update(ref, "participantIds", FieldValue.arrayRemove(uid))
+            if (room.status != RoomStatus.RECRUITING && room.status != RoomStatus.COMPLETED)
+                throw RoomException(RoomException.Reason.CANNOT_LEAVE_IN_PROGRESS)
+
+            val remaining = room.participantIds.filterNot { it == uid }
+            val updates = mutableMapOf<String, Any>("participantIds" to remaining)
+            if (room.isHost(uid)) updates["hostId"] = remaining.firstOrNull() ?: ""
+            if (remaining.isEmpty()) updates["status"] = RoomStatus.COMPLETED.name
+            tx.update(ref, updates)
         }.await()
     }
 
