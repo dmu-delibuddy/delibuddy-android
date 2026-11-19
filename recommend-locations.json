@@ -5,7 +5,8 @@
     "description": "동양미래대학교에 Main건물",
     "lat": 37.49962,
     "lon": 126.86720,
-    "imagePath": "recommend-locations/campus1.jpg"
+    "imagePath": "recommend-locations/campus1.jpg",
+    "mode: "PICKUP_ONLY"
   },
   {
     "id": "loc_2",
@@ -14,6 +15,7 @@
     "lat": 37.49975,
     "lon": 126.86760,
     "imagePath": "recommend-locations/campus2.jpg"
+    "mode: "PICKUP_ONLY"
   },
   {
     "id": "loc_3",
@@ -22,6 +24,7 @@
     "lat": 37.50005,
     "lon": 126.86735,
     "imagePath": "recommend-locations/campus3.jpg"
+    "mode: "PICKUP_ONLY"
   },
   {
     "id": "loc_4",
@@ -30,6 +33,7 @@
     "lat": 37.49990,
     "lon": 126.86685,
     "imagePath": "recommend-locations/campus4.jpg"
+    "mode: "PICKUP_ONLY"
   },
   {
     "id": "loc_5",
@@ -38,6 +42,7 @@
     "lat": 37.50025,
     "lon": 126.86705,
     "imagePath": "recommend-locations/campus5.jpg"
+    "mode: "PICKUP_ONLY"
   },
   {
     "id": "loc_6",
@@ -46,6 +51,7 @@
     "lat": 37.50050,
     "lon": 126.86725,
     "imagePath": "recommend-locations/campus6.jpg"
+    "mode: "PICKUP_ONLY"
   },
   {
     "id": "loc_7",
@@ -54,6 +60,7 @@
     "lat": 37.50080,
     "lon": 126.86765,
     "imagePath": "recommend-locations/campus7.jpg"
+    "mode: "PICKUP_ONLY"
   },
   {
     "id": "loc_8",
@@ -62,6 +69,7 @@
     "lat": 37.50020,
     "lon": 126.86780,
     "imagePath": "recommend-locations/campus8.jpg"
+    "mode: "PICKUP_ONLY"
   },
   {
     "id": "loc_9",
@@ -70,6 +78,7 @@
     "lat": 37.50110,
     "lon": 126.86810,
     "imagePath": "recommend-locations/gisuksa.jpg"
+    "mode: "MEAL_BUDDY"
   },
   {
     "id": "loc_10",
@@ -78,5 +87,25 @@
     "lat": 37.49995,
     "lon": 126.86755,
     "imagePath": "recommend-locations/outtable.jpg"
-  }
+    "mode: "MEAL_BUDDY"
+  },
+ {
+  "id": "loc_11",
+  "name": "동양미래대학교 정문",
+  "desription": "동양미래대학교 정문",
+  "lat": 37.4998,
+  "lot": 126.8685,
+  "imagePath": "recommend-locations/maindoor.jpg"
+    "mode: "PICKUP_ONLY"
+ },
+ {
+  "id": "loc_12",
+  "name": "동양미래대학교 후문",
+  "desription": "동양미래대학교 후문",
+  "lat": 37.5006,
+  "lot": 126.8665 ,
+  "imagePath": "recommend-locations/backdoor.jpg" 
+    "mode: "PICKUP_ONLY"
+ }
 ]
+
