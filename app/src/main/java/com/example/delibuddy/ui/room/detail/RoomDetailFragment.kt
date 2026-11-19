@@ -198,7 +198,7 @@ class RoomDetailFragment : Fragment() {
     // 방 정보(상태, 제목, 모드, 가게, 마감, 금액, 정산) + 참여자 + 버튼 표시
     private fun renderRoom(room: RoomModel) = with(binding) {
 
-        textStatus.text = getString(statusLabel(room.status)) + " " +
+        textStatus.text = getString(statusLabel(room)) + " " +
                 getString(R.string.detail_count, room.currentCount, room.maxParticipants)
         textTitle.text = room.title
         textMode.setText(
@@ -289,7 +289,7 @@ class RoomDetailFragment : Fragment() {
 
     private fun renderOrderAvailability(room: RoomModel) {
         val editable = viewModel.canChat(room) &&
-                room.status in setOf(RoomStatus.RECRUITING, RoomStatus.FULL)
+                room.status == RoomStatus.RECRUITING
         val enabled = editable
         with(binding.order) {
             inputOrderPrice.isEnabled = enabled
@@ -303,12 +303,15 @@ class RoomDetailFragment : Fragment() {
         }
     }
 
-    // 방 상태 => 화면 표시 문구 (모집 중 / 정원 마감 / 모집 마감 / 완료)
+    // 방 상태 => 화면 표시 문구 (모집 중인데 정원이 차면 정원 마감)
     @StringRes
-    private fun statusLabel(status: RoomStatus) = when (status) {
-        RoomStatus.RECRUITING -> R.string.detail_status_recruiting
-        RoomStatus.FULL -> R.string.detail_status_full
+    private fun statusLabel(room: RoomModel) = when (room.status) {
+        RoomStatus.RECRUITING ->
+            if (room.isFull) R.string.detail_status_full
+            else R.string.detail_status_recruiting
         RoomStatus.ORDER_CONFIRMED -> R.string.detail_status_confirmed
+        RoomStatus.ORDERED -> R.string.detail_status_ordered
+        RoomStatus.RECEIVED -> R.string.detail_status_received
         RoomStatus.COMPLETED -> R.string.detail_status_completed
     }
 

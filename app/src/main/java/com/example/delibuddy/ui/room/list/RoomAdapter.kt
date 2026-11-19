@@ -44,7 +44,7 @@ class RoomAdapter(
         fun bind(room: RoomModel) = with(binding) {
             // 모집 배지 = 상태 + 인원
             textStatus.text =
-                "${statusLabel(room.status)} ${room.currentCount}/${room.maxParticipants}명"
+                "${statusLabel(room)} ${room.currentCount}/${room.maxParticipants}명"
 
             // 배달비
             textDeliveryFee.text = "배달비 1인당 %,d원".format(room.deliveryFeePerPerson)
@@ -71,11 +71,12 @@ class RoomAdapter(
         }
     }
 
-    // 방 상태 → 카드 표시 문구
-    private fun statusLabel(status: RoomStatus) = when (status) {
-        RoomStatus.RECRUITING -> "모집 중"
-        RoomStatus.FULL -> "정원 마감"
-        RoomStatus.ORDER_CONFIRMED -> "모집 마감"
+    // 방 상태 → 카드 표시 문구 (모집 중인데 정원이 차면 정원 마감)
+    private fun statusLabel(room: RoomModel) = when (room.status) {
+        RoomStatus.RECRUITING -> if (room.isFull) "정원 마감" else "모집 중"
+        RoomStatus.ORDER_CONFIRMED -> "주문 확정"
+        RoomStatus.ORDERED -> "주문 완료"
+        RoomStatus.RECEIVED -> "수령 완료"
         RoomStatus.COMPLETED -> "완료"
     }
 

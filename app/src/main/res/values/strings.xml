@@ -151,7 +151,9 @@
     <string name="detail_title">방 정보</string>
     <string name="detail_status_recruiting">모집 중</string>
     <string name="detail_status_full">정원 마감</string>
-    <string name="detail_status_confirmed">모집 마감</string>
+    <string name="detail_status_confirmed">주문 확정</string>
+    <string name="detail_status_ordered">주문 완료</string>
+    <string name="detail_status_received">수령 완료</string>
     <string name="detail_status_completed">완료</string>
     <string name="detail_count">%1$d/%2$d명</string>
     <string name="detail_restaurant">음식점</string>
