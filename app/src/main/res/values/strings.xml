@@ -12,6 +12,7 @@
     <string name="chat_panel_menu">메뉴</string>
     <string name="chat_panel_participants">참여자</string>
     <string name="mypage_logout">로그아웃</string>
+    <string name="mypage_logout_title">로그아웃할까요?</string>
     <string name="signup_account_info_description">배달비와 음식값 정산에 사용될 계좌예요.</string>
     <string name="signup_finish">회원가입 완료</string>
     <string name="signup_account_required">은행명과 계좌번호를 입력해 주세요. 등록하지 않으려면 건너뛰기를 눌러 주세요.</string>
@@ -98,6 +99,9 @@
     <string name="create_category_hint">카테고리를 선택해주세요</string>
     <string name="create_restaurant_label">2. 음식점</string>
     <string name="create_restaurant_hint">예) 맘스터치 동양미래대점</string>
+    <string name="create_exit_title">방 만들기를 그만둘까요?</string>
+    <string name="create_exit_desc">입력한 내용은 저장되지 않아요.</string>
+    <string name="create_exit_confirm">그만두기</string>
     <!-- FoodCategory 순서와 같아야 함 : KOR, CHN, JPN, WEST, ETC -->
     <string-array name="create_category_labels">
         <item>한식</item>
@@ -178,6 +182,7 @@
     <string name="detail_confirm_close">모집을 마감할까요?\n마감 후에는 새로 참여할 수 없어요</string>
     <string name="detail_confirm_complete">공동 주문을 완료할까요?</string>
     <string name="detail_go_chat">채팅방으로 이동</string>
+    <string name="detail_account_required_title">송금 계좌가 필요해요</string>
     <string name="chat_no_room">방 상세에서 채팅방에 들어가 주세요</string>
     <string name="chat_load_error">채팅을 불러오지 못했어요\n방에 참여 중인지 확인해 주세요</string>
     <string name="chat_input_hint">메시지를 입력하세요</string>
