@@ -278,6 +278,7 @@ class ChatViewModel(
                 ?: localImages[message.id]?.toString(),
             senderNickname = profile?.nickname?.takeIf { it.isNotBlank() },
             senderImageUrl = profile?.imageUrl?.takeIf { it.isNotBlank() },
+            senderId = message.senderId?.takeIf { it.isNotBlank() },
         )
     }
 

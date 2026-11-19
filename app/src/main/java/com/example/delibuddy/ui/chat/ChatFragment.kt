@@ -33,6 +33,9 @@ import java.io.IOException
 import androidx.annotation.StringRes
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomStatus
+import com.example.delibuddy.data.room.RoomMode
+import com.example.delibuddy.data.profile.ProfileType
+import com.example.delibuddy.ui.common.profile.ProfileDialogFragment
 
 /*
     * 채팅방
@@ -47,7 +50,7 @@ class ChatFragment : Fragment() {
     private val viewModel: ChatViewModel by viewModels()
 
     private lateinit var chatAdapter: ChatAdapter
-    private val participantAdapter = ChatParticipantAdapter()
+    private val participantAdapter = ChatParticipantAdapter(::showProfile)
     private var keyboardLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
     private var wasKeyboardVisible = false
     private var cameraPhotoUri: Uri? = null
@@ -134,12 +137,25 @@ class ChatFragment : Fragment() {
         chatAdapter = ChatAdapter(
             onRetryClick = { id -> viewModel.retry(id) },
             onImageClick = { url -> FullscreenImageDialogFragment.show(childFragmentManager, url) },
+            onProfileClick = ::showProfile,
         )
         binding.recyclerMessages.layoutManager =
             LinearLayoutManager(requireContext()).apply {
                 stackFromEnd = true
             }
         binding.recyclerMessages.adapter = chatAdapter
+    }
+
+    private fun showProfile(userId: String) {
+        val mode = viewModel.roomHeader.value?.mode ?: return
+        if (childFragmentManager.isStateSaved ||
+            childFragmentManager.findFragmentByTag(ProfileDialogFragment.TAG) != null
+        ) return
+        val type = when (mode) {
+            RoomMode.PICKUP_ONLY -> ProfileType.PICKUP_ONLY
+            RoomMode.MEAL_BUDDY -> ProfileType.MEAL_BUDDY
+        }
+        ProfileDialogFragment.show(childFragmentManager, userId, type)
     }
 
     private fun setUpParticipantList() {

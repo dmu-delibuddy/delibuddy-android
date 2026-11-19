@@ -27,6 +27,7 @@ import java.util.Locale
 class ChatAdapter(
     private val onRetryClick: (messageId: String) -> Unit,
     private val onImageClick: (imageUrl: String) -> Unit,
+    private val onProfileClick: (userId: String) -> Unit,
 ) : ListAdapter<ChatItem, RecyclerView.ViewHolder>(DIFF) {
 
     // 메시지 종류별 말풍선 번호
@@ -110,6 +111,10 @@ class ChatAdapter(
                 .fallback(R.drawable.mypage_icon)
                 .circleCrop()
                 .into(imageProfile)
+            imageProfile.setOnClickListener {
+                item.senderId?.let(onProfileClick)
+            }
+            imageProfile.isEnabled = item.senderId != null
             bindContent(textContent, imageAttachment, item)
             textTime.text = timeText(item)
         }

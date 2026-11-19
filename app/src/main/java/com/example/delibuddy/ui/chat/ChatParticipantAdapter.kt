@@ -17,16 +17,22 @@ data class ChatParticipant(
     val isHost: Boolean
 )
 
-class ChatParticipantAdapter : ListAdapter<ChatParticipant, ChatParticipantAdapter.Holder>(DIFF) {
+class ChatParticipantAdapter(private val onProfileClick: (String) -> Unit) :
+    ListAdapter<ChatParticipant, ChatParticipantAdapter.Holder>(DIFF) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder = Holder(
-        ItemChatParticipantBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        ItemChatParticipantBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+        onProfileClick,
     )
 
     override fun onBindViewHolder(holder: Holder, position: Int) = holder.bind(getItem(position))
 
-    class Holder(private val binding: ItemChatParticipantBinding) :
+    class Holder(
+        private val binding: ItemChatParticipantBinding,
+        private val onProfileClick: (String) -> Unit,
+    ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(participant: ChatParticipant) {
+            binding.root.setOnClickListener { onProfileClick(participant.id) }
             binding.imageHost.isVisible = participant.isHost
             binding.textName.text = participant.nickname.takeIf { it.isNotBlank() }
                 ?: binding.root.context.getString(R.string.chat_sender_participant)
