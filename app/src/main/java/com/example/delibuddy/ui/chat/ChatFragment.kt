@@ -247,7 +247,7 @@ class ChatFragment : Fragment() {
     private fun setUpParticipantList() {
         binding.chatPanel.panelParticipants.layoutManager = GridLayoutManager(requireContext(), 3)
         binding.chatPanel.panelParticipants.adapter = participantAdapter
-        showPanel(false)
+        selectPanelTab(PanelTab.MENU)
     }
 
     private fun setUpShareAccountButton() {
@@ -289,8 +289,8 @@ class ChatFragment : Fragment() {
     }
 
     private fun setUpPanelTabs() {
-        binding.chatPanel.tabMenu.setOnClickListener { showPanel(false) }
-        binding.chatPanel.tabParticipants.setOnClickListener { showPanel(true) }
+        binding.chatPanel.tabMenu.setOnClickListener { selectPanelTab(PanelTab.MENU) }
+        binding.chatPanel.tabParticipants.setOnClickListener { selectPanelTab(PanelTab.PARTICIPANTS) }
     }
 
     private fun setUpMessageInput() {
@@ -379,7 +379,10 @@ class ChatFragment : Fragment() {
         decorView.viewTreeObserver.addOnGlobalLayoutListener(listener)
     }
 
-    private fun showPanel(participants: Boolean) {
+    private enum class PanelTab { MENU, PARTICIPANTS }
+
+    private fun selectPanelTab(tab: PanelTab) {
+        val participants = tab == PanelTab.PARTICIPANTS
         binding.chatPanel.indicatorMenu.visibility =
             if (participants) View.INVISIBLE else View.VISIBLE
         binding.chatPanel.indicatorParticipants.visibility =
