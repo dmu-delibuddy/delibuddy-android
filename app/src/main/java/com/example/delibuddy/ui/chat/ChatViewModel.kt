@@ -32,6 +32,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
+import com.example.delibuddy.R
+import com.example.delibuddy.data.room.RoomStatus
+import com.example.delibuddy.data.chat.SystemMessage
 
 /*
     * 채팅방 화면
@@ -148,6 +151,52 @@ class ChatViewModel(
     private val localImages = mutableMapOf<String, Uri>()
 
     val roomHeader: LiveData<RoomModel?> = sharedRoom.asLiveData()
+
+    private val _statusError = MutableLiveData<String?>()
+    val statusError : LiveData<String?> = _statusError
+
+    private var changingStatus = false
+
+    fun isHost(room : RoomModel) : Boolean = room.isHost(chatRepository.myUid)
+
+    fun advanceStatus() {
+        val id = roomId ?: return
+        val status = roomHeader.value?.status ?: return
+        if (changingStatus)
+            return
+        changingStatus = true
+        viewModelScope.launch {
+            try {
+                when (status) {
+                    RoomStatus.RECRUITING,
+                    RoomStatus.FULL -> {
+                        roomRepository.closeRecruiting(id)
+                        chatRepository.sendSystem(
+                            id, SystemMessage.CLOSED)
+                    }
+                    RoomStatus.ORDER_CONFIRMED -> {
+                        roomRepository.completeRoom(id)
+                        chatRepository.sendSystem(
+                            id, SystemMessage.COMPLETED)
+                    }
+                    RoomStatus.COMPLETED -> Unit
+                }
+            } catch (e : CancellationException) {
+                throw e
+            } catch (e : RoomException) {
+                _statusError.value = e.reason.message
+            } catch (e : Exception) {
+                Log.e(TAG, "방 상태 변경 실패 : $id", e)
+                _statusError.value = getApplication<Application>().getString(R.string.notice_action_failed)
+            } finally {
+                changingStatus = false
+            }
+        }
+    }
+
+    fun clearStatusError() {
+        _statusError.value = null
+    }
 
     val participants: LiveData<List<ChatParticipant>> =
         combine(sharedRoom, profiles) { currentRoom, cachedProfiles ->

@@ -244,6 +244,29 @@
         <item>우리은행</item>
         <item>수협은행</item>
     </string-array>
+    <string name="notice_badge_recruiting">모집 중</string>
+    <string name="notice_badge_full">모집 마감</string>
+    <string name="notice_badge_ordered">주문 완료</string>
+    <string name="notice_badge_completed">완료</string>
+    <string name="notice_summary_recruiting">%1$d/%2$d명 · %3$d명 더 모이면 마감</string>
+    <string name="notice_summary_full">%1$d/%2$d명 · 메뉴를 정해주세요</string>
+    <string name="notice_summary_ordered">배달 기다리는 중</string>
+    <string name="notice_summary_completed">거래가 끝난 방이에요</string>
+    <string name="notice_step_recruiting">모집</string>
+    <string name="notice_step_full">마감</string>
+    <string name="notice_step_ordered">주문</string>
+    <string name="notice_step_completed">완료</string>
+    <string name="notice_hint_recruiting">인원이 다 차지 않아도 방장이 주문을 확정할 수 있어요</string>
+    <string name="notice_hint_full">모두 메뉴를 담으면 주문을 확정해 주세요</string>
+    <string name="notice_hint_ordered">주문이 들어갔어요. 받으면 완료를 눌러 주세요</string>
+    <string name="notice_hint_completed">함께해 주셔서 고마워요</string>
+    <string name="notice_action_confirm">주문 확정하기</string>
+    <string name="notice_action_complete">완료하기</string>
+    <string name="notice_confirm_order_title">주문을 확정할까요?</string>
+    <string name="notice_confirm_complete_title">공동 주문을 완료할까요?</string>
+    <string name="notice_confirm_message">다음 단계로 넘기면 되돌릴 수 없어요. 진행할까요?</string>
+    <string name="notice_action_failed">상태를 바꾸지 못했어요. 다시 시도해 주세요</string>
+    <string name="notice_expand_desc">공지 펼치기</string>
     <string name="alert_confirm">확인</string>
     <string name="alert_cancel">취소</string>
 </resources>

@@ -17,6 +17,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- 방 상태 공지 (접기/펼치기) -->
+    <include
+        android:id="@+id/chat_notice"
+        layout="@layout/layout_chat_notice"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="12dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf=
+            "@id/chat_header" />
+
     <!-- 메시지 목록 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_messages"
@@ -29,7 +44,7 @@
         app:layout_constraintBottom_toTopOf="@id/layout_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_header" />
+        app:layout_constraintTop_toBottomOf="@id/chat_notice" />
 
     <!-- 입력창 + 전송 버튼 -->
     <LinearLayout
