@@ -124,20 +124,13 @@
         app:layout_constraintTop_toTopOf="@id/text_menu"
         tools:text="장소: 3호관 앞 광장" />
 
-    <TextView
+    <include
+        layout="@layout/layout_mode_badge"
         android:id="@+id/text_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_badge_orange"
-        android:paddingStart="8dp"
-        android:paddingTop="3dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="5dp"
-        android:textColor="@color/black"
-        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@id/text_menu"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/text_menu"
-        tools:text="픽업만" />
+        app:layout_constraintTop_toTopOf="@id/text_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

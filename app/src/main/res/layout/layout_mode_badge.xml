@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:measureAllChildren="false">
+
+    <include
+        android:id="@+id/badge_pickup"
+        layout="@layout/layout_pickup_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <include
+        android:id="@+id/badge_meal_buddy"
+        layout="@layout/layout_meal_buddy_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</ViewAnimator>

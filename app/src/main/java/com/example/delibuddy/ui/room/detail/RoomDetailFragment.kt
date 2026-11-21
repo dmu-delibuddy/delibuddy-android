@@ -212,10 +212,7 @@ class RoomDetailFragment : Fragment() {
         textStatus.text = getString(statusLabel(room)) + " " +
                 getString(R.string.detail_count, room.currentCount, room.maxParticipants)
         textTitle.text = room.title
-        textMode.setText(
-            if (room.mode == RoomMode.MEAL_BUDDY) R.string.mode_meal_buddy
-            else R.string.mode_pickup
-        )
+        textMode.root.displayedChild = if (room.mode == RoomMode.MEAL_BUDDY) 1 else 0
 
         information.textRestaurant.text = row(
             R.string.detail_restaurant,

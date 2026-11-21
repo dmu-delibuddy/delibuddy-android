@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 선택됨 -->
+    <item android:state_checked="true">
+        <layer-list>
+            <item android:left="@dimen/pixel_shadow" android:top="@dimen/pixel_shadow">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/black" />
+                </shape>
+            </item>
+            <item android:right="@dimen/pixel_shadow" android:bottom="@dimen/pixel_shadow">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/button_red" />
+                    <stroke android:width="@dimen/pixel_stroke" android:color="@color/black" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item android:drawable="@drawable/bg_mode_button_off" />
+</selector>

@@ -3,7 +3,6 @@ package com.example.delibuddy.ui.room.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -55,7 +54,7 @@ class RoomAdapter(
             // 배달 앱 · 음식점 태그 (예 : 배민 · 맘스터치), 장소 태그 / 모드 배지
             textMenu.text = "${room.deliveryAppLabel(root.context)} · ${room.restaurant}"
             textPlace.visibility = View.GONE // 장소 필드가 정해지면 표시로 바꿀 예정
-            textMode.setText(modeLabel(room.mode))
+            textMode.root.displayedChild = if (room.mode == RoomMode.MEAL_BUDDY) 1 else 0
 
             root.setOnClickListener { onClick(room.id) }
         }
@@ -78,13 +77,6 @@ class RoomAdapter(
         RoomStatus.ORDERED -> "주문 완료"
         RoomStatus.RECEIVED -> "수령 완료"
         RoomStatus.COMPLETED -> "완료"
-    }
-
-    // 모드 → 카드 표시 문구 (픽업만 / 밥친구, 홈 / 상세와 같은 문구)
-    @StringRes
-    private fun modeLabel(mode: RoomMode) = when (mode) {
-        RoomMode.PICKUP_ONLY -> R.string.mode_pickup
-        RoomMode.MEAL_BUDDY -> R.string.mode_meal_buddy
     }
 
     // 카테고리 → 표시 문구

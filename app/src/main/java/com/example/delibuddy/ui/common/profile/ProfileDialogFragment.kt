@@ -110,12 +110,7 @@ class ProfileDialogFragment : DialogFragment() {
                 is ProfileUiState.Success -> {
                     val profile = state.profile
                     textNickname.text = profile.nickname.ifBlank { getString(R.string.profile_dialog_nickname_empty) }
-                    textMode.setText(
-                        when (profile.type) {
-                            ProfileType.PICKUP_ONLY -> R.string.mode_pickup
-                            ProfileType.MEAL_BUDDY -> R.string.mode_meal_buddy
-                        }
-                    )
+                    textMode.root.displayedChild = if (profile.type == ProfileType.MEAL_BUDDY) 1 else 0
                     // ProfileModel 의 bio / imageUrl 은 String? 이라 orEmpty() 로 null 처리
                     textBio.text = profile.bio.orEmpty().ifBlank { getString(R.string.profile_dialog_bio_empty) }
                     // TODO: 리뷰(reviews) 기능이 생기면 받은 리뷰 평균 별점으로 교체

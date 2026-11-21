@@ -59,16 +59,12 @@
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
-                    <TextView
+                    <include
+                        layout="@layout/layout_mode_badge"
                         android:id="@+id/text_mode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="#2B2D42"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="3dp"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp" />
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
             </LinearLayout>
 

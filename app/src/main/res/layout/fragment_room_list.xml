@@ -45,7 +45,7 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_mode_button"
+                android:background="@drawable/bg_meal_buddy_mode_button"
                 android:button="@null"
                 android:gravity="center"
                 android:text="@string/mode_meal_buddy"

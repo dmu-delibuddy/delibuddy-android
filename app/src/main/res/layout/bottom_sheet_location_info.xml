@@ -18,18 +18,12 @@
         android:background="@drawable/bg_pixel_box"
         android:backgroundTint="#666666" />
 
-    <TextView
+    <include
+        layout="@layout/layout_mode_badge"
         android:id="@+id/text_recommend_badge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/bg_pixel_box_yellow"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="4dp"
-        android:text="추천하는 모드"
-        android:textColor="#000000"
-        android:textSize="13sp"
-        android:textStyle="bold" />
+        android:layout_gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/text_location_name"

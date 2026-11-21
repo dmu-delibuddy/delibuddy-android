@@ -118,16 +118,7 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         val dialog = BottomSheetDialog(requireContext())
         val sheet = BottomSheetLocationInfoBinding.inflate(dialog.layoutInflater)
 
-        when (location.mode) {
-            RoomMode.PICKUP_ONLY -> {
-                sheet.textRecommendBadge.setText(R.string.mode_pickup)
-                sheet.textRecommendBadge.setBackgroundResource(R.drawable.bg_badge_orange)
-            }
-            RoomMode.MEAL_BUDDY -> {
-                sheet.textRecommendBadge.setText(R.string.mode_meal_buddy)
-                sheet.textRecommendBadge.setBackgroundResource(R.drawable.bg_badge_yellow)
-            }
-        }
+        sheet.textRecommendBadge.root.displayedChild = if (location.mode == RoomMode.MEAL_BUDDY) 1 else 0
 
         sheet.textLocationName.text = location.name
         sheet.buttonCreateRoomHere.setOnClickListener { dialog.dismiss() }

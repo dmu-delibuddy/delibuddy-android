@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- 모드 버튼 (픽업만 / 밥친구): 선택 = 주황, 아니면 연노랑 -->
+<?xml version="1.0" encoding="utf-8"?><!-- 모드 버튼: 선택 = 주황, 아니면 연노랑 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 선택됨 -->
     <item android:state_checked="true">
@@ -16,20 +16,5 @@
             </item>
         </layer-list>
     </item>
-    <!-- 선택 안 됨 -->
-    <item>
-        <layer-list>
-            <item android:left="@dimen/pixel_shadow" android:top="@dimen/pixel_shadow">
-                <shape android:shape="rectangle">
-                    <solid android:color="@color/black" />
-                </shape>
-            </item>
-            <item android:right="@dimen/pixel_shadow" android:bottom="@dimen/pixel_shadow">
-                <shape android:shape="rectangle">
-                    <solid android:color="@color/mode_off" />
-                    <stroke android:width="@dimen/pixel_stroke" android:color="@color/black" />
-                </shape>
-            </item>
-        </layer-list>
-    </item>
+    <item android:drawable="@drawable/bg_mode_button_off" />
 </selector>
