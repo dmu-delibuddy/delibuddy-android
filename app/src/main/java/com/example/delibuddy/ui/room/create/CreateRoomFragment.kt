@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
@@ -14,7 +15,9 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.R
+import com.example.delibuddy.databinding.BottomSheetPlacePickerBinding
 import com.example.delibuddy.databinding.FragmentCreateRoomBinding
+import com.example.delibuddy.databinding.ItemPlaceBinding
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.viewModels
@@ -71,6 +74,8 @@ class CreateRoomFragment : Fragment() {
         setUpRestaurantInput()
 
         // 3단계 : 배달 앱
+        setUpPlaceSelect()
+        observePlace()
         setUpDeliveryAppSelect()
         observeDeliveryApp()
 
@@ -293,6 +298,50 @@ class CreateRoomFragment : Fragment() {
         binding.step2.editRestaurant.doAfterTextChanged { text ->
             viewModel.setRestaurant(text?.toString().orEmpty())
         }
+    }
+
+    // 3단계 : 장소 칸을 누르면 장소 선택 시트
+    private fun setUpPlaceSelect() {
+        viewModel.loadPlaces(requireContext().assets)
+        binding.step3.textPlace.setOnClickListener { showPlacePicker() }
+    }
+
+    // 고른 장소 이름 표시 (안 골랐으면 XML hint 가 보임)
+    private fun observePlace() {
+        viewModel.place.observe(viewLifecycleOwner) { place ->
+            binding.step3.textPlace.text = place?.name.orEmpty()
+        }
+    }
+
+    // 추천 장소 목록 + 직접 입력 시트
+    // (나중에 시트 위에 '지도에서 보기'를 붙여 지도 선택으로 넓힐 수 있음)
+    private fun showPlacePicker() {
+        val dialog = BottomSheetDialog(requireContext())
+        val sheet = BottomSheetPlacePickerBinding.inflate(dialog.layoutInflater)
+
+        viewModel.places.value.orEmpty().forEach { location ->
+            val item = ItemPlaceBinding.inflate(dialog.layoutInflater, sheet.layoutPlaces, true)
+            item.textPlaceName.text = location.name
+            item.textPlaceDesc.text = location.description
+            item.textPlaceDesc.isVisible = location.description.isNotBlank()
+            item.root.setOnClickListener {
+                viewModel.selectPlace(location)
+                dialog.dismiss()
+            }
+        }
+
+        sheet.buttonPlaceCustom.setOnClickListener {
+            val name = sheet.editPlace.text?.toString().orEmpty()
+            if (name.isBlank()) {
+                sheet.editPlace.error = getString(R.string.create_error_place_name)
+                return@setOnClickListener
+            }
+            viewModel.setCustomPlace(name)
+            dialog.dismiss()
+        }
+
+        dialog.setContentView(sheet.root)
+        dialog.show()
     }
 
     // 3단계 : 배달 앱 선택 (버튼 id → 배달 앱) + 직접 입력한 이름 저장
