@@ -1,5 +1,6 @@
 package com.example.delibuddy.ui.room.create
 
+import android.content.res.AssetManager
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
@@ -9,6 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
 import com.example.delibuddy.data.chat.ChatRepository
 import com.example.delibuddy.data.chat.SystemMessage
+import com.example.delibuddy.data.recommendation.RecommendLocation
+import com.example.delibuddy.data.recommendation.RecommendLocationRepository
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.DeliveryApp
@@ -17,6 +20,7 @@ import com.example.delibuddy.data.room.FoodCostSplitMethod
 import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -85,6 +89,39 @@ class CreateRoomViewModel(
     }
 
     // 3단계 : 장소, 배달 앱
+    private val placeRepository = RecommendLocationRepository()
+
+    // 장소 선택 시트에 보여줄 추천 장소 (경민님 recommend-locations.json)
+    private val _places = MutableLiveData<List<RecommendLocation>>(emptyList())
+    val places: LiveData<List<RecommendLocation>> = _places
+
+    private val _place = MutableLiveData<Place?>(null) // null = 아직 선택 안 함
+    val place: LiveData<Place?> = _place
+
+    // 추천 장소 목록 불러오기 (한 번만). 실패하면 직접 입력만 가능
+    fun loadPlaces(assets: AssetManager) {
+        if (_places.value.orEmpty().isNotEmpty()) return
+        viewModelScope.launch {
+            try {
+                _places.value = placeRepository.getPlaces(assets)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w(TAG, "추천 장소 불러오기 실패", e)
+            }
+        }
+    }
+
+    // 추천 장소 선택 (이름 + 좌표)
+    fun selectPlace(location: RecommendLocation) {
+        _place.value = Place(location.name, location.lat, location.lon)
+    }
+
+    // 직접 입력한 장소 (좌표 없음)
+    fun setCustomPlace(name: String) {
+        _place.value = Place(name.trim())
+    }
+
     private val _deliveryApp = MutableLiveData<DeliveryApp?>(null) // null = 아직 선택 안 함
     val deliveryApp: LiveData<DeliveryApp?> = _deliveryApp
 
@@ -168,6 +205,7 @@ class CreateRoomViewModel(
         }
 
         3 -> when {
+            _place.value == null -> R.string.create_error_place
             _deliveryApp.value == null -> R.string.create_error_delivery_app
             _deliveryApp.value == DeliveryApp.OTHER &&
                     _deliveryAppName.value.isNullOrBlank() -> R.string.create_error_delivery_app_name
@@ -258,6 +296,8 @@ class CreateRoomViewModel(
             ?: FoodCategory.ETC,
         restaurant = _restaurant.value
             .orEmpty().trim(),
+        location = _place.value?.geoPoint,
+        locationName = _place.value?.name.orEmpty(),
         deliveryApp = _deliveryApp.value ?: DeliveryApp.OTHER,
         // 직접 입력일 때만 이름 저장 (아이콘 앱이면 빈 값)
         deliveryAppName = if (_deliveryApp.value == DeliveryApp.OTHER)
@@ -286,6 +326,16 @@ class CreateRoomViewModel(
         const val DEFAULT_PARTICIPANTS = 3 // 기본값 설정
         const val RESTAURANT_MAX = 30
         private const val TAG = "CreateRoomVM"
+    }
+
+    // 고른 수령 장소. 직접 입력이면 좌표 없음
+    data class Place(
+        val name: String,
+        val lat: Double? = null,
+        val lon: Double? = null,
+    ) {
+        val geoPoint: GeoPoint?
+            get() = if (lat != null && lon != null) GeoPoint(lat, lon) else null
     }
 
     // 개설 진행 상태 종류

@@ -15,6 +15,10 @@
         style="@style/DetailRow" />
 
     <TextView
+        android:id="@+id/text_place"
+        style="@style/DetailRow" />
+
+    <TextView
         android:id="@+id/text_delivery_app"
         style="@style/DetailRow" />
 

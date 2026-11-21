@@ -20,7 +20,7 @@
         android:textColor="@color/black"
         android:textSize="13sp" />
 
-    <!-- 1. 장소 (저장 방식 정해지면 선택 기능 추가) -->
+    <!-- 1. 장소 : 누르면 장소 선택 시트 (추천 장소 / 직접 입력) -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,13 +34,16 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="6dp"
-        android:alpha="0.5"
         android:background="@drawable/bg_pixel_box"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
         android:gravity="center_vertical"
+        android:hint="@string/create_place_hint"
         android:paddingStart="12dp"
         android:paddingEnd="15dp"
-        android:text="@string/create_place_pending"
         android:textColor="@color/black"
+        android:textColorHint="#80000000"
         android:textSize="14sp" />
 
     <!-- 2. 배달 앱 : 배달의 민족 / 쿠팡이츠 / 요기요 는 아이콘, 그 외는 직접 입력 -->
