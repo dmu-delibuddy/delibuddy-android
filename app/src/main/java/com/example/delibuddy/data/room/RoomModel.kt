@@ -45,7 +45,8 @@ data class RoomModel(
     val restaurant: String = "",
     val deliveryApp: DeliveryApp = DeliveryApp.OTHER,  // 예전 방은 OTHER 로 읽힘
     val deliveryAppName: String = "",                  // OTHER 일 때 직접 입력한 앱 이름
-    val location: GeoPoint? = null,
+    val location: GeoPoint? = null,                    // 수령 장소 좌표 (직접 입력이면 null)
+    val locationName: String = "",                     // 수령 장소 이름 (예전 방은 빈 값)
     val minOrderAmount: Int = 0,
     val estimatedDeliveryFee: Int = 0,
     val foodCostSplitMethod: FoodCostSplitMethod = FoodCostSplitMethod.EQUAL_SPLIT,

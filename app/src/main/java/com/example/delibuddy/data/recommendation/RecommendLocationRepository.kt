@@ -5,9 +5,11 @@ import android.util.Log
 import com.example.delibuddy.data.image.ImageRepository
 import com.example.delibuddy.data.room.RoomMode
 import com.google.firebase.storage.StorageException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 
 class RecommendLocationRepository(
@@ -27,6 +29,10 @@ class RecommendLocationRepository(
             }
         }.awaitAll()
     }
+
+    // 방 만들기 장소 선택용 : 사진 주소 없이 이름 · 좌표만 (네트워크 요청 없음)
+    suspend fun getPlaces(assets: AssetManager): List<RecommendLocation> =
+        withContext(Dispatchers.IO) { loadLocations(assets) }
 
     private fun loadLocations(assets: AssetManager): List<RecommendLocation> {
         return try {
