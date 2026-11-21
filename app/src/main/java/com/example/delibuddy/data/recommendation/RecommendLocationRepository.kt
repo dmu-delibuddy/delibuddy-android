@@ -1,28 +1,62 @@
 package com.example.delibuddy.data.recommendation
 
-import com.example.delibuddy.data.room.RoomMode
+import android.content.res.AssetManager
+import android.util.Log
 import com.example.delibuddy.data.image.ImageRepository
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.delibuddy.data.room.RoomMode
+import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.tasks.await
+import org.json.JSONArray
 
 class RecommendLocationRepository(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val imageRepository: ImageRepository = ImageRepository(),
 ) {
-    private val locations = db.collection("recommend-locations")
+    suspend fun getLocations(assets: AssetManager): List<RecommendLocation> = coroutineScope {
+        loadLocations(assets).map { location ->
+            async {
+                if (location.imagePath.isBlank()) return@async location
 
-    suspend fun getLocations(mode: RoomMode? = null): List<RecommendLocation> {
-        val query = if (mode == null) locations else locations.whereEqualTo("mode", mode.name)
-        val results = query.get().await().toObjects(RecommendLocation::class.java)
-        return coroutineScope {
-            results.map { location ->
-                async {
+                try {
                     location.copy(imageUrl = imageRepository.getImageUrl(location.imagePath))
+                } catch (error: StorageException) {
+                    Log.w("RecommendLocationRepository", "Could not resolve ${location.imagePath}", error)
+                    location
                 }
-            }.awaitAll()
+            }
+        }.awaitAll()
+    }
+
+    private fun loadLocations(assets: AssetManager): List<RecommendLocation> {
+        return try {
+            val jsonString = assets.open("recommend-locations.json").bufferedReader().use { it.readText() }
+            val jsonArray = JSONArray(jsonString)
+            val list = mutableListOf<RecommendLocation>()
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                val modeStr = obj.optString("mode", "PICKUP_ONLY")
+                val roomMode = try {
+                    RoomMode.valueOf(modeStr)
+                } catch (_: Exception) {
+                    RoomMode.PICKUP_ONLY
+                }
+
+                list.add(
+                    RecommendLocation(
+                        id = obj.optString("id"),
+                        name = obj.optString("name"),
+                        description = obj.optString("description"),
+                        lat = obj.optDouble("lat"),
+                        lon = obj.optDouble("lon"),
+                        imagePath = obj.optString("imagePath"),
+                        mode = roomMode,
+                    ),
+                )
+            }
+            list
+        } catch (_: Exception) {
+            emptyList()
         }
     }
 }
