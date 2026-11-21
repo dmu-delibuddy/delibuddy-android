@@ -37,30 +37,12 @@ class RoomRepository(
     }
 
     // ----------------- 방 리스트 / 상세 ---------------------
-    /*
-        * 홈 화면 방 목록 실시간 구독.
-        * onlyJoinable = true 이면 모집 중 (RECRUITING)인 방만,
-        * false 이면 정원 마감, 모집 마감(주문 확정) 방도 함께 가져옴
-        * 누구에게 보일지(마감된 방은 방장 / 참여자만)는 RoomListViewModel 에서 거름
-    */
-
+    // 홈 화면에서 모집 중인 방을 실시간으로 구독한다.
     fun observeRooms(
-        onlyJoinable: Boolean = false,
         mode: RoomMode? = null,
         category: FoodCategory? = null,
     ): Flow<List<RoomModel>> = callbackFlow {
-        var query: Query = if (onlyJoinable) {
-            rooms.whereEqualTo("status", RoomStatus.RECRUITING.name)
-        } else {
-            rooms.whereIn(
-                "status", listOf(
-                    RoomStatus.RECRUITING.name,
-                    RoomStatus.ORDER_CONFIRMED.name,
-                    RoomStatus.ORDERED.name,
-                    RoomStatus.RECEIVED.name,
-                )
-            )
-        }
+        var query: Query = rooms.whereEqualTo("status", RoomStatus.RECRUITING.name)
         if (mode != null) query = query.whereEqualTo("mode", mode.name)
         if (category != null) query = query.whereEqualTo("category", category.name)
 

@@ -47,7 +47,6 @@ class RoomListFragment : Fragment() {
 
         setUpModeFilter()
         setUpCategoryFilter()
-        setUpJoinableOnlySwitch()
         setUpSearchInput()
     }
 
@@ -92,13 +91,6 @@ class RoomListFragment : Fragment() {
                     else -> null
                 }
             )
-        }
-    }
-
-    // 참여 가능한 방만 보기 스위치
-    private fun setUpJoinableOnlySwitch() {
-        binding.switchJoinableOnly.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.setJoinableOnly(isChecked)
         }
     }
 

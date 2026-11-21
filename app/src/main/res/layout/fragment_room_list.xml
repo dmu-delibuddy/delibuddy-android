@@ -52,27 +52,6 @@
                 android:textColor="@color/black" />
         </RadioGroup>
 
-        <!-- 참여 가능한 방만 보기 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/home_joinable_only"
-                android:textColor="@color/black" />
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switch_joinable_only"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
         <!-- 검색창 -->
         <EditText
             android:id="@+id/edit_search"
