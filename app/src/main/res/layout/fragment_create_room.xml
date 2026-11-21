@@ -153,32 +153,22 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.button.MaterialButton
+            style="@style/ActionButton.Secondary"
             android:id="@+id/button_prev"
             android:layout_width="0dp"
             android:layout_height="52dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:text="@string/create_room_prev"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:visibility="gone"
-            app:backgroundTint="@color/mode_off"
-            app:cornerRadius="0dp"
-            app:strokeColor="@color/black"
-            app:strokeWidth="2dp" />
+            android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
+            style="@style/ActionButton.Primary"
             android:id="@+id/button_next"
             android:layout_width="0dp"
             android:layout_height="52dp"
             android:layout_weight="2"
-            android:text="@string/create_room_next"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/button_red"
-            app:cornerRadius="0dp"
-            app:strokeColor="@color/black"
-            app:strokeWidth="2dp" />
+            android:text="@string/create_room_next" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

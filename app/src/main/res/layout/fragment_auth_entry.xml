@@ -85,13 +85,10 @@
         app:layout_constraintTop_toBottomOf="@id/text_auth_entry_tagline" />
 
     <com.google.android.material.button.MaterialButton
-        android:background="@drawable/bg_pixel_box_yellow"
-        android:textColor="@color/black"
-        android:textAllCaps="false"
-        app:backgroundTint="@null"
+        style="@style/ActionButton.Primary"
         android:id="@+id/button_auth_entry_start"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:layout_marginStart="28dp"
         android:layout_marginEnd="28dp"
         android:layout_marginTop="28dp"
@@ -103,13 +100,10 @@
         app:layout_constraintTop_toBottomOf="@id/text_auth_entry_description" />
 
     <com.google.android.material.button.MaterialButton
-        android:background="@drawable/bg_pixel_box"
-        android:textColor="@color/black"
-        android:textAllCaps="false"
-        app:backgroundTint="@null"
+        style="@style/ActionButton.Secondary"
         android:id="@+id/button_auth_entry_signin"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:layout_marginStart="28dp"
         android:layout_marginTop="3dp"
         android:layout_marginEnd="28dp"
@@ -118,6 +112,7 @@
         app:layout_constraintBottom_toBottomOf="@id/content_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_auth_entry_start" />
+        app:layout_constraintTop_toBottomOf="@id/button_auth_entry_start"
+        app:backgroundTint="@color/nav_selected" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

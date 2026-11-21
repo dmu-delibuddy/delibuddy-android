@@ -121,18 +121,13 @@
 
         <!-- 역할 / 방 상태에 따라 글자가 바뀜 -->
         <com.google.android.material.button.MaterialButton
+            style="@style/ActionButton.Primary"
             android:id="@+id/button_action"
             android:layout_width="0dp"
             android:layout_height="52dp"
             android:layout_marginBottom="16dp"
             android:layout_weight="2"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:visibility="gone"
-            app:backgroundTint="@color/button_red"
-            app:cornerRadius="0dp"
-            app:strokeColor="@color/black"
-            app:strokeWidth="2dp" />
+            android:visibility="gone" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

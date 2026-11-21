@@ -10,6 +10,7 @@ import androidx.navigation.navGraphViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentEmailBinding
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 
 class EmailFragment : Fragment() {
 
@@ -35,6 +36,14 @@ class EmailFragment : Fragment() {
 
     private fun setUpListeners() {
         binding.buttonNext.setOnClickListener {
+            if (!viewModel.isEmailValid()) {
+                GlobalAlertDialog.show(
+                    fragmentManager = childFragmentManager,
+                    type = GlobalAlertDialog.Type.INFO,
+                    title = getString(R.string.signup_invalid_email),
+                )
+                return@setOnClickListener
+            }
             findNavController().navigate(R.id.action_email_to_password)
         }
         binding.editEmail.doAfterTextChanged { text ->

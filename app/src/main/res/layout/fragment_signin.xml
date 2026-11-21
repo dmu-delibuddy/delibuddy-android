@@ -84,25 +84,13 @@
                 android:textColor="@color/navy" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:id="@+id/text_signin_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:accessibilityLiveRegion="polite"
-            android:textColor="@color/navy"
-            android:textSize="14sp" />
-
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
         <com.google.android.material.button.MaterialButton
-            android:background="@drawable/bg_pixel_box_yellow"
-            android:textColor="@color/black"
-            android:textAllCaps="false"
-            app:backgroundTint="@null"
+            style="@style/ActionButton.Primary"
             android:id="@+id/button_signin"
             android:layout_width="match_parent"
             android:layout_height="60dp"

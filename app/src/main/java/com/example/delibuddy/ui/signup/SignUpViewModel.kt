@@ -78,16 +78,25 @@ class SignUpViewModel : ViewModel() {
     private val _profileError = MutableLiveData<Int?>()
     val profileError: LiveData<Int?> = _profileError
 
+    fun onProfileErrorShown() {
+        _profileError.value = null
+    }
+
+    fun onVerificationMessageShown() {
+        _verificationMessage.value = null
+    }
+
     fun finishRegistration(skipAccount: Boolean) {
         if (_isSavingProfile.value == true || _isRegistrationComplete.value == true) return
         val bank = bankName.value.orEmpty().trim()
         val number = account.value.orEmpty().trim()
-        _profileError.value = when {
+        val validationError = when {
             !skipAccount && (bank.isBlank() || number.isBlank()) -> R.string.signup_account_required
             !skipAccount && number.any { it !in '0'..'9' } -> R.string.signup_account_invalid
             else -> null
         }
-        if (_profileError.value != null) return
+        _profileError.value = validationError
+        if (validationError != null) return
 
         val profile = UserModel(
             univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
@@ -172,6 +181,12 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
+    fun isEmailValid(): Boolean {
+        val emailId = email.value.orEmpty().trim()
+        return emailId.isNotBlank() && '@' !in emailId &&
+            android.util.Patterns.EMAIL_ADDRESS.matcher("$emailId@dongyang.ac.kr").matches()
+    }
+
     fun sendVerificationEmail() {
         if (_isSendingVerification.value == true || _isCompletingSignUp.value == true) return
 
@@ -179,10 +194,7 @@ class SignUpViewModel : ViewModel() {
         val passwordValue = password.value.orEmpty()
         val fullEmail = "$emailId@dongyang.ac.kr"
         val validationError = when {
-            emailId.isBlank() || '@' in emailId ||
-                    !android.util.Patterns.EMAIL_ADDRESS.matcher(fullEmail).matches() ->
-                R.string.signup_invalid_email
-
+            !isEmailValid() -> R.string.signup_invalid_email
             passwordValue.length < 6 -> R.string.signup_password_too_short
             passwordValue != passwordConfirm.value -> R.string.signup_password_mismatch
             else -> null

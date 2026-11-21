@@ -22,6 +22,10 @@ class SignInViewModel : ViewModel() {
     private val _message = MutableLiveData<Int?>()
     val message: LiveData<Int?> = _message
 
+    fun onMessageShown() {
+        _message.value = null
+    }
+
     fun signIn(emailId: String, password: String) {
         if (isSigningIn.value == true) return
 

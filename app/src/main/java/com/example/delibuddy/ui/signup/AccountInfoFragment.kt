@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentAccountInfoBinding
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import com.example.delibuddy.ui.common.GlobalLoadingDialog
 
 class AccountInfoFragment : Fragment() {
@@ -85,8 +85,14 @@ class AccountInfoFragment : Fragment() {
             }
         }
         viewModel.profileError.observe(viewLifecycleOwner) { error ->
-            binding.textProfileError.text = error?.let { getString(it) }.orEmpty()
-            binding.textProfileError.isVisible = error != null
+            if (error == null) return@observe
+            GlobalLoadingDialog.hide(childFragmentManager)
+            GlobalAlertDialog.show(
+                fragmentManager = childFragmentManager,
+                type = GlobalAlertDialog.Type.INFO,
+                title = getString(error),
+            )
+            viewModel.onProfileErrorShown()
         }
         viewModel.isRegistrationComplete.observe(viewLifecycleOwner) { complete ->
             val navController = findNavController()

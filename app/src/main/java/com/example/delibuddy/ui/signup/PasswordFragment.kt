@@ -11,6 +11,7 @@ import androidx.navigation.navGraphViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentPasswordBinding
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import com.example.delibuddy.ui.common.GlobalLoadingDialog
 
 class PasswordFragment : Fragment() {
@@ -57,8 +58,14 @@ class PasswordFragment : Fragment() {
             updateLoadingState()
         }
         viewModel.verificationMessage.observe(viewLifecycleOwner) { message ->
-            binding.textVerificationStatus.text = message?.let { getString(it) }.orEmpty()
-            binding.textVerificationStatus.isVisible = message != null
+            if (message == null) return@observe
+            GlobalLoadingDialog.hide(childFragmentManager)
+            GlobalAlertDialog.show(
+                fragmentManager = childFragmentManager,
+                type = GlobalAlertDialog.Type.INFO,
+                title = getString(message),
+            )
+            viewModel.onVerificationMessageShown()
         }
         viewModel.isVerificationEmailSent.observe(viewLifecycleOwner) { sent ->
             binding.textVerificationGuide.isVisible = sent

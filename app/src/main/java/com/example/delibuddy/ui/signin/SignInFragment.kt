@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.FragmentSigninBinding
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import com.example.delibuddy.ui.common.GlobalLoadingDialog
 
 class SignInFragment : Fragment() {
@@ -59,7 +60,14 @@ class SignInFragment : Fragment() {
 
     private fun observeMessages() {
         viewModel.message.observe(viewLifecycleOwner) { message ->
-            binding.textSigninStatus.text = message?.let { getString(it) }.orEmpty()
+            if (message == null) return@observe
+            GlobalLoadingDialog.hide(childFragmentManager)
+            GlobalAlertDialog.show(
+                fragmentManager = childFragmentManager,
+                type = GlobalAlertDialog.Type.INFO,
+                title = getString(message),
+            )
+            viewModel.onMessageShown()
         }
     }
 

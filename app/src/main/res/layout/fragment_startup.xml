@@ -33,10 +33,7 @@
             android:layout_height="wrap_content" />
 
         <com.google.android.material.button.MaterialButton
-            android:background="@drawable/bg_pixel_box_yellow"
-            android:textColor="@color/black"
-            android:textAllCaps="false"
-            app:backgroundTint="@null"
+            style="@style/ActionButton.Primary"
             android:id="@+id/button_retry"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -44,10 +41,7 @@
             android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
-            android:background="@drawable/bg_pixel_box"
-            android:textColor="@color/black"
-            android:textAllCaps="false"
-            app:backgroundTint="@null"
+            style="@style/ActionButton.Secondary"
             android:id="@+id/button_login"
             android:layout_width="match_parent"
             android:layout_height="60dp"

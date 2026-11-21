@@ -36,18 +36,13 @@
 
     <!-- 방 만들기 -->
     <com.google.android.material.button.MaterialButton
+        style="@style/ActionButton.Primary"
         android:id="@+id/button_create_room"
         android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:layout_margin="16dp"
         android:text="@string/home_create_room"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
         android:textSize="16sp"
-        app:backgroundTint="@color/button_red"
-        app:cornerRadius="0dp"
-        app:strokeColor="@color/black"
-        app:strokeWidth="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
