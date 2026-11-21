@@ -1,13 +1,12 @@
 package com.example.delibuddy.ui.room.list
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.delibuddy.R
-import com.example.delibuddy.data.room.FoodCategory
+import com.example.delibuddy.data.room.DeliveryApp
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomStatus
@@ -39,21 +38,36 @@ class RoomAdapter(
         private val binding: ItemRoomBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        // 방 정보 → 카드 화면 (배지, 배달비, 제목, 태그) + 클릭 연결
         fun bind(room: RoomModel) = with(binding) {
-            // 모집 배지 = 상태 + 인원
-            textStatus.text =
-                "${statusLabel(room)} ${room.currentCount}/${room.maxParticipants}명"
-
-            // 배달비
+            val context = root.context
+            textStatus.setText(
+                when (room.status) {
+                    RoomStatus.RECRUITING -> if (room.isFull) {
+                        R.string.detail_status_full
+                    } else {
+                        R.string.detail_status_recruiting
+                    }
+                    RoomStatus.ORDER_CONFIRMED -> R.string.detail_status_confirmed
+                    RoomStatus.ORDERED -> R.string.detail_status_ordered
+                    RoomStatus.RECEIVED -> R.string.detail_status_received
+                    RoomStatus.COMPLETED -> R.string.detail_status_completed
+                }
+            )
+            textParticipantCount.text = context.getString(
+                R.string.chat_header_participant_count, room.currentCount, room.maxParticipants,
+            )
             textDeliveryFee.text = "배달비 1인당 %,d원".format(room.deliveryFeePerPerson)
-
-            // 제목
+            imageDeliveryApp.setImageResource(
+                when (room.deliveryApp) {
+                    DeliveryApp.BAEMIN -> R.drawable.icon_delivery_baemin
+                    DeliveryApp.COUPANG_EATS -> R.drawable.icon_delivery_coupang_eats
+                    DeliveryApp.YOGIYO -> R.drawable.icon_delivery_yogiyo
+                    DeliveryApp.OTHER -> R.drawable.receipt_icon
+                }
+            )
+            textDeliveryApp.text = room.deliveryAppLabel(context)
             textTitle.text = room.title
-
-            // 배달 앱 · 음식점 태그 (예 : 배민 · 맘스터치), 장소 태그 / 모드 배지
-            textMenu.text = "${room.deliveryAppLabel(root.context)} · ${room.restaurant}"
-            textPlace.visibility = View.GONE // 장소 필드가 정해지면 표시로 바꿀 예정
+            textRestaurant.text = room.restaurant
             textMode.root.displayedChild = if (room.mode == RoomMode.MEAL_BUDDY) 1 else 0
 
             root.setOnClickListener { onClick(room.id) }
@@ -68,23 +82,5 @@ class RoomAdapter(
             // 내용이 같은지 data class 의 equals (모든 필드 비교)
             override fun areContentsTheSame(old: RoomModel, new: RoomModel) = old == new
         }
-    }
-
-    // 방 상태 → 카드 표시 문구 (모집 중인데 정원이 차면 정원 마감)
-    private fun statusLabel(room: RoomModel) = when (room.status) {
-        RoomStatus.RECRUITING -> if (room.isFull) "정원 마감" else "모집 중"
-        RoomStatus.ORDER_CONFIRMED -> "주문 확정"
-        RoomStatus.ORDERED -> "주문 완료"
-        RoomStatus.RECEIVED -> "수령 완료"
-        RoomStatus.COMPLETED -> "완료"
-    }
-
-    // 카테고리 → 표시 문구
-    private fun categoryLabel(category: FoodCategory) = when (category) {
-        FoodCategory.KOR -> "한식"
-        FoodCategory.CHN -> "중식"
-        FoodCategory.JPN -> "일식"
-        FoodCategory.WEST -> "양식"
-        FoodCategory.ETC -> "기타"
     }
 }

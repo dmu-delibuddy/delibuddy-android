@@ -25,7 +25,7 @@ enum class FoodCostSplitMethod { HOST_PAYS, EQUAL_SPLIT, PROPORTIONAL_SPLIT, CUS
 // 배달비 정산 방법 : 방장 부담 / 1/N / 직접 입력
 enum class DeliveryFeeSplitMethod { HOST_PAYS, EQUAL_SPLIT, CUSTOM }
 
-// 사용할 배달 앱 : 배민 / 쿠팡이츠 / 요기요 / 그 외(직접 입력)
+// 사용할 배달 앱 : 배달의 민족 / 쿠팡이츠 / 요기요 / 그 외(직접 입력)
 enum class DeliveryApp { BAEMIN, COUPANG_EATS, YOGIYO, OTHER }
 
 /*

@@ -132,7 +132,7 @@
     <string name="create_delivery_app_name_hint">예) 땡겨요</string>
     <string name="create_error_delivery_app">사용할 배달 앱을 선택해 주세요</string>
     <string name="create_error_delivery_app_name">배달 앱 이름을 입력해 주세요</string>
-    <string name="delivery_app_baemin">배민</string>
+    <string name="delivery_app_baemin">배달의 민족</string>
     <string name="delivery_app_coupang_eats">쿠팡이츠</string>
     <string name="delivery_app_yogiyo">요기요</string>
     <string name="delivery_app_other">직접 입력</string>

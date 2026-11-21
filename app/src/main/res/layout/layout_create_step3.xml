@@ -43,7 +43,7 @@
         android:textColor="@color/black"
         android:textSize="14sp" />
 
-    <!-- 2. 배달 앱 : 배민 / 쿠팡이츠 / 요기요 는 아이콘, 그 외는 직접 입력 -->
+    <!-- 2. 배달 앱 : 배달의 민족 / 쿠팡이츠 / 요기요 는 아이콘, 그 외는 직접 입력 -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
