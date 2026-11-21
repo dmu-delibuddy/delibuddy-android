@@ -16,7 +16,6 @@ import com.example.delibuddy.data.recommendation.RecommendLocation
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.databinding.FragmentRecommendationBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.firebase.storage.FirebaseStorage
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapFragment
@@ -61,9 +60,8 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         this.naverMap = naverMap
         naverMap.locale = Locale.KOREAN
 
-        // 1. 지도 중앙을 동양미래대학교로 설정 (37.4997, 126.8674)
-        val dongyangUnivLatLng = LatLng(37.4997, 126.8674)
-        val cameraUpdate = CameraUpdate.scrollAndZoomTo(dongyangUnivLatLng, 16.5)
+        val dongyangUnivLatLng = LatLng(37.500744352377076, 126.86737286093494)
+        val cameraUpdate = CameraUpdate.scrollAndZoomTo(dongyangUnivLatLng, 15.5)
         naverMap.moveCamera(cameraUpdate)
 
         // 2. ViewModel 장소 데이터 관찰 및 마커 표시
@@ -131,38 +129,21 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         textLocationName?.text = location.name
         textLocationDescription?.text = location.description
 
-        if (imageLocationPhoto != null && location.imagePath.isNotBlank()) {
-            if (location.imageUrl.isNotBlank()) {
-                Glide.with(this)
-                    .load(location.imageUrl)
-                    .placeholder(R.drawable.delibuddy_pizza_icon)
-                    .error(R.drawable.delibuddy_pizza_icon)
-                    .into(imageLocationPhoto)
-            } else {
-                FirebaseStorage.getInstance().reference.child(location.imagePath)
-                    .downloadUrl
-                    .addOnSuccessListener { uri ->
-                        if (_binding != null && isAdded) {
-                            Glide.with(this)
-                                .load(uri)
-                                .placeholder(R.drawable.delibuddy_pizza_icon)
-                                .error(R.drawable.delibuddy_pizza_icon)
-                                .into(imageLocationPhoto)
-                        }
-                    }
-                    .addOnFailureListener { exception ->
-                        android.util.Log.e("RecommendationFragment", "Storage image load failed (${location.imagePath}): ${exception.message}", exception)
-                        imageLocationPhoto.setImageResource(R.drawable.delibuddy_pizza_icon)
-                    }
-            }
+        dialog.setContentView(view)
+        dialog.show()
+
+        if (imageLocationPhoto != null) {
+            Glide.with(this)
+                .load(location.imageUrl.takeIf { it.isNotBlank() })
+                .placeholder(R.drawable.delibuddy_pizza_icon)
+                .fallback(R.drawable.delibuddy_pizza_icon)
+                .error(R.drawable.delibuddy_pizza_icon)
+                .into(imageLocationPhoto)
         }
 
         buttonCreateRoom?.setOnClickListener {
             dialog.dismiss()
         }
-
-        dialog.setContentView(view)
-        dialog.show()
     }
 
     override fun onDestroyView() {
