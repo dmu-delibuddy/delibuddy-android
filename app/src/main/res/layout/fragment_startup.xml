@@ -24,8 +24,7 @@
             app:autoSizeMaxTextSize="32sp"
             app:autoSizeMinTextSize="12sp"
             app:autoSizeStepGranularity="1sp"
-            app:autoSizeTextType="uniform"
-            app:fontFamily="@font/pressstart_regular" />
+            app:autoSizeTextType="uniform" />
 
         <include
             android:id="@+id/loading_content"
