@@ -181,6 +181,8 @@
     <string name="detail_status_completed">완료</string>
     <string name="detail_count">%1$d/%2$d명</string>
     <string name="detail_restaurant">음식점</string>
+    <string name="detail_place">수령 장소</string>
+    <string name="detail_place_none">미정</string>
     <string name="detail_delivery_app">배달 앱</string>
     <string name="detail_min_order">최소 주문금액</string>
     <string name="detail_delivery_fee">예상 배달비</string>

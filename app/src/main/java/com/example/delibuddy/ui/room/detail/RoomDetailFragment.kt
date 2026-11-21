@@ -222,6 +222,11 @@ class RoomDetailFragment : Fragment() {
             room.restaurant
         )
 
+        information.textPlace.text = row(
+            R.string.detail_place,
+            room.locationName.ifBlank { getString(R.string.detail_place_none) }
+        )
+
         information.textDeliveryApp.text = row(
             R.string.detail_delivery_app,
             room.deliveryAppLabel(requireContext())
