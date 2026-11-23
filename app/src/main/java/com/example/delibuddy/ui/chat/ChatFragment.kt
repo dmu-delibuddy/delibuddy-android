@@ -34,6 +34,7 @@ import com.example.delibuddy.databinding.FragmentChatBinding
 import com.example.delibuddy.ui.chat.ChatViewModel.LeaveRoomState
 import com.example.delibuddy.ui.chat.ChatViewModel.ScreenState
 import com.example.delibuddy.ui.common.FullscreenImageDialogFragment
+import com.example.delibuddy.ui.chat.order.MyOrderDialogFragment
 import com.example.delibuddy.ui.common.GlobalAlertDialog
 import java.io.File
 import java.io.IOException
@@ -90,6 +91,7 @@ class ChatFragment : Fragment() {
         setUpProfileActions()
         setUpPanelTabs()
         setUpShareAccountButton()
+        setUpMyOrderButton()
         setUpMessageInput()
         setUpSendButton()
         setUpPhotoButton()
@@ -285,6 +287,14 @@ class ChatFragment : Fragment() {
                     button.isEnabled = true
                 }
             }
+        }
+    }
+
+    // 메뉴 탭 > 내 주문 : 내 주문 확인 / 변경 창
+    private fun setUpMyOrderButton() {
+        binding.chatPanel.menuOrder.setOnClickListener {
+            val roomId = viewModel.roomId ?: return@setOnClickListener
+            MyOrderDialogFragment.show(childFragmentManager, roomId)
         }
     }
 
