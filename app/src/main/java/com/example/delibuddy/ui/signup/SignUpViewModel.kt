@@ -49,6 +49,7 @@ class SignUpViewModel : ViewModel() {
         if (_email.value != value) {
             _isVerificationEmailSent.value = false
             _verificationMessage.value = null
+            _isEmailVerified.value = false
         }
         _email.value = value
     }
@@ -178,13 +179,12 @@ class SignUpViewModel : ViewModel() {
     }
 
     fun moveToBirthDate() {
-        if(_isEmailVerified.value != true) {
-            _verificationMessage.value =
-                R.string.signup_verification_required
+        if (_isEmailVerified.value != true) {
+            _isEmailVerified.value = false
+            _verificationMessage.value = R.string.signup_verification_required
             return
-        } else {
-            _isReadyForBirthDate.value = true
         }
+        _isReadyForBirthDate.value = true
     }
 
     fun isEmailValid(): Boolean {
