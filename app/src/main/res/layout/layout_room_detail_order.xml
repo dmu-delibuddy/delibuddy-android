@@ -114,4 +114,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#697080" />
+
+    <!-- 방 상세 : 참여 후 모집 중일 때만 보임 (채팅방 내 주문 창은 자체 버튼 사용) -->
+    <TextView
+        android:id="@+id/button_save_order"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_pixel_box_yellow"
+        android:gravity="center"
+        android:text="@string/my_order_save"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 </LinearLayout>
