@@ -42,19 +42,12 @@
             android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/signup_Input"
                 android:id="@+id/input_email"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="@string/signup_email_hint"
-                app:boxBackgroundColor="@color/white"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusTopStart="4dp"
-                app:boxCornerRadiusTopEnd="4dp"
-                app:boxCornerRadiusBottomStart="4dp"
-                app:boxCornerRadiusBottomEnd="4dp"
-                app:boxStrokeColor="@color/navy"
-                app:hintTextColor="@color/navy">
+                android:hint="@string/signup_email_hint">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_email"
