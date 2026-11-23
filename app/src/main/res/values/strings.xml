@@ -84,6 +84,8 @@
     <string name="signup_send_verification_email">인증 메일 보내기</string>
     <string name="signup_verification_guide">인증 메일을 보냈어요.\n메일함에서 인증을 마친 뒤 아래 ‘인증 완료’ 버튼을 눌러 주세요.</string>
     <string name="signup_email_not_verified">아직 인증되지 않았어요. 메일함에서 인증 후 다시 눌러주세요.</string>
+    <string name="signup_verification_confirmed">인증이 확인되었습니다.</string>
+    <string name="signup_verification_required">인증을 먼저 완료해주세요.</string>
     <string name="signup_verification_check_network_failed">인터넷 연결을 확인하고 다시 시도해 주세요.</string>
     <string name="signup_session_expired">로그인 정보가 만료됐어요. 회원가입을 다시 진행해 주세요.</string>
     <string name="signup_invalid_email">학교 이메일의 @ 앞부분을 올바르게 입력해 주세요.</string>
