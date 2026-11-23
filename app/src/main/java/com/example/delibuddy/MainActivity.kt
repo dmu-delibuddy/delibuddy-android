@@ -22,13 +22,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         applySystemBarInsets()
 
-        val navView: BottomNavigationView = binding.navView
+        val bottomNavigation: BottomNavigationView = binding.navView
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        navView.setupWithNavController(navController)
+        bottomNavigation.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            navView.isVisible = destination.id !in setOf(
+            bottomNavigation.isVisible = destination.id !in setOf(
                 R.id.navigation_startup,
                 R.id.navigation_auth_entry,
                 R.id.navigation_signup,
@@ -43,14 +43,15 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        navView.itemIconTintList = null
+        // 이거 xml코드에 넣고 싶어 미치겠는데 xml에 넣으면 적용이 안됨...
+        // 진짜 뭐지.......
+        bottomNavigation.itemIconTintList = null
 
     }
 
     private fun applySystemBarInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // 키보드가 올라오면 그 높이만큼 아래 여백 (입력창이 가려지지 않게)
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             view.updatePadding(
                 left = bars.left,
@@ -58,10 +59,11 @@ class MainActivity : AppCompatActivity() {
                 right = bars.right,
                 bottom = maxOf(bars.bottom, ime.bottom),
             )
+
             // 자식 뷰에서 시스템 바 여백을 중복 적용하지 않도록 처리
-            WindowInsetsCompat.CONSUMED
+            return@setOnApplyWindowInsetsListener WindowInsetsCompat.CONSUMED
         }
+
         ViewCompat.requestApplyInsets(binding.root)
     }
-
 }
