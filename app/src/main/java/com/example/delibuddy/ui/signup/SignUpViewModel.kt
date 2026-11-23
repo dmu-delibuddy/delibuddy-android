@@ -184,7 +184,7 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    fun moveToBirthData() {
+    fun moveToBirthDate() {
         if(_isEmailVerified.value != true) {
             _verificationMessage.value =
                 R.string.signup_verification_required

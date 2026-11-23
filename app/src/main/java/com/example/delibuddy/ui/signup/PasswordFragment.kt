@@ -49,7 +49,7 @@ class PasswordFragment : Fragment() {
             viewModel.completeSignUp()
         }
         binding.buttonPreviousNext.setOnClickListener {
-            viewModel.moveToBirthData()
+            viewModel.moveToBirthDate()
         }
     }
 
