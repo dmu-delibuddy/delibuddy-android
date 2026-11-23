@@ -46,7 +46,7 @@ class PasswordFragment : Fragment() {
             viewModel.sendVerificationEmail()
         }
         binding.buttonVerificationComplete.setOnClickListener {
-            viewModel.completeSignUp()
+            viewModel.confirmEmailVerification()
         }
         binding.buttonPreviousNext.setOnClickListener {
             viewModel.moveToBirthDate()
@@ -54,7 +54,7 @@ class PasswordFragment : Fragment() {
     }
 
     private fun observeSignUpState() {
-        viewModel.isCompletingSignUp.observe(viewLifecycleOwner) {
+        viewModel.isConfirmingVerification.observe(viewLifecycleOwner) {
             updateLoadingState()
         }
         viewModel.isSendingVerification.observe(viewLifecycleOwner) {
@@ -72,6 +72,7 @@ class PasswordFragment : Fragment() {
         }
         viewModel.isVerificationEmailSent.observe(viewLifecycleOwner) { sent ->
             binding.textVerificationGuide.isVisible = sent
+            updateLoadingState()
         }
         viewModel.isEmailVerified.observe(viewLifecycleOwner) { verified ->
             binding.textVerificationDone.isVisible = verified
@@ -104,15 +105,16 @@ class PasswordFragment : Fragment() {
 
     private fun updateLoadingState() {
         val isBusy = viewModel.isSendingVerification.value == true ||
-                viewModel.isCompletingSignUp.value == true
+                viewModel.isConfirmingVerification.value == true
         binding.buttonVerificationComplete.isEnabled = !isBusy
-        binding.buttonVerifyEmail.isEnabled = !isBusy
+        binding.buttonVerifyEmail.isEnabled =
+            !isBusy && viewModel.isVerificationEmailSent.value != true
         binding.buttonPrevious.isEnabled = !isBusy
         binding.editPassword.isEnabled = !isBusy
         binding.editPasswordConfirm.isEnabled = !isBusy
 
         val loadingMessage = when {
-            viewModel.isCompletingSignUp.value == true -> R.string.signup_checking_verification
+            viewModel.isConfirmingVerification.value == true -> R.string.signup_checking_verification
             viewModel.isSendingVerification.value == true -> R.string.signup_sending_verification_email
             else -> null
         }

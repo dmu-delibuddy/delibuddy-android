@@ -8,7 +8,9 @@ import com.example.delibuddy.R
 import com.example.delibuddy.data.auth.AuthRepository
 import com.example.delibuddy.data.auth.EmailNotVerifiedException
 import com.example.delibuddy.data.auth.SignUpSessionMissingException
+import com.example.delibuddy.data.user.UserRepository
 import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.example.delibuddy.data.user.UserModel
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -19,6 +21,8 @@ import kotlinx.coroutines.launch
 class SignUpViewModel : ViewModel() {
 
     private val authRepository = AuthRepository()
+    private val userRepository = UserRepository()
+    private val auth = FirebaseAuth.getInstance()
 
     private val _isSendingVerification = MutableLiveData(false)
     val isSendingVerification: LiveData<Boolean> = _isSendingVerification
@@ -29,8 +33,8 @@ class SignUpViewModel : ViewModel() {
     private val _isVerificationEmailSent = MutableLiveData(false)
     val isVerificationEmailSent: LiveData<Boolean> = _isVerificationEmailSent
 
-    private val _isCompletingSignUp = MutableLiveData(false)
-    val isCompletingSignUp: LiveData<Boolean> = _isCompletingSignUp
+    private val _isConfirmingVerification = MutableLiveData(false)
+    val isConfirmingVerification: LiveData<Boolean> = _isConfirmingVerification
 
     private val _isReadyForBirthDate = MutableLiveData(false)
     val isReadyForBirthDate: LiveData<Boolean> = _isReadyForBirthDate
@@ -41,33 +45,43 @@ class SignUpViewModel : ViewModel() {
 
     private val _email = MutableLiveData("")
     val email: LiveData<String> = _email
+    fun setEmail(value: String) {
+        if (_email.value != value) {
+            _isVerificationEmailSent.value = false
+            _verificationMessage.value = null
+        }
+        _email.value = value
+    }
 
     private val _password = MutableLiveData("")
     val password: LiveData<String> = _password
+    fun setPassword(value: String) {
+        _password.value = value
+    }
 
     private val _passwordConfirm = MutableLiveData("")
     val passwordConfirm: LiveData<String> = _passwordConfirm
+    fun setPasswordConfirm(value: String) {
+        _passwordConfirm.value = value
+    }
 
     private val _isEmailVerified = MutableLiveData(false)
     val isEmailVerified: LiveData<Boolean> = _isEmailVerified
 
     private val _birthDate = MutableLiveData<String?>()
     val birthDate: LiveData<String?> = _birthDate
-
     fun setBirthDate(value: String?) {
         _birthDate.value = value
     }
 
     private val _bankName = MutableLiveData("")
     val bankName: LiveData<String> = _bankName
-
-    private val _account = MutableLiveData("")
-    val account: LiveData<String> = _account
-
     fun setBankName(value: String) {
         _bankName.value = value
     }
 
+    private val _account = MutableLiveData("")
+    val account: LiveData<String> = _account
     fun setAccount(value: String) {
         _account.value = value
     }
@@ -91,26 +105,24 @@ class SignUpViewModel : ViewModel() {
 
     fun finishRegistration(skipAccount: Boolean) {
         if (_isSavingProfile.value == true || _isRegistrationComplete.value == true) return
-        val bank = bankName.value.orEmpty().trim()
-        val number = account.value.orEmpty().trim()
-        val validationError = when {
-            !skipAccount && (bank.isBlank() || number.isBlank()) -> R.string.signup_account_required
-            !skipAccount && number.any { it !in '0'..'9' } -> R.string.signup_account_invalid
-            else -> null
-        }
+
+        val profile = createUserModel(skipAccount)
+        val validationError = validateProfile(profile, skipAccount)
         _profileError.value = validationError
         if (validationError != null) return
 
-        val profile = UserModel(
-            univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
-            birthDate = birthDate.value,
-            bankName = if (skipAccount) null else bank,
-            account = if (skipAccount) null else number,
-        )
+        saveProfile(profile, skipAccount)
+    }
+
+    private fun saveProfile(profile: UserModel, skipAccount: Boolean) {
         _isSavingProfile.value = true
         viewModelScope.launch {
             try {
-                authRepository.completeSignUp(profile)
+                val user = auth.currentUser ?: throw SignUpSessionMissingException()
+                userRepository.update(
+                    user.uid,
+                    profile.copy(univEmail = user.email ?: profile.univEmail),
+                )
                 if (skipAccount) {
                     _bankName.value = ""
                     _account.value = ""
@@ -119,67 +131,48 @@ class SignUpViewModel : ViewModel() {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _profileError.value = when (e) {
-                    is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
-                    is SignUpSessionMissingException,
-                    is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
-
-                    is EmailNotVerifiedException -> R.string.signup_email_not_verified
-                    else -> R.string.signup_completion_failed
-                }
+                _profileError.value = e.toProfileError()
             } finally {
                 _isSavingProfile.value = false
             }
         }
     }
 
-    fun setPassword(value: String) {
-        _password.value = value
+    private fun createUserModel(skipAccount: Boolean): UserModel = UserModel(
+        univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
+        birthDate = birthDate.value,
+        bankName = bankName.value.orEmpty().trim().takeUnless { skipAccount },
+        account = account.value.orEmpty().trim().takeUnless { skipAccount },
+    )
+
+    private fun validateProfile(profile: UserModel, skipAccount: Boolean): Int? = when {
+        !skipAccount && (profile.bankName.isNullOrBlank() || profile.account.isNullOrBlank()) ->
+            R.string.signup_account_required
+
+        !skipAccount && profile.account.orEmpty().any { it !in '0'..'9' } ->
+            R.string.signup_account_invalid
+
+        else -> null
     }
 
-    fun setPasswordConfirm(value: String) {
-        _passwordConfirm.value = value
-    }
 
-    fun setEmail(value: String) {
-        if (_email.value != value) {
-            _isVerificationEmailSent.value = false
-            _verificationMessage.value = null
-        }
-        _email.value = value
-    }
 
-    fun completeSignUp() {
-        if (_isCompletingSignUp.value == true || _isSendingVerification.value == true) return
 
-        _isCompletingSignUp.value = true
+    fun confirmEmailVerification() {
+        if (_isConfirmingVerification.value == true || _isSendingVerification.value == true) return
+
+        _isConfirmingVerification.value = true
         _verificationMessage.value = null
         viewModelScope.launch {
             try {
-                authRepository.completeSignUp(
-                    UserModel(
-                        univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
-                        birthDate = null,
-                    )
-                )
-                if (authRepository.isLoggedIn()) {
-                    _isEmailVerified.value = true
-                } else {
-                    _verificationMessage.value = R.string.signup_completion_failed
-                }
+                authRepository.createUserDocument()
+                _isEmailVerified.value = true
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _verificationMessage.value = when (e) {
-                    is EmailNotVerifiedException -> R.string.signup_email_not_verified
-                    is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
-                    is SignUpSessionMissingException,
-                    is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
-
-                    else -> R.string.signup_completion_failed
-                }
+                _verificationMessage.value = e.toConfirmationError()
             } finally {
-                _isCompletingSignUp.value = false
+                _isConfirmingVerification.value = false
             }
         }
     }
@@ -201,39 +194,83 @@ class SignUpViewModel : ViewModel() {
     }
 
     fun sendVerificationEmail() {
-        if (_isSendingVerification.value == true || _isCompletingSignUp.value == true) return
+        if (isVerificationBusy()) return
 
-        val emailId = email.value.orEmpty().trim()
-        val passwordValue = password.value.orEmpty()
-        val fullEmail = "$emailId@dongyang.ac.kr"
-        val validationError = when {
-            !isEmailValid() -> R.string.signup_invalid_email
-            passwordValue.length < 6 -> R.string.signup_password_too_short
-            passwordValue != passwordConfirm.value -> R.string.signup_password_mismatch
-            else -> null
-        }
+        val request = createSignUpRequest()
+        val validationError = validateSignUp(request)
         if (validationError != null) {
             _verificationMessage.value = validationError
             return
         }
 
+        requestVerificationEmail {
+            val user = authRepository.signUp(request.email, request.password)
+            authRepository.sendVerificationEmail(user)
+        }
+    }
+
+    private fun requestVerificationEmail(request: suspend () -> Unit) {
         _isSendingVerification.value = true
         _verificationMessage.value = null
         viewModelScope.launch {
             try {
-                authRepository.sendSignUpVerification(fullEmail, passwordValue)
+                request()
                 _isVerificationEmailSent.value = true
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _verificationMessage.value = when (e) {
-                    is FirebaseAuthUserCollisionException -> R.string.signup_email_already_used
-                    is FirebaseAuthWeakPasswordException -> R.string.signup_password_weak
-                    else -> R.string.signup_verification_failed
-                }
+                _verificationMessage.value = e.toVerificationError()
             } finally {
                 _isSendingVerification.value = false
             }
         }
     }
+
+    private fun isVerificationBusy(): Boolean =
+        _isSendingVerification.value == true || _isConfirmingVerification.value == true
+
+    private fun createSignUpRequest() = SignUpRequest(
+        email = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
+        password = password.value.orEmpty(),
+        passwordConfirm = passwordConfirm.value.orEmpty(),
+    )
+
+    private fun validateSignUp(request: SignUpRequest): Int? = when {
+        !isEmailValid() -> R.string.signup_invalid_email
+        request.password.length < 6 -> R.string.signup_password_too_short
+        request.password != request.passwordConfirm -> R.string.signup_password_mismatch
+        else -> null
+    }
+
+    private fun Exception.toVerificationError(): Int = when (this) {
+        is FirebaseAuthUserCollisionException -> R.string.signup_email_already_used
+        is FirebaseAuthWeakPasswordException -> R.string.signup_password_weak
+        is SignUpSessionMissingException,
+        is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+
+        else -> R.string.signup_verification_failed
+    }
+
+    private fun Exception.toConfirmationError(): Int = when (this) {
+        is EmailNotVerifiedException -> R.string.signup_email_not_verified
+        is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
+        is SignUpSessionMissingException,
+        is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+
+        else -> R.string.signup_completion_failed
+    }
+
+    private fun Exception.toProfileError(): Int = when (this) {
+        is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
+        is SignUpSessionMissingException,
+        is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
+
+        else -> R.string.signup_completion_failed
+    }
+
+    private data class SignUpRequest(
+        val email: String,
+        val password: String,
+        val passwordConfirm: String,
+    )
 }

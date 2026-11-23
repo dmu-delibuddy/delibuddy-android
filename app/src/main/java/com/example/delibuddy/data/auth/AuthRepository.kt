@@ -2,13 +2,14 @@ package com.example.delibuddy.data.auth
 
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.example.delibuddy.data.profile.ProfileRepository
 import com.example.delibuddy.data.user.UserModel
 import com.example.delibuddy.data.user.UserRepository
-import com.example.delibuddy.data.profile.ProfileRepository
 import kotlinx.coroutines.tasks.await
 
-class SignUpSessionMissingException : IllegalStateException()
-class EmailNotVerifiedException : IllegalStateException()
+class SignUpSessionMissingException : IllegalStateException("로그인된 사용자가 없습니다.")
+class EmailNotVerifiedException : IllegalStateException("이메일 인증이 완료되지 않았습니다.")
 
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
@@ -20,51 +21,39 @@ class AuthRepository {
         user.reload().await()
         if (!user.isEmailVerified) return false
 
-        // 인증 직후에도 Firestore가 최신 이메일 인증 상태를 확인하도록 토큰 갱신
         user.getIdToken(true).await()
-        val hasProfile = userRepository.exists(user.uid)
+        val hasUserDocument = userRepository.exists(user.uid)
 
-        return hasProfile && auth.currentUser?.uid == user.uid
+        return hasUserDocument && auth.currentUser?.uid == user.uid
     }
 
-    suspend fun sendSignUpVerification(email: String, password: String) {
-        val currentUser = auth.currentUser
-        if (currentUser?.email.equals(email, ignoreCase = true)) {
-            // 계정 생성 후 발송에 실패했거나 재발송하는 경우 비밀번호를 확인하고 재시도
-            val user = signIn(email, password).user
-                ?: error("사용자를 찾을 수 없습니다.")
-            user.sendEmailVerification().await()
-        } else {
-            signUp(email, password)
-        }
+    suspend fun signIn(email: String, password: String): AuthResult {
+        return auth.signInWithEmailAndPassword(email, password).await()
     }
 
-    suspend fun signIn(email: String, password: String): AuthResult =
-        auth.signInWithEmailAndPassword(email, password).await()
+    suspend fun signUp(email: String, password: String): FirebaseUser {
+        return auth.createUserWithEmailAndPassword(email, password).await().user
+            ?: error("회원가입 사용자를 찾을 수 없습니다.")
+    }
 
+    suspend fun sendVerificationEmail(user: FirebaseUser) {
+        user.sendEmailVerification().await()
+    }
 
-    suspend fun completeSignUp(userData: UserModel) {
-        val user = auth.currentUser
-            ?: throw SignUpSessionMissingException()
-
-        user.reload().await()
-        if (!user.isEmailVerified) {
-            throw EmailNotVerifiedException()
-        }
-
-        // reload는 사용자 정보만 갱신하므로, 보안 규칙에 전달할 인증 토큰도 갱신한다.
-        user.getIdToken(true).await()
+    suspend fun createUserDocument() {
+        val user = requireVerifiedUser()
         userRepository.create(
             user.uid,
-            userData.copy(univEmail = user.email ?: userData.univEmail)
+            UserModel(univEmail = user.email.orEmpty(), birthDate = null),
         )
         profileRepository.createInitialProfiles(user.uid)
     }
 
-    private suspend fun signUp(email: String, password: String) {
-        val result = auth.createUserWithEmailAndPassword(email, password).await()
-        val user = result.user
-            ?: throw IllegalStateException("회원가입 사용자를 찾을 수 없습니다.")
-        user.sendEmailVerification().await()
+    private suspend fun requireVerifiedUser(): FirebaseUser {
+        val user = auth.currentUser ?: throw SignUpSessionMissingException()
+        user.reload().await()
+        if (!user.isEmailVerified) throw EmailNotVerifiedException()
+        user.getIdToken(true).await()
+        return user
     }
 }
