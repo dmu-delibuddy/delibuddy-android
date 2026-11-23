@@ -73,7 +73,7 @@
                 android:background="@drawable/bg_badge_yellow"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="2dp"
-                android:textColor="@color/black"
+                android:textColor="@color/badge_text"
                 android:textSize="12sp"
                 tools:text="모집 중 2/3명" />
 

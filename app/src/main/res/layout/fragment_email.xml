@@ -49,6 +49,10 @@
                 android:hint="@string/signup_email_hint"
                 app:boxBackgroundColor="@color/white"
                 app:boxBackgroundMode="outline"
+                app:boxCornerRadiusTopStart="4dp"
+                app:boxCornerRadiusTopEnd="4dp"
+                app:boxCornerRadiusBottomStart="4dp"
+                app:boxCornerRadiusBottomEnd="4dp"
                 app:boxStrokeColor="@color/navy"
                 app:hintTextColor="@color/navy">
 

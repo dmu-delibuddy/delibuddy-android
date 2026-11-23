@@ -159,7 +159,7 @@
                 android:layout_marginTop="12dp" />
 
             <!-- 5. 메뉴 : 참여 내역 (화면 연결 예정) -->
-            <LinearLayout
+           <!-- <LinearLayout
                 android:id="@+id/menu_history"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -203,13 +203,18 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/button_change_account"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/mypage_menu_arrow"
+                    android:background="@drawable/bg_pixel_box"
+                    android:paddingStart="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="17dp"
+                    android:paddingBottom="11dp"
+                    android:text="@string/mypage_account_change"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
                     android:textStyle="bold" />
-            </LinearLayout>
+            </LinearLayout>-->
 
             <!-- 5. 메뉴 : 설정 (화면 연결 예정) -->
             <LinearLayout
@@ -256,11 +261,16 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/button_change_setting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/mypage_menu_arrow"
+                    android:background="@drawable/bg_pixel_box"
+                    android:paddingStart="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="17dp"
+                    android:paddingBottom="11dp"
+                    android:text="@string/mypage_account_change"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -276,7 +286,7 @@
                 android:paddingTop="14dp"
                 android:paddingBottom="17dp"
                 android:text="@string/mypage_logout"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
