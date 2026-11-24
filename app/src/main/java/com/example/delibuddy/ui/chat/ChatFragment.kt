@@ -13,6 +13,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
@@ -493,6 +494,8 @@ class ChatFragment : Fragment() {
         val status = room.status
         with(binding.chatNotice) {
             textBadge.setText(noticeBadge(status))
+            textBadge.setBackgroundResource(noticeBackgroundBadge(status))
+            textBadge.isActivated = status != RoomStatus.RECRUITING
             textSummary.text = noticeSummary(room)
             textHint.setText(noticeHint(status))
             val action = noticeAction(status)
@@ -543,6 +546,21 @@ class ChatFragment : Fragment() {
                 R.string.notice_badge_received
             RoomStatus.COMPLETED ->
                 R.string.notice_badge_completed
+        }
+
+    @DrawableRes
+    private fun noticeBackgroundBadge(status: RoomStatus) =
+        when (status) {
+            RoomStatus.RECRUITING ->
+                R.drawable.bg_badge_yellow
+            RoomStatus.ORDER_CONFIRMED ->
+                R.drawable.bg_badge_orange
+            RoomStatus.ORDERED ->
+                R.drawable.bg_badge_green
+            RoomStatus.RECEIVED ->
+                R.drawable.bg_badge_red
+            RoomStatus.COMPLETED ->
+                R.drawable.bg_badge_gray
         }
 
     private fun noticeSummary(room: RoomModel): String {

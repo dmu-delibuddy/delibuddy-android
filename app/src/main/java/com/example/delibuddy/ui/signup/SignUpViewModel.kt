@@ -49,6 +49,7 @@ class SignUpViewModel : ViewModel() {
         if (_email.value != value) {
             _isVerificationEmailSent.value = false
             _verificationMessage.value = null
+            _isEmailVerified.value = false
         }
         _email.value = value
     }
@@ -64,6 +65,9 @@ class SignUpViewModel : ViewModel() {
     fun setPasswordConfirm(value: String) {
         _passwordConfirm.value = value
     }
+
+    private val _isEmailVerified = MutableLiveData(false)
+    val isEmailVerified: LiveData<Boolean> = _isEmailVerified
 
     private val _birthDate = MutableLiveData<String?>()
     val birthDate: LiveData<String?> = _birthDate
@@ -163,7 +167,7 @@ class SignUpViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 authRepository.createUserDocument()
-                _isReadyForBirthDate.value = true
+                _isEmailVerified.value = true
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -172,6 +176,15 @@ class SignUpViewModel : ViewModel() {
                 _isConfirmingVerification.value = false
             }
         }
+    }
+
+    fun moveToBirthDate() {
+        if (_isEmailVerified.value != true) {
+            _isEmailVerified.value = false
+            _verificationMessage.value = R.string.signup_verification_required
+            return
+        }
+        _isReadyForBirthDate.value = true
     }
 
     fun isEmailValid(): Boolean {

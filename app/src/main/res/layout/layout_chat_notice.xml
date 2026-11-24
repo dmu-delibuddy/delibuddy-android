@@ -29,9 +29,9 @@
             android:layout_height="wrap_content"
             android:background=
                 "@drawable/bg_badge_orange"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="1dp"
-            android:textColor="@color/black"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/badge_text"
             android:textSize="11sp"
             android:textStyle="bold"
             tools:text="모집 중" />

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -211,6 +212,8 @@ class RoomDetailFragment : Fragment() {
 
         textStatus.text = getString(statusLabel(room)) + " " +
                 getString(R.string.detail_count, room.currentCount, room.maxParticipants)
+        textStatus.setBackgroundResource(statusBackground(room))
+        textStatus.isActivated = room.status != RoomStatus.RECRUITING || room.isFull
         textTitle.text = room.title
         textMode.root.displayedChild = if (room.mode == RoomMode.MEAL_BUDDY) 1 else 0
 
@@ -257,6 +260,7 @@ class RoomDetailFragment : Fragment() {
         participantRenderer?.render(room)
         renderOrder(room)
         renderActionButton(room)
+
     }
 
     // 라벨 값 한 줄
@@ -314,6 +318,22 @@ class RoomDetailFragment : Fragment() {
             !editable -> "모집이 마감되어 주문을 변경할 수 없습니다."
             else -> ""
         }
+    }
+
+    // 방 상태 => 표시 문구 별 배경색 변경
+    @DrawableRes
+    private fun statusBackground(room: RoomModel) = when(room.status) {
+        RoomStatus.RECRUITING ->
+            if(room.isFull) R.drawable.bg_badge_red
+            else R.drawable.bg_badge_yellow
+        RoomStatus.ORDER_CONFIRMED ->
+            R.drawable.bg_badge_orange
+        RoomStatus.ORDERED ->
+            R.drawable.bg_badge_green
+        RoomStatus.RECEIVED ->
+            R.drawable.bg_badge_red
+        RoomStatus.COMPLETED ->
+            R.drawable.bg_badge_gray
     }
 
     // 방 상태 => 화면 표시 문구 (모집 중인데 정원이 차면 정원 마감)

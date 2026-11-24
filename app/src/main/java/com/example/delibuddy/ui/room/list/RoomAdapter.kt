@@ -53,6 +53,22 @@ class RoomAdapter(
                     RoomStatus.COMPLETED -> R.string.detail_status_completed
                 }
             )
+            textStatus.setBackgroundResource(
+                when (room.status) {
+                    RoomStatus.RECRUITING ->
+                        if (room.isFull) R.drawable.bg_badge_red
+                        else R.drawable.bg_badge_yellow
+                    RoomStatus.ORDER_CONFIRMED ->
+                        R.drawable.bg_badge_orange
+                    RoomStatus.ORDERED ->
+                        R.drawable.bg_badge_green
+                    RoomStatus.RECEIVED ->
+                        R.drawable.bg_badge_red
+                    RoomStatus.COMPLETED ->
+                        R.drawable.bg_badge_gray
+                }
+            )
+            textStatus.isActivated = room.status != RoomStatus.RECRUITING || room.isFull
             textParticipantCount.text = context.getString(
                 R.string.chat_header_participant_count, room.currentCount, room.maxParticipants,
             )

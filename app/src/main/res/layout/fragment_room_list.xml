@@ -49,7 +49,7 @@
                 android:button="@null"
                 android:gravity="center"
                 android:text="@string/mode_meal_buddy"
-                android:textColor="@color/black" />
+                android:textColor="@color/meal_buddy_mode_text" />
         </RadioGroup>
 
         <!-- 검색창 -->

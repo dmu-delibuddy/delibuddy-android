@@ -46,7 +46,7 @@ class BirthDateFragment : Fragment() {
 
     private fun observeBirthDate() {
         viewModel.birthDate.observe(viewLifecycleOwner) { date ->
-            binding.buttonBirthDate.text = date ?: getString(R.string.signup_birth_date_hint)
+            binding.buttonBirthDate.text = date ?.replace("-",". ") ?: getString(R.string.signup_birth_date_hint)
             binding.buttonNext.isEnabled = date != null
         }
     }

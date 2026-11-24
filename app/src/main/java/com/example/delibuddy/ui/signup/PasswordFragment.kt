@@ -48,6 +48,9 @@ class PasswordFragment : Fragment() {
         binding.buttonVerificationComplete.setOnClickListener {
             viewModel.confirmEmailVerification()
         }
+        binding.buttonPreviousNext.setOnClickListener {
+            viewModel.moveToBirthDate()
+        }
     }
 
     private fun observeSignUpState() {
@@ -71,6 +74,10 @@ class PasswordFragment : Fragment() {
             binding.textVerificationGuide.isVisible = sent
             updateLoadingState()
         }
+        viewModel.isEmailVerified.observe(viewLifecycleOwner) { verified ->
+            binding.textVerificationDone.isVisible = verified
+        }
+
     }
 
     private fun observeVerificationCompletion() {
