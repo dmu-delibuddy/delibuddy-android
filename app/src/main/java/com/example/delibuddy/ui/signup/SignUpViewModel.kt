@@ -204,7 +204,7 @@ class SignUpViewModel : ViewModel() {
         }
 
         requestVerificationEmail {
-            val user = authRepository.signUp(request.email, request.password)
+            val user = authRepository.createFirebaseUser(request.email, request.password)
             authRepository.sendVerificationEmail(user)
         }
     }

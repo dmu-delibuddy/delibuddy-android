@@ -31,7 +31,7 @@ class AuthRepository {
         return auth.signInWithEmailAndPassword(email, password).await()
     }
 
-    suspend fun signUp(email: String, password: String): FirebaseUser {
+    suspend fun createFirebaseUser(email: String, password: String): FirebaseUser {
         return auth.createUserWithEmailAndPassword(email, password).await().user
             ?: error("회원가입 사용자를 찾을 수 없습니다.")
     }
