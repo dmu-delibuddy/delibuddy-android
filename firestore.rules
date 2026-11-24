@@ -2,39 +2,95 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // 동양미래대 이메일 인증을 마친 사용자 (앱의 도메인 검사를 서버에서도 똑같이)
+    function isStudent() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.matches('.*@dongyang[.]ac[.]kr$');
+    }
+
+    function isRoomMember(roomId) {
+      return isStudent()
+        && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
+    }
+
+    // 시스템 메시지로 보낼 수 있는 문구. SystemMessage.kt 를 바꾸면 여기도 같이 바꿔야 함
+    function systemMessages() {
+      return [
+        '방이 만들어졌어요',
+        '새 참여자가 들어왔어요',
+        '주문이 확정됐어요. 이제 메뉴를 바꿀 수 없어요.',
+        '방장이 배달 앱에서 주문했어요',
+        '음식이 도착했어요. 나눠 가져가요',
+        '공동 주문이 완료됐어요'
+      ];
+    }
+
     match /recommend-locations/{locationId} {
       allow read: if true;
     }
 
     match /rooms/{roomId} {
       allow read: if true;
-      allow write: if request.auth != null;
+
+      // 방 만들기 : 내가 방장, 참여자는 나 혼자, 모집 중으로 시작
+      allow create: if isStudent()
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.participantIds == [request.auth.uid]
+        && request.resource.data.status == 'RECRUITING';
+
+      // 방장 : 상태 변경, 강퇴, 방장 넘기고 나가기 / 그 외 : 나만 참여하거나 나가기
+      allow update: if isStudent()
+        && (resource.data.get('hostId', '') == request.auth.uid || isJoiningOrLeaving());
+
+      // 마지막 한 명이 나가면 방 삭제
+      allow delete: if isStudent()
+        && resource.data.participantIds == [request.auth.uid];
+
+      // RoomRepository.joinRoom / leaveRoom 과 같은 조건
+      function isJoiningOrLeaving() {
+        let me = request.auth.uid;
+        let before = resource.data.participantIds;
+        let after = request.resource.data.participantIds;
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participantIds'])
+          && (
+            // 참여 : 모집 중, 정원 안, 나 하나만 추가
+            (!(me in before)
+              && resource.data.status == 'RECRUITING'
+              && after.size() == before.size() + 1
+              && after.size() <= resource.data.maxParticipants
+              && after.toSet() == before.toSet().union([me].toSet()))
+            // 나가기 : 모집 중 / 완료일 때 나 하나만 빠짐
+            || (me in before
+              && resource.data.status in ['RECRUITING', 'COMPLETED']
+              && after.size() == before.size() - 1
+              && before.toSet().difference(after.toSet()) == [me].toSet())
+          );
+      }
 
       // 채팅 : 같은 방 참여자(방장 포함)만 읽고 쓰기
       match /messages/{messageId} {
         allow read: if isRoomMember(roomId);
-        // 일반 메시지는 본인 이름으로만, 시스템 메시지는 보낸 사람 없이
+        // 일반 메시지는 본인 이름으로만, 시스템 메시지는 보낸 사람 없이 정해진 문구만
         allow create: if isRoomMember(roomId) && (
-          request.resource.data.senderId == request.auth.uid
+          (request.resource.data.type == 'NORMAL'
+            && request.resource.data.senderId == request.auth.uid)
           || (request.resource.data.type == 'SYSTEM'
-              && request.resource.data.senderId == null)
+            && request.resource.data.senderId == null
+            && request.resource.data.content in systemMessages())
         );
       }
 
       match /orders/{userId} {
-        function isParticipant() {
-          return request.auth != null
-                 && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
-        }
-
         function canEdit() {
           let room = get(/databases/$(database)/documents/rooms/$(roomId)).data;
-          return isParticipant()
+          return isRoomMember(roomId)
                  && request.auth.uid == userId
                  && room.status == 'RECRUITING';
         }
 
-        allow read: if isParticipant();
+        allow read: if isRoomMember(roomId);
         allow create, update: if canEdit()
                               && request.resource.data.keys().hasAll(['price'])
                               && request.resource.data.keys().hasOnly(['price', 'cartScreenshotUrl', 'memo'])
@@ -48,39 +104,24 @@ service cloud.firestore {
       }
     }
 
-    function isRoomMember(roomId) {
-      return request.auth != null
-        && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
-    }
-
-    match /test/{docId} {
-      allow create: if request.resource.data.keys().hasAll(['message'])
-                    && request.resource.data.keys().hasOnly(['message'])
-                    && request.resource.data.message is string;
-    }
-
     match /users/{userId} {
-      allow create: if request.auth != null
-                    && request.auth.uid == userId
-                    && request.auth.token.email_verified == true;
-
-      allow read, update, delete: if request.auth != null
-                                 && request.auth.uid == userId
-                                 && request.auth.token.email_verified == true;
+      allow create, read, update, delete: if isStudent() && request.auth.uid == userId;
     }
 
     match /users/{userId}/profiles/{profileType} {
-      allow read: if request.auth != null
-                  && request.auth.token.email_verified == true
+      allow read: if isStudent()
                   && profileType in ['PICKUP_ONLY', 'MEAL_BUDDY'];
-      allow write: if request.auth != null
+      allow write: if isStudent()
                    && request.auth.uid == userId
-                   && request.auth.token.email_verified == true
                    && profileType in ['PICKUP_ONLY', 'MEAL_BUDDY'];
     }
 
+    // 사진 정보 : id(메시지, 주문, 프로필에 들어 있음)로 하나씩만 읽고, 목록 조회는 막음
+    // 지우기는 올린 사람만 (ownerId 가 없는 예전 문서는 콘솔에서만 지울 수 있음)
     match /images/{imageId} {
-      allow read, write: if request.auth != null;
+      allow get: if isStudent();
+      allow create: if isStudent() && request.resource.data.ownerId == request.auth.uid;
+      allow delete: if isStudent() && resource.data.get('ownerId', '') == request.auth.uid;
     }
   }
 }

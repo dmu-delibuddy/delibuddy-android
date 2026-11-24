@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
@@ -17,11 +18,13 @@ import kotlinx.coroutines.withContext
 class ImageRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val storage: FirebaseStorage = FirebaseStorage.getInstance(),
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
 ) {
     private val images = db.collection("images")
 
     suspend fun uploadImage(uri: Uri, contentResolver: ContentResolver): ImageModel =
         withContext(Dispatchers.IO) {
+            val uid = checkNotNull(auth.currentUser?.uid) { "로그인이 필요합니다." }
             val contentType = contentResolver.getType(uri)
                 ?: throw IllegalArgumentException("이미지 MIME 타입을 확인할 수 없습니다.")
             require(contentType.startsWith("image/")) { "이미지 파일만 업로드할 수 있습니다." }
@@ -48,13 +51,18 @@ class ImageRepository(
                 }
 
             val reference = storage.reference.child("images/${document.id}")
-            val metadata = StorageMetadata.Builder().setContentType(contentType).build()
+            // storage.rules 는 ownerId 가 내 uid 일 때만 올리기 / 지우기를 허용
+            val metadata = StorageMetadata.Builder()
+                .setContentType(contentType)
+                .setCustomMetadata("ownerId", uid)
+                .build()
             // 업로드부터 문서 저장까지 마친 뒤 취소를 전달해 중간 취소로 인한 고아 파일을 줄인다.
             withContext(NonCancellable) {
                 val uploaded = reference.putFile(uri, metadata).await()
                 try {
                     val image = ImageModel(
                         id = document.id,
+                        ownerId = uid,
                         url = reference.downloadUrl.await().toString(),
                         storagePath = reference.path,
                         fileName = fileName,
