@@ -17,7 +17,16 @@ import com.example.delibuddy.data.room.RoomRepository
 import com.example.delibuddy.data.room.RoomStatus
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+
+// 저장 전 입력 검사. 음식값은 0보다 커야 하고, 새 사진도 저장된 사진도 없으면 안 됨
+@StringRes
+internal fun validateOrder(price: Long?, hasNewPhoto: Boolean, currentUrl: String?): Int? = when {
+    price == null || price <= 0 -> R.string.my_order_price_required
+    !hasNewPhoto && currentUrl.isNullOrBlank() -> R.string.my_order_photo_required
+    else -> null
+}
 
 /*
     * 채팅방 > 메뉴 > 내 주문 : 내 주문 확인 / 변경
@@ -57,11 +66,13 @@ class MyOrderViewModel(
     private val _newPhoto = MutableLiveData<Uri?>(null)
     val newPhoto: LiveData<Uri?> = _newPhoto
 
-    // 내 주문과 방 상태 불러오기 (한 번만)
+    private var loadJob: Job? = null
+
+    // 내 주문과 방 상태 불러오기 (한 번만. 불러오는 중이면 또 부르지 않음)
     fun load() {
-        if (_loadState.value is LoadState.Loaded) return
+        if (_loadState.value is LoadState.Loaded || loadJob?.isActive == true) return
         _loadState.value = LoadState.Loading
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             _loadState.value = try {
                 val uid = FirebaseAuth.getInstance().currentUser?.uid
                     ?: throw IllegalStateException("로그인이 필요합니다.")
@@ -88,12 +99,7 @@ class MyOrderViewModel(
         val loaded = _loadState.value as? LoadState.Loaded
         val current = loaded?.order
         val photo = _newPhoto.value
-        val error = when {
-            price == null || price <= 0 -> R.string.my_order_price_required
-            photo == null && current?.cartScreenshotUrl.isNullOrBlank() ->
-                R.string.my_order_photo_required
-            else -> null
-        }
+        val error = validateOrder(price, photo != null, current?.cartScreenshotUrl)
         if (error != null) {
             _saveState.value = SaveState.Failed(error)
             return

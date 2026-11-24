@@ -8,13 +8,11 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.delibuddy.R
-import com.example.delibuddy.data.order.OrderModel
 import com.example.delibuddy.databinding.DialogMyOrderBinding
 import com.example.delibuddy.ui.chat.order.MyOrderViewModel.LoadState
 import com.example.delibuddy.ui.chat.order.MyOrderViewModel.SaveState
@@ -70,17 +68,9 @@ class MyOrderDialogFragment : DialogFragment() {
     // 사진 고르기, 메모 글자 수, 취소 / 저장
     private fun setUpListeners() = with(binding) {
         order.imageOrderPreview.setOnClickListener { photoPicker.launch("image/*") }
-        order.inputOrderMemo.doAfterTextChanged {
-            order.textMemoCount.text = getString(R.string.my_order_memo_count, it?.length ?: 0)
-        }
+        order.setUpMemoCount()
         buttonCancel.setOnClickListener { dismiss() }
-        buttonSave.setOnClickListener {
-            viewModel.save(
-                price = order.orderPriceAmount.editText.text.toString().trim().toLongOrNull(),
-                memo = order.inputOrderMemo.text.toString(),
-                resolver = requireContext().contentResolver,
-            )
-        }
+        buttonSave.setOnClickListener { order.saveTo(viewModel, requireContext().contentResolver) }
     }
 
     // 불러온 주문 채우기 + 모집 중이 아니면 보기 전용
@@ -103,18 +93,9 @@ class MyOrderDialogFragment : DialogFragment() {
             binding.buttonCancel.setText(
                 if (editable) R.string.my_order_cancel else R.string.my_order_close
             )
-            loaded?.order?.let(::fillOrder)
-        }
-    }
-
-    // 저장된 주문 채우기 (입력 중인 값이 있으면 그대로 둠)
-    private fun fillOrder(order: OrderModel) = with(binding.order) {
-        val price = orderPriceAmount.editText
-        if (price.text.isEmpty()) price.setText(order.price.toString())
-        if (inputOrderMemo.text.isEmpty()) inputOrderMemo.setText(order.memo.orEmpty())
-        val url = order.cartScreenshotUrl
-        if (viewModel.newPhoto.value == null && !url.isNullOrBlank()) {
-            Glide.with(this@MyOrderDialogFragment).load(url).into(imageOrderPreview)
+            loaded?.order?.let {
+                binding.order.fill(it, viewModel.newPhoto.value != null, this)
+            }
         }
     }
 

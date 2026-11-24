@@ -25,12 +25,14 @@ import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.DetailState
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.widget.doAfterTextChanged
 import com.bumptech.glide.Glide
 import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.ui.common.GlobalAlertDialog
 import com.example.delibuddy.ui.common.GlobalLoadingDialog
 import com.example.delibuddy.ui.chat.order.MyOrderViewModel
+import com.example.delibuddy.ui.chat.order.fill
+import com.example.delibuddy.ui.chat.order.saveTo
+import com.example.delibuddy.ui.chat.order.setUpMemoCount
 import com.example.delibuddy.ui.chat.order.MyOrderViewModel.LoadState
 import com.example.delibuddy.ui.chat.order.MyOrderViewModel.SaveState
 
@@ -49,8 +51,9 @@ class RoomDetailFragment : Fragment() {
     private val photoPicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null && _binding != null) {
-                selectedImage = uri
-                orderViewModel.selectPhoto(uri) // 참여 후 저장할 때 쓰는 새 사진
+                // 참여 전 사진은 참여할 때만 씀. 내 주문 ViewModel 에 남으면 돌아왔을 때 다시 올라감
+                val joined = currentRoom()?.let(viewModel::canChat) == true
+                if (joined) orderViewModel.selectPhoto(uri) else selectedImage = uri
                 Glide.with(this).load(uri).into(binding.order.imageOrderPreview)
             }
         }
@@ -272,19 +275,11 @@ class RoomDetailFragment : Fragment() {
     }
 
     // 사진 고르기, 메모 글자 수, (참여 후) 주문 저장
-    private fun setUpOrder() {
-        binding.order.imageOrderPreview.setOnClickListener {
-            photoPicker.launch("image/*")
-        }
-        binding.order.inputOrderMemo.doAfterTextChanged {
-            binding.order.textMemoCount.text = "${it?.length ?: 0}/100"
-        }
-        binding.order.buttonSaveOrder.setOnClickListener {
-            orderViewModel.save(
-                price = binding.order.orderPriceAmount.editText.text.toString().trim().toLongOrNull(),
-                memo = binding.order.inputOrderMemo.text.toString(),
-                resolver = requireContext().contentResolver,
-            )
+    private fun setUpOrder() = with(binding.order) {
+        imageOrderPreview.setOnClickListener { photoPicker.launch("image/*") }
+        setUpMemoCount()
+        buttonSaveOrder.setOnClickListener {
+            saveTo(orderViewModel, requireContext().contentResolver)
         }
     }
 
@@ -292,16 +287,8 @@ class RoomDetailFragment : Fragment() {
     private fun observeMyOrder() {
         orderViewModel.loadState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is LoadState.Loaded -> {
-                    val order = state.order ?: return@observe
-                    val price = binding.order.orderPriceAmount.editText
-                    val memo = binding.order.inputOrderMemo
-                    if (price.text.isEmpty()) price.setText(order.price.toString())
-                    if (memo.text.isEmpty()) memo.setText(order.memo.orEmpty())
-                    val url = order.cartScreenshotUrl
-                    if (orderViewModel.newPhoto.value == null && !url.isNullOrBlank()) {
-                        Glide.with(this).load(url).into(binding.order.imageOrderPreview)
-                    }
+                is LoadState.Loaded -> state.order?.let {
+                    binding.order.fill(it, orderViewModel.newPhoto.value != null, this)
                 }
                 LoadState.Error -> toast(getString(R.string.profile_order_error))
                 LoadState.Loading -> Unit
@@ -342,6 +329,7 @@ class RoomDetailFragment : Fragment() {
         }
         binding.order.textOrderMessage.text = when {
             !joined && editable -> getString(R.string.detail_join_order_alert)
+            !joined -> getString(R.string.detail_join_closed) // 정원 마감 / 모집 마감
             !editable -> getString(R.string.my_order_locked)
             else -> ""
         }
