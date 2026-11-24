@@ -23,18 +23,19 @@ import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.databinding.FragmentRoomDetailBinding
 import com.example.delibuddy.ui.room.deliveryAppLabel
 import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.DetailState
-import com.google.firebase.auth.FirebaseAuth
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.lifecycleScope
-import com.example.delibuddy.data.order.OrderRepository
 import com.bumptech.glide.Glide
 import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.ui.common.GlobalAlertDialog
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.CancellationException
+import com.example.delibuddy.ui.common.GlobalLoadingDialog
+import com.example.delibuddy.ui.chat.order.MyOrderViewModel
+import com.example.delibuddy.ui.chat.order.fill
+import com.example.delibuddy.ui.chat.order.saveTo
+import com.example.delibuddy.ui.chat.order.setUpMemoCount
+import com.example.delibuddy.ui.chat.order.MyOrderViewModel.LoadState
+import com.example.delibuddy.ui.chat.order.MyOrderViewModel.SaveState
 
 class RoomDetailFragment : Fragment() {
 
@@ -43,15 +44,17 @@ class RoomDetailFragment : Fragment() {
 
     private val viewModel: RoomDetailViewModel by viewModels()
 
-    private var selectedImage: Uri? = null
-    private var screenshotUrl: String? = null
-    private var orderLoaded = false
-    private val orderRepository = OrderRepository()
+    // 참여 후 내 주문 불러오기 / 저장 (채팅방 내 주문 창과 같은 ViewModel, 같은 roomId 인자)
+    private val orderViewModel: MyOrderViewModel by viewModels()
+
+    private var selectedImage: Uri? = null // 참여할 때 올릴 사진
     private var participantRenderer: ParticipantRenderer? = null
     private val photoPicker =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null && _binding != null) {
-                selectedImage = uri
+                // 참여 전 사진은 참여할 때만 씀. 내 주문 ViewModel 에 남으면 돌아왔을 때 다시 올라감
+                val joined = currentRoom()?.let(viewModel::canChat) == true
+                if (joined) orderViewModel.selectPhoto(uri) else selectedImage = uri
                 Glide.with(this).load(uri).into(binding.order.imageOrderPreview)
             }
         }
@@ -76,6 +79,8 @@ class RoomDetailFragment : Fragment() {
         observeRoom()
         observeActionState()
         setUpOrder()
+        observeMyOrder()
+        observeOrderSaveState()
     }
 
     // 상단 < 버튼 : 이전 화면(방 목록)으로
@@ -267,40 +272,52 @@ class RoomDetailFragment : Fragment() {
     private fun row(@StringRes label: Int, value: String) =
         "${getString(label)} $value"
 
+    // 참여한 방이면 내 주문 불러오기 (한 번만)
     private fun renderOrder(room: RoomModel) {
         renderOrderAvailability(room)
-        if (!orderLoaded && viewModel.canChat(room)) {
-            orderLoaded = true
-            viewLifecycleOwner.lifecycleScope.launch {
-                try {
-                    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
-                    val order = orderRepository.getOrder(viewModel.roomId, uid) ?: return@launch
-                    if (_binding == null) return@launch
-                    // 복원 시 진행 중인 입력은 유지한다.
-                    val price = binding.order.orderPriceAmount.editText
-                    val memo = binding.order.inputOrderMemo
-                    if (price.text.isEmpty()) price.setText(order.price.toString())
-                    if (memo.text.isEmpty()) memo.setText(order.memo.orEmpty())
-                    screenshotUrl = order.cartScreenshotUrl
-                    if (selectedImage == null && screenshotUrl != null) {
-                        Glide.with(this@RoomDetailFragment).load(screenshotUrl)
-                            .into(binding.order.imageOrderPreview)
-                    }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    toast("주문 정보를 불러오지 못했습니다.")
+        if (viewModel.canChat(room)) orderViewModel.load()
+    }
+
+    // 사진 고르기, 메모 글자 수, (참여 후) 주문 저장
+    private fun setUpOrder() = with(binding.order) {
+        imageOrderPreview.setOnClickListener { photoPicker.launch("image/*") }
+        setUpMemoCount()
+        buttonSaveOrder.setOnClickListener {
+            saveTo(orderViewModel, requireContext().contentResolver)
+        }
+    }
+
+    // 불러온 내 주문 채우기 (복원 시 진행 중인 입력은 유지)
+    private fun observeMyOrder() {
+        orderViewModel.loadState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is LoadState.Loaded -> state.order?.let {
+                    binding.order.fill(it, orderViewModel.newPhoto.value != null, this)
                 }
+                LoadState.Error -> toast(getString(R.string.profile_order_error))
+                LoadState.Loading -> Unit
             }
         }
     }
 
-    private fun setUpOrder() {
-        binding.order.imageOrderPreview.setOnClickListener {
-            photoPicker.launch("image/*")
-        }
-        binding.order.inputOrderMemo.doAfterTextChanged {
-            binding.order.textMemoCount.text = "${it?.length ?: 0}/100"
+    // 주문 저장 중 로딩, 결과 안내
+    private fun observeOrderSaveState() {
+        orderViewModel.saveState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                SaveState.Saving ->
+                    GlobalLoadingDialog.show(childFragmentManager, getString(R.string.my_order_saving))
+                SaveState.Saved -> {
+                    GlobalLoadingDialog.hide(childFragmentManager)
+                    toast(getString(R.string.my_order_saved))
+                    orderViewModel.clearSaveState()
+                }
+                is SaveState.Failed -> {
+                    GlobalLoadingDialog.hide(childFragmentManager)
+                    toast(getString(state.message))
+                    orderViewModel.clearSaveState()
+                }
+                SaveState.Idle -> Unit
+            }
         }
     }
 
@@ -312,10 +329,12 @@ class RoomDetailFragment : Fragment() {
             orderPriceAmount.editText.isEnabled = enabled
             inputOrderMemo.isEnabled = enabled
             imageOrderPreview.isEnabled = enabled
+            buttonSaveOrder.isVisible = joined && editable // 참여 후 모집 중일 때만 저장
         }
         binding.order.textOrderMessage.text = when {
             !joined && editable -> getString(R.string.detail_join_order_alert)
-            !editable -> "모집이 마감되어 주문을 변경할 수 없습니다."
+            !joined -> getString(R.string.detail_join_closed) // 정원 마감 / 모집 마감
+            !editable -> getString(R.string.my_order_locked)
             else -> ""
         }
     }
