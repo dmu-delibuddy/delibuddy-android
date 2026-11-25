@@ -27,7 +27,6 @@ import com.example.delibuddy.ui.room.detail.RoomDetailViewModel.DetailState
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
-import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.ui.common.GlobalAlertDialog
 import com.example.delibuddy.ui.common.GlobalLoadingDialog
 import com.example.delibuddy.ui.chat.order.MyOrderViewModel
@@ -165,20 +164,17 @@ class RoomDetailFragment : Fragment() {
             }
 
             is ActionState.Failed -> {
-                if (state.reason ==
-                    RoomException.Reason.ACCOUNT_REQUIRED
-                ) {
+                if (state.accountRequired) {
                     GlobalAlertDialog.show(
                         fragmentManager = childFragmentManager,
                         type = GlobalAlertDialog.Type.INFO,
                         title = getString(
                             R.string.detail_account_required_title),
-                        description = state.reason.message,
+                        description = getString(state.message),
                     )
                 } else {
                     toast(
-                        state.reason?.message
-                            ?: getString(R.string.detail_action_error)
+                        getString(state.message)
                     )
                 }
                 viewModel.clearActionState()
@@ -206,8 +202,8 @@ class RoomDetailFragment : Fragment() {
                 DetailState.NotFound -> binding.textMessage
                     .setText(R.string.detail_not_found)
 
-                DetailState.Error -> binding.textMessage
-                    .setText(R.string.detail_load_error)
+                is DetailState.Error -> binding.textMessage
+                    .setText(state.message)
             }
         }
     }
