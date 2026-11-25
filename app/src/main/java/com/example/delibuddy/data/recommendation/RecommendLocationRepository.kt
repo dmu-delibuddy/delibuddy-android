@@ -15,7 +15,7 @@ import org.json.JSONArray
 class RecommendLocationRepository(
     private val imageRepository: ImageRepository = ImageRepository(),
 ) {
-    suspend fun getLocations(assets: AssetManager): List<RecommendLocation> = coroutineScope {
+    suspend fun getLocations(assets: AssetManager): List<RecommendLocationModel> = coroutineScope {
         loadLocations(assets).map { location ->
             async {
                 if (location.imagePath.isBlank()) return@async location
@@ -31,14 +31,14 @@ class RecommendLocationRepository(
     }
 
     // 방 만들기 장소 선택용 : 사진 주소 없이 이름 · 좌표만 (네트워크 요청 없음)
-    suspend fun getPlaces(assets: AssetManager): List<RecommendLocation> =
+    suspend fun getPlaces(assets: AssetManager): List<RecommendLocationModel> =
         withContext(Dispatchers.IO) { loadLocations(assets) }
 
-    private fun loadLocations(assets: AssetManager): List<RecommendLocation> {
+    private fun loadLocations(assets: AssetManager): List<RecommendLocationModel> {
         return try {
             val jsonString = assets.open("recommend-locations.json").bufferedReader().use { it.readText() }
             val jsonArray = JSONArray(jsonString)
-            val list = mutableListOf<RecommendLocation>()
+            val list = mutableListOf<RecommendLocationModel>()
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
                 val modeStr = obj.optString("mode", "PICKUP_ONLY")
@@ -49,7 +49,7 @@ class RecommendLocationRepository(
                 }
 
                 list.add(
-                    RecommendLocation(
+                    RecommendLocationModel(
                         id = obj.optString("id"),
                         name = obj.optString("name"),
                         description = obj.optString("description"),

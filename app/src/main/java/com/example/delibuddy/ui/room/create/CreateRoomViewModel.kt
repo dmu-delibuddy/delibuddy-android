@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
 import com.example.delibuddy.data.chat.ChatRepository
 import com.example.delibuddy.data.chat.SystemMessage
-import com.example.delibuddy.data.recommendation.RecommendLocation
+import com.example.delibuddy.data.recommendation.RecommendLocationModel
 import com.example.delibuddy.data.recommendation.RecommendLocationRepository
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.FoodCategory
@@ -92,8 +92,8 @@ class CreateRoomViewModel(
     private val placeRepository = RecommendLocationRepository()
 
     // 장소 선택 시트에 보여줄 추천 장소 (경민님 recommend-locations.json)
-    private val _places = MutableLiveData<List<RecommendLocation>>(emptyList())
-    val places: LiveData<List<RecommendLocation>> = _places
+    private val _places = MutableLiveData<List<RecommendLocationModel>>(emptyList())
+    val places: LiveData<List<RecommendLocationModel>> = _places
 
     private val _place = MutableLiveData<Place?>(null) // null = 아직 선택 안 함
     val place: LiveData<Place?> = _place
@@ -113,7 +113,7 @@ class CreateRoomViewModel(
     }
 
     // 추천 장소 선택 (이름 + 좌표)
-    fun selectPlace(location: RecommendLocation) {
+    fun selectPlace(location: RecommendLocationModel) {
         _place.value = Place(location.name, location.lat, location.lon)
     }
 

@@ -15,7 +15,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.delibuddy.R
-import com.example.delibuddy.data.recommendation.RecommendLocation
+import com.example.delibuddy.data.recommendation.RecommendLocationModel
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.databinding.BottomSheetLocationInfoBinding
 import com.example.delibuddy.databinding.FragmentRecommendationBinding
@@ -76,7 +76,7 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         viewModel.loadLocations(requireContext())
     }
 
-    private fun displayMarkers(locations: List<RecommendLocation>) {
+    private fun displayMarkers(locations: List<RecommendLocationModel>) {
         val map = naverMap ?: return
 
         activeMarkers.forEach { it.map = null }
@@ -114,7 +114,7 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         RoomMode.PICKUP_ONLY -> R.drawable.pickup_only_marker
     }
 
-    private fun showLocationBottomSheet(location: RecommendLocation) {
+    private fun showLocationBottomSheet(location: RecommendLocationModel) {
         val dialog = BottomSheetDialog(requireContext())
         val sheet = BottomSheetLocationInfoBinding.inflate(dialog.layoutInflater)
 
