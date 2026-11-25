@@ -12,9 +12,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 
-class RecommendLocationRepository {
-    private val imageRepository: ImageRepository = ImageRepository()
-
+class RecommendLocationRepository(
+    private val imageRepository: ImageRepository = ImageRepository(),
+) {
     suspend fun getLocations(assets: AssetManager): List<RecommendLocationModel> = coroutineScope {
         loadLocations(assets).map { location ->
             async {
