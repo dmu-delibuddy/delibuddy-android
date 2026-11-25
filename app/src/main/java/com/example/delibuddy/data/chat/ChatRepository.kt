@@ -13,10 +13,10 @@ import kotlinx.coroutines.tasks.await
     * 채팅 메시지 저장 / 실시간 구독
     * 위치 : rooms/{roomId}/messages/{messageId}
 */
-class ChatRepository(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-) {
+class ChatRepository {
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
     // 로그인한 내 uid
     val myUid: String?
         get() = auth.currentUser?.uid

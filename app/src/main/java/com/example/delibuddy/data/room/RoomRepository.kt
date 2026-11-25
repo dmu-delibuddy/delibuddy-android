@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 
-class RoomRepository(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-) {
+class RoomRepository {
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
     private val rooms = db.collection("rooms")
 
     // 로그인한 내 uid. 로그인 안 했으면 NOT_LOGGED_IN 예외

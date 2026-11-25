@@ -14,11 +14,9 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class ImageRepository(
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val storage: FirebaseStorage = FirebaseStorage.getInstance(),
-) {
-    private val images = db.collection("images")
+class ImageRepository {
+    private val images = FirebaseFirestore.getInstance().collection("images")
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 
     suspend fun uploadImage(uri: Uri, contentResolver: ContentResolver): ImageModel =
         withContext(Dispatchers.IO) {
