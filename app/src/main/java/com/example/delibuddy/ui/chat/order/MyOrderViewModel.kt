@@ -13,6 +13,13 @@ import com.example.delibuddy.R
 import com.example.delibuddy.data.image.ImageRepository
 import com.example.delibuddy.data.order.OrderModel
 import com.example.delibuddy.data.order.OrderRepository
+import com.example.delibuddy.data.order.InvalidOrderPriceException
+import com.example.delibuddy.data.order.InvalidOrderRoomIdException
+import com.example.delibuddy.data.order.OrderNotLoggedInException
+import com.example.delibuddy.data.order.InvalidOrderUserIdException
+import com.example.delibuddy.data.order.OrderRoomNotFoundException
+import com.example.delibuddy.data.order.OrderNotParticipantException
+import com.example.delibuddy.data.order.OrderRoomClosedException
 import com.example.delibuddy.data.room.RoomRepository
 import com.example.delibuddy.data.room.RoomStatus
 import com.google.firebase.auth.FirebaseAuth
@@ -45,7 +52,7 @@ class MyOrderViewModel(
     sealed interface LoadState {
         data object Loading : LoadState
         data class Loaded(val order: OrderModel?, val editable: Boolean) : LoadState
-        data object Error : LoadState
+        data class Error(@StringRes val message: Int) : LoadState
     }
 
     // 저장 상태
@@ -74,16 +81,18 @@ class MyOrderViewModel(
         _loadState.value = LoadState.Loading
         loadJob = viewModelScope.launch {
             _loadState.value = try {
+                if (roomId.isBlank()) throw InvalidOrderRoomIdException()
                 val uid = FirebaseAuth.getInstance().currentUser?.uid
-                    ?: throw IllegalStateException("로그인이 필요합니다.")
+                    ?: throw OrderNotLoggedInException()
                 val room = roomRepository.getRoom(roomId)
+                    ?: throw OrderRoomNotFoundException()
                 val order = orderRepository.getOrder(roomId, uid)
-                LoadState.Loaded(order, room?.status == RoomStatus.RECRUITING)
+                LoadState.Loaded(order, room.status == RoomStatus.RECRUITING)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 Log.e(TAG, "내 주문 불러오기 실패 : $roomId", e)
-                LoadState.Error
+                LoadState.Error(e.toOrderError(R.string.profile_order_error))
             }
         }
     }
@@ -122,15 +131,23 @@ class MyOrderViewModel(
                 SaveState.Saved
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: IllegalStateException) {
-                // 모집 마감 / 참여자 아님 (OrderRepository 의 check)
-                Log.w(TAG, "주문 변경 불가 : $roomId", e)
-                SaveState.Failed(R.string.my_order_locked)
             } catch (e: Exception) {
                 Log.e(TAG, "주문 저장 실패 : $roomId", e)
-                SaveState.Failed(R.string.my_order_save_error)
+                SaveState.Failed(e.toOrderError(R.string.my_order_save_error))
             }
         }
+    }
+
+    @StringRes
+    private fun Exception.toOrderError(@StringRes fallback: Int): Int = when (this) {
+        is InvalidOrderRoomIdException -> R.string.my_order_room_invalid
+        is InvalidOrderUserIdException -> R.string.my_order_user_invalid
+        is InvalidOrderPriceException -> R.string.my_order_price_invalid
+        is OrderNotLoggedInException -> R.string.create_error_not_logged_in
+        is OrderRoomNotFoundException -> R.string.my_order_room_not_found
+        is OrderNotParticipantException -> R.string.my_order_not_participant
+        is OrderRoomClosedException -> R.string.my_order_room_closed
+        else -> fallback
     }
 
     // 새 사진이 있으면 올리고 저장. 저장에 실패하면 올린 사진은 지움. 저장한 주문을 돌려줌

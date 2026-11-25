@@ -84,7 +84,7 @@ class MyOrderDialogFragment : DialogFragment() {
                 imageOrderPreview.isEnabled = editable
                 textOrderMessage.text = when (state) {
                     LoadState.Loading -> getString(R.string.my_order_loading)
-                    LoadState.Error -> getString(R.string.profile_order_error)
+                    is LoadState.Error -> getString(state.message)
                     is LoadState.Loaded ->
                         if (editable) "" else getString(R.string.my_order_locked)
                 }
