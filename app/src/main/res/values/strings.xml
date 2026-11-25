@@ -122,6 +122,7 @@
     <string name="create_exit_title">방 만들기를 그만둘까요?</string>
     <string name="create_exit_desc">입력한 내용은 저장되지 않아요.</string>
     <string name="create_exit_confirm">그만두기</string>
+    <string name="recommend_create_room_here">해당 위치로 방 만들기</string>
     <!-- FoodCategory 순서와 같아야 함 : KOR, CHN, JPN, WEST, ETC -->
     <string-array name="create_category_labels">
         <item>한식</item>

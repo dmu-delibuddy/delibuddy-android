@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -50,6 +51,18 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpMap()
+        observeCreateRoom()
+    }
+
+    private fun observeCreateRoom() {
+        viewModel.createRoomArgs.observe(viewLifecycleOwner) { args ->
+            if (args == null) return@observe
+            val navController = findNavController()
+            if (navController.currentDestination?.id == R.id.navigation_recommendation) {
+                navController.navigate(R.id.action_recommendation_to_create_room, args)
+            }
+            viewModel.onCreateRoomNavigated()
+        }
     }
 
     private fun setUpMap() {
@@ -121,7 +134,10 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         sheet.textRecommendBadge.root.displayedChild = if (location.mode == RoomMode.MEAL_BUDDY) 1 else 0
 
         sheet.textLocationName.text = location.name
-        sheet.buttonCreateRoomHere.setOnClickListener { dialog.dismiss() }
+        sheet.buttonCreateRoomHere.setOnClickListener {
+            dialog.dismiss()
+            viewModel.createRoomAt(location)
+        }
         dialog.setContentView(sheet.root)
         dialog.show()
 

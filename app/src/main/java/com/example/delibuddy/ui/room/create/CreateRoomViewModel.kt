@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
@@ -30,8 +31,10 @@ import kotlinx.coroutines.launch
 */
 
 class CreateRoomViewModel(
-    private val roomRepository: RoomRepository = RoomRepository()
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    private val roomRepository = RoomRepository()
 
     // 방이 만들어지면 채팅방에 첫 안내를 남길 때 사용
     private val chatRepository = ChatRepository()
@@ -95,7 +98,7 @@ class CreateRoomViewModel(
     private val _places = MutableLiveData<List<RecommendLocationModel>>(emptyList())
     val places: LiveData<List<RecommendLocationModel>> = _places
 
-    private val _place = MutableLiveData<Place?>(null) // null = 아직 선택 안 함
+    private val _place = MutableLiveData(placeFromArgs(savedStateHandle)) // null = 아직 선택 안 함
     val place: LiveData<Place?> = _place
 
     // 추천 장소 목록 불러오기 (한 번만). 실패하면 직접 입력만 가능
@@ -321,6 +324,20 @@ class CreateRoomViewModel(
         const val DEFAULT_PARTICIPANTS = 3 // 기본값 설정
         const val RESTAURANT_MAX = 30
         private const val TAG = "CreateRoomVM"
+
+        const val ARG_PLACE_NAME = "placeName"
+        const val ARG_PLACE_LAT = "placeLat"
+        const val ARG_PLACE_LON = "placeLon"
+
+        private fun placeFromArgs(handle: SavedStateHandle): Place? {
+            val name = handle.get<String>(ARG_PLACE_NAME)?.takeIf { it.isNotBlank() }
+                ?: return null
+            return Place(
+                name,
+                handle.get<Double>(ARG_PLACE_LAT),
+                handle.get<Double>(ARG_PLACE_LON),
+            )
+        }
     }
 
     // 고른 수령 장소. 직접 입력이면 좌표 없음
