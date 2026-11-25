@@ -294,7 +294,7 @@ class RoomDetailFragment : Fragment() {
                 is LoadState.Loaded -> state.order?.let {
                     binding.order.fill(it, orderViewModel.newPhoto.value != null, this)
                 }
-                LoadState.Error -> toast(getString(R.string.profile_order_error))
+                is LoadState.Error -> toast(getString(state.message))
                 LoadState.Loading -> Unit
             }
         }
