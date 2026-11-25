@@ -17,7 +17,7 @@ import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.DeliveryApp
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
 import com.example.delibuddy.data.room.FoodCostSplitMethod
-import com.example.delibuddy.data.room.RoomException
+import com.example.delibuddy.ui.room.toRoomError
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
 import com.google.firebase.firestore.GeoPoint
@@ -262,12 +262,7 @@ class CreateRoomViewModel(
                 throw e
             } catch (e: Exception) {
                 Log.w("CreateRoom", "createRoom 실패", e)
-                val notLoggedIn = e is RoomException &&
-                        e.reason == RoomException.Reason.NOT_LOGGED_IN
-                SubmitState.Error(
-                    if (notLoggedIn) R.string.create_error_not_logged_in
-                    else R.string.create_error_unknown
-                )
+                SubmitState.Error(e.toRoomError(R.string.create_error_unknown))
             }
         }
     }

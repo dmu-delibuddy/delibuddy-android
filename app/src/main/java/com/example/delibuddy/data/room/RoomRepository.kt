@@ -20,7 +20,7 @@ class RoomRepository(
 
     // 로그인한 내 uid. 로그인 안 했으면 NOT_LOGGED_IN 예외
     private fun requireUid(): String =
-        auth.currentUser?.uid ?: throw RoomException(RoomException.Reason.NOT_LOGGED_IN)
+        auth.currentUser?.uid ?: throw RoomNotLoggedInException()
 
     // -------------------- 방 생성 ---------------------
     suspend fun createRoom(room: RoomModel): String {
@@ -91,14 +91,14 @@ class RoomRepository(
         val ref = rooms.document(roomId)
         db.runTransaction { tx ->
             val room = tx.get(ref).toObject(RoomModel::class.java)
-                ?: throw RoomException(RoomException.Reason.NOT_FOUND)
+                ?: throw RoomNotFoundException()
             when {
                 room.isParticipant(uid) ->
-                    throw RoomException(RoomException.Reason.ALREADY_JOINED)
+                    throw RoomAlreadyJoinedException()
                 room.status != RoomStatus.RECRUITING ->
-                    throw RoomException(RoomException.Reason.CLOSED)
+                    throw RoomClosedException()
                 room.isFull ->
-                    throw RoomException (RoomException.Reason.FULL)
+                    throw RoomFullException()
             }
             tx.update(ref, "participantIds", FieldValue.arrayUnion(uid))
         }.await()
@@ -110,11 +110,11 @@ class RoomRepository(
         val ref = rooms.document(roomId)
         db.runTransaction { tx ->
             val room = tx.get(ref).toObject(RoomModel::class.java)
-                ?: throw RoomException(RoomException.Reason.NOT_FOUND)
+                ?: throw RoomNotFoundException()
             if (!room.isParticipant(uid))
                 return@runTransaction
             if (room.status != RoomStatus.RECRUITING && room.status != RoomStatus.COMPLETED)
-                throw RoomException(RoomException.Reason.CANNOT_LEAVE_IN_PROGRESS)
+                throw RoomCannotLeaveInProgressException()
 
             val remaining = room.participantIds.filterNot { it == uid }
             if (remaining.isEmpty()) {
@@ -132,21 +132,20 @@ class RoomRepository(
         val ref = rooms.document(roomId)
         db.runTransaction { tx ->
             val room = tx.get(ref).toObject(RoomModel::class.java)
-                ?: throw RoomException(RoomException.Reason.NOT_FOUND)
-            if (!room.isHost(uid)) throw RoomException(RoomException.Reason.NOT_HOST)
+                ?: throw RoomNotFoundException()
+            if (!room.isHost(uid)) throw RoomNotHostException()
             if (participantId == uid || !room.isParticipant(participantId)) {
-                throw RoomException(RoomException.Reason.INVALID_STATE)
+                throw RoomInvalidStateException()
             }
             if (room.status != RoomStatus.RECRUITING && room.status != RoomStatus.COMPLETED) {
-                throw RoomException(RoomException.Reason.CANNOT_LEAVE_IN_PROGRESS)
+                throw RoomCannotLeaveInProgressException()
             }
             tx.update(ref, "participantIds", FieldValue.arrayRemove(participantId))
         }.await()
     }
 
     suspend fun advanceStatus (roomId : String, from : RoomStatus) {
-        val to = from.next ?: throw RoomException (
-            RoomException.Reason.INVALID_STATE)
+        val to = from.next ?: throw RoomInvalidStateException()
         changeStatusAsHost(roomId, setOf(from), to)
     }
 
@@ -156,9 +155,9 @@ class RoomRepository(
         val ref = rooms.document(roomId)
         db.runTransaction { tx ->
             val room = tx.get(ref).toObject(RoomModel::class.java)
-                ?: throw RoomException(RoomException.Reason.NOT_FOUND)
-            if (!room.isHost(uid)) throw RoomException(RoomException.Reason.NOT_HOST)
-            if (room.status !in from) throw RoomException(RoomException.Reason.INVALID_STATE)
+                ?: throw RoomNotFoundException()
+            if (!room.isHost(uid)) throw RoomNotHostException()
+            if (room.status !in from) throw RoomInvalidStateException()
             tx.update(ref, "status", to.name)
         }.await()
     }

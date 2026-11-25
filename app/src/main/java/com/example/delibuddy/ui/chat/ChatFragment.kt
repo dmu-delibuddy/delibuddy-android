@@ -131,7 +131,7 @@ class ChatFragment : Fragment() {
             when (state) {
                 LeaveRoomState.Done -> findNavController().navigateUp()
                 is LeaveRoomState.Failed -> {
-                    val message = state.reason?.message ?: getString(R.string.chat_leave_room_error)
+                    val message = getString(state.message)
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     viewModel.clearLeaveRoomFailure()
                 }
@@ -211,7 +211,7 @@ class ChatFragment : Fragment() {
             val userId = result.getString(userKey) ?: return@setFragmentResultListener
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.removeParticipant(userId)?.let { message ->
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(message), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -631,7 +631,7 @@ class ChatFragment : Fragment() {
         viewModel.statusError.observe(viewLifecycleOwner) { msg ->
             msg ?: return@observe
             Toast.makeText(
-                requireContext(), msg, Toast.LENGTH_SHORT
+                requireContext(), getString(msg), Toast.LENGTH_SHORT
             ).show()
             viewModel.clearStatusError()
         }

@@ -1,9 +1,12 @@
 package com.example.delibuddy.ui.chat
 
+import com.example.delibuddy.data.room.RoomNotFoundException
 import com.example.delibuddy.data.chat.SharedAccount
 import com.example.delibuddy.data.user.UserRepository
 
 import android.app.Application
+import androidx.annotation.StringRes
+import com.example.delibuddy.ui.room.toRoomError
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -21,7 +24,6 @@ import com.example.delibuddy.data.image.ImageRepository
 import com.example.delibuddy.data.profile.ProfileModel
 import com.example.delibuddy.data.profile.ProfileRepository
 import com.example.delibuddy.data.profile.ProfileType
-import com.example.delibuddy.data.room.RoomException
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
@@ -67,7 +69,7 @@ class ChatViewModel(
         data object Idle : LeaveRoomState
         data object Loading : LeaveRoomState
         data object Done : LeaveRoomState
-        data class Failed(val reason: RoomException.Reason?) : LeaveRoomState
+        data class Failed(@StringRes val message: Int) : LeaveRoomState
     }
 
     private val _leaveRoomState = MutableLiveData<LeaveRoomState>(LeaveRoomState.Idle)
@@ -77,7 +79,7 @@ class ChatViewModel(
         if (_leaveRoomState.value != LeaveRoomState.Idle) return
         val id = roomId
         if (id == null) {
-            _leaveRoomState.value = LeaveRoomState.Failed(RoomException.Reason.NOT_FOUND)
+            _leaveRoomState.value = LeaveRoomState.Failed(R.string.room_error_not_found)
             return
         }
 
@@ -88,11 +90,9 @@ class ChatViewModel(
                 LeaveRoomState.Done
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: RoomException) {
-                LeaveRoomState.Failed(e.reason)
             } catch (e: Exception) {
                 Log.e(TAG, "방 나가기 실패: $id", e)
-                LeaveRoomState.Failed(null)
+                LeaveRoomState.Failed(e.toRoomError(R.string.chat_leave_room_error))
             }
         }
     }
@@ -159,15 +159,15 @@ class ChatViewModel(
 
     val roomHeader: LiveData<RoomModel?> = sharedRoom.asLiveData()
 
-    private val _statusError = MutableLiveData<String?>()
-    val statusError : LiveData<String?> = _statusError
+    private val _statusError = MutableLiveData<Int?>()
+    val statusError : LiveData<Int?> = _statusError
 
     private var changingStatus = false
 
     fun isHost(room : RoomModel) : Boolean = room.isHost(chatRepository.myUid)
 
     suspend fun loadParticipantOrder(userId: String): Result<OrderModel?> {
-        val id = roomId ?: return Result.failure(RoomException(RoomException.Reason.NOT_FOUND))
+        val id = roomId ?: return Result.failure(RoomNotFoundException())
         return try {
             Result.success(orderRepository.getOrder(id, userId))
         } catch (e: CancellationException) {
@@ -179,18 +179,17 @@ class ChatViewModel(
     }
 
     // 성공하면 별도 안내가 필요 없고 참여자 목록은 실시간 구독으로 갱신된다.
-    suspend fun removeParticipant(userId: String): String? {
-        val id = roomId ?: return RoomException.Reason.NOT_FOUND.message
+    @StringRes
+    suspend fun removeParticipant(userId: String): Int? {
+        val id = roomId ?: return R.string.room_error_not_found
         return try {
             roomRepository.removeParticipant(id, userId)
             null
         } catch (e: CancellationException) {
             throw e
-        } catch (e: RoomException) {
-            e.reason.message
         } catch (e: Exception) {
             Log.w(TAG, "참여자 강제 퇴장 실패", e)
-            getApplication<Application>().getString(R.string.profile_remove_participant_error)
+            e.toRoomError(R.string.profile_remove_participant_error)
         }
     }
 
@@ -209,11 +208,9 @@ class ChatViewModel(
                 }
             } catch (e : CancellationException) {
                 throw e
-            } catch (e : RoomException) {
-                _statusError.value = e.reason.message
             } catch (e : Exception) {
                 Log.e(TAG, "방 상태 변경 실패 : $id", e)
-                _statusError.value = getApplication<Application>().getString(R.string.notice_action_failed)
+                _statusError.value = e.toRoomError(R.string.notice_action_failed)
             } finally {
                 changingStatus = false
             }

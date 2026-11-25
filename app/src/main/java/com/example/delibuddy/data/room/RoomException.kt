@@ -1,15 +1,19 @@
 package com.example.delibuddy.data.room
 
-class RoomException(val reason: Reason) : Exception(reason.message) {
-    enum class Reason(val message: String) {
-        NOT_LOGGED_IN("로그인이 필요합니다."),
-        NOT_FOUND("방을 찾을 수 없습니다."),
-        CLOSED("모집이 마감된 방입니다."),
-        FULL("정원이 가득 찼습니다."),
-        ALREADY_JOINED("이미 참여 중인 방입니다."),
-        NOT_HOST("방장만 할 수 있습니다."),
-        CANNOT_LEAVE_IN_PROGRESS("모집 중이거나 완료된 방에서만 나갈 수 있습니다."),
-        INVALID_STATE("지금 상태에서는 할 수 없습니다."),
-        ACCOUNT_REQUIRED("송금 계좌를 등록해야 참여할 수 있어요. 마이페이지에서 등록해 주세요."),
-    }
-}
+class RoomNotLoggedInException : IllegalStateException("로그인이 필요합니다.")
+
+class RoomNotFoundException : IllegalStateException("방을 찾을 수 없습니다.")
+
+class RoomClosedException : IllegalStateException("모집이 마감된 방입니다.")
+
+class RoomFullException : IllegalStateException("정원이 가득 찼습니다.")
+
+class RoomAlreadyJoinedException : IllegalStateException("이미 참여 중인 방입니다.")
+
+class RoomNotHostException : IllegalStateException("방장만 할 수 있습니다.")
+
+class RoomCannotLeaveInProgressException : IllegalStateException("모집 중이거나 완료된 방에서만 나갈 수 있습니다.")
+
+class RoomInvalidStateException : IllegalStateException("지금 상태에서는 할 수 없습니다.")
+
+class RoomAccountRequiredException : IllegalStateException("송금 계좌를 등록해야 참여할 수 있어요. 마이페이지에서 등록해 주세요.")
