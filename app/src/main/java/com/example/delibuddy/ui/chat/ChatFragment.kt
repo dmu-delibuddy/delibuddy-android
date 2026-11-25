@@ -238,7 +238,7 @@ class ChatFragment : Fragment() {
                 .setTitle(R.string.profile_view_order)
                 .setMessage(message)
                 .setPositiveButton(R.string.profile_dialog_close, null)
-            order?.cartScreenshotUrl?.takeIf { it.isNotBlank() }?.let { url ->
+            order?.imageUrl?.takeIf { it.isNotBlank() }?.let { url ->
                 dialog.setNeutralButton(R.string.profile_order_photo) { _, _ ->
                     FullscreenImageDialogFragment.show(childFragmentManager, url)
                 }

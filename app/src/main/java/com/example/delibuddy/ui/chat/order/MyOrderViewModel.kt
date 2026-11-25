@@ -29,9 +29,9 @@ import kotlinx.coroutines.launch
 
 // 저장 전 입력 검사. 음식값은 0보다 커야 하고, 새 사진도 저장된 사진도 없으면 안 됨
 @StringRes
-internal fun validateOrder(price: Long?, hasNewPhoto: Boolean, currentUrl: String?): Int? = when {
+internal fun validateOrder(price: Long?, hasNewPhoto: Boolean, currentImageId: String?): Int? = when {
     price == null || price <= 0 -> R.string.my_order_price_required
-    !hasNewPhoto && currentUrl.isNullOrBlank() -> R.string.my_order_photo_required
+    !hasNewPhoto && currentImageId.isNullOrBlank() -> R.string.my_order_photo_required
     else -> null
 }
 
@@ -108,7 +108,7 @@ class MyOrderViewModel(
         val loaded = _loadState.value as? LoadState.Loaded
         val current = loaded?.order
         val photo = _newPhoto.value
-        val error = validateOrder(price, photo != null, current?.cartScreenshotUrl)
+        val error = validateOrder(price, photo != null, current?.imageId)
         if (error != null) {
             _saveState.value = SaveState.Failed(error)
             return
@@ -120,7 +120,8 @@ class MyOrderViewModel(
                 val saved = saveOrder(
                     OrderModel(
                         price = price ?: 0L,
-                        cartScreenshotUrl = current?.cartScreenshotUrl,
+                        imageId = current?.imageId,
+                        imageUrl = current?.imageUrl,
                         memo = memo.trim().ifEmpty { null },
                     ),
                     photo,
@@ -161,7 +162,7 @@ class MyOrderViewModel(
             return order
         }
         val image = imageRepository.uploadImage(photo, resolver)
-        val withPhoto = order.copy(cartScreenshotUrl = image.url)
+        val withPhoto = order.copy(imageId = image.id, imageUrl = image.url)
         try {
             orderRepository.saveMyOrder(roomId, withPhoto)
             return withPhoto
