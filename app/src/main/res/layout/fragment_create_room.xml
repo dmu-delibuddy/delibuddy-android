@@ -120,21 +120,21 @@
 
             <include
                 android:id="@+id/step1"
-                layout="@layout/layout_create_step1" />
+                layout="@layout/fragment_create_room_info" />
 
             <include
                 android:id="@+id/step2"
-                layout="@layout/layout_create_step2"
+                layout="@layout/fragment_create_room_food"
                 android:visibility="gone" />
 
             <include
                 android:id="@+id/step3"
-                layout="@layout/layout_create_step3"
+                layout="@layout/fragment_create_room_place"
                 android:visibility="gone" />
 
             <include
                 android:id="@+id/step4"
-                layout="@layout/layout_create_step4"
+                layout="@layout/fragment_create_room_amount"
                 android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
