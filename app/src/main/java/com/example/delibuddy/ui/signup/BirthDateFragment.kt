@@ -32,7 +32,7 @@ class BirthDateFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpListeners()
-        observeBirthDate()
+        updateBirthDate()
     }
 
     private fun setUpListeners() {
@@ -44,11 +44,10 @@ class BirthDateFragment : Fragment() {
         binding.buttonNext.setOnClickListener { navigateToAccountInfo() }
     }
 
-    private fun observeBirthDate() {
-        viewModel.birthDate.observe(viewLifecycleOwner) { date ->
-            binding.buttonBirthDate.text = date ?.replace("-",". ") ?: getString(R.string.signup_birth_date_hint)
-            binding.buttonNext.isEnabled = date != null
-        }
+    private fun updateBirthDate() {
+        val date = viewModel.birthDate
+        binding.buttonBirthDate.text = date?.replace("-", ". ") ?: getString(R.string.signup_birth_date_hint)
+        binding.buttonNext.isEnabled = date != null
     }
 
     private fun navigateToAccountInfo() {
@@ -61,7 +60,7 @@ class BirthDateFragment : Fragment() {
     private fun showDatePicker() {
         if (datePicker?.isShowing == true) return
         val initial = Calendar.getInstance()
-        val selectedDate = viewModel.birthDate.value
+        val selectedDate = viewModel.birthDate
         if (selectedDate == null) {
             initial.add(Calendar.YEAR, -20)
         } else {
@@ -81,6 +80,7 @@ class BirthDateFragment : Fragment() {
                         day
                     )
                 )
+                updateBirthDate()
             },
             initial.get(Calendar.YEAR),
             initial.get(Calendar.MONTH),

@@ -24,6 +24,28 @@ class SignUpViewModel : ViewModel() {
     private val userRepository = UserRepository()
     private val auth = FirebaseAuth.getInstance()
 
+    private data class SignUpRequest(
+        val email: String,
+        val password: String,
+        val passwordConfirm: String,
+    )
+
+    private fun createSignUpRequest() = SignUpRequest(
+        email = "${email.trim()}@dongyang.ac.kr",
+        password = password,
+        passwordConfirm = passwordConfirm,
+    )
+
+    private fun createUserModel(): UserModel = UserModel(
+        univEmail = "${email.trim()}@dongyang.ac.kr",
+        birthDate = birthDate,
+        bankName = bankName?.trim(),
+        account = account?.trim(),
+    )
+
+    private val _isEmailVerified = MutableLiveData(false)
+    val isEmailVerified: LiveData<Boolean> = _isEmailVerified
+
     private val _isSendingVerification = MutableLiveData(false)
     val isSendingVerification: LiveData<Boolean> = _isSendingVerification
 
@@ -39,54 +61,6 @@ class SignUpViewModel : ViewModel() {
     private val _isReadyForBirthDate = MutableLiveData(false)
     val isReadyForBirthDate: LiveData<Boolean> = _isReadyForBirthDate
 
-    fun onBirthDateNavigated() {
-        _isReadyForBirthDate.value = false
-    }
-
-    private val _email = MutableLiveData("")
-    val email: LiveData<String> = _email
-    fun setEmail(value: String) {
-        if (_email.value != value) {
-            _isVerificationEmailSent.value = false
-            _verificationMessage.value = null
-            _isEmailVerified.value = false
-        }
-        _email.value = value
-    }
-
-    private val _password = MutableLiveData("")
-    val password: LiveData<String> = _password
-    fun setPassword(value: String) {
-        _password.value = value
-    }
-
-    private val _passwordConfirm = MutableLiveData("")
-    val passwordConfirm: LiveData<String> = _passwordConfirm
-    fun setPasswordConfirm(value: String) {
-        _passwordConfirm.value = value
-    }
-
-    private val _isEmailVerified = MutableLiveData(false)
-    val isEmailVerified: LiveData<Boolean> = _isEmailVerified
-
-    private val _birthDate = MutableLiveData<String?>()
-    val birthDate: LiveData<String?> = _birthDate
-    fun setBirthDate(value: String?) {
-        _birthDate.value = value
-    }
-
-    private val _bankName = MutableLiveData("")
-    val bankName: LiveData<String> = _bankName
-    fun setBankName(value: String) {
-        _bankName.value = value
-    }
-
-    private val _account = MutableLiveData("")
-    val account: LiveData<String> = _account
-    fun setAccount(value: String) {
-        _account.value = value
-    }
-
     private val _isSavingProfile = MutableLiveData(false)
     val isSavingProfile: LiveData<Boolean> = _isSavingProfile
 
@@ -96,6 +70,10 @@ class SignUpViewModel : ViewModel() {
     private val _profileError = MutableLiveData<Int?>()
     val profileError: LiveData<Int?> = _profileError
 
+    fun onBirthDateNavigated() {
+        _isReadyForBirthDate.value = false
+    }
+
     fun onProfileErrorShown() {
         _profileError.value = null
     }
@@ -104,18 +82,65 @@ class SignUpViewModel : ViewModel() {
         _verificationMessage.value = null
     }
 
-    fun finishRegistration(skipAccount: Boolean) {
+    private var _email = ""
+    val email: String get() = _email
+
+    private var _password = ""
+    val password: String get() = _password
+
+    private var _passwordConfirm = ""
+    val passwordConfirm: String get() = _passwordConfirm
+
+    private var _birthDate: String? = null
+    val birthDate: String? get() = _birthDate
+
+    private var _bankName: String? = null
+    val bankName: String? get() = _bankName
+
+    private var _account: String? = null
+    val account: String? get() = _account
+
+    fun setEmail(value: String) {
+        if (_email != value) {
+            _isVerificationEmailSent.value = false
+            _verificationMessage.value = null
+            _isEmailVerified.value = false
+        }
+        _email = value
+    }
+
+    fun setPassword(value: String) {
+        _password = value
+    }
+
+    fun setPasswordConfirm(value: String) {
+        _passwordConfirm = value
+    }
+
+    fun setBankName(value: String?) {
+        _bankName = value
+    }
+
+    fun setBirthDate(value: String?) {
+        _birthDate = value
+    }
+
+    fun setAccount(value: String?) {
+        _account = value
+    }
+
+    fun finishRegistration() {
         if (_isSavingProfile.value == true || _isRegistrationComplete.value == true) return
 
-        val profile = createUserModel(skipAccount)
-        val validationError = validateProfile(profile, skipAccount)
+        val profile = createUserModel()
+        val validationError = validateProfile(profile)
         _profileError.value = validationError
         if (validationError != null) return
 
-        saveProfile(profile, skipAccount)
+        saveProfile(profile)
     }
 
-    private fun saveProfile(profile: UserModel, skipAccount: Boolean) {
+    private fun saveProfile(profile: UserModel) {
         _isSavingProfile.value = true
         viewModelScope.launch {
             try {
@@ -124,10 +149,6 @@ class SignUpViewModel : ViewModel() {
                     user.uid,
                     profile.copy(univEmail = user.email ?: profile.univEmail),
                 )
-                if (skipAccount) {
-                    _bankName.value = ""
-                    _account.value = ""
-                }
                 _isRegistrationComplete.value = true
             } catch (e: CancellationException) {
                 throw e
@@ -139,24 +160,17 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    private fun createUserModel(skipAccount: Boolean): UserModel = UserModel(
-        univEmail = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
-        birthDate = birthDate.value,
-        bankName = bankName.value.orEmpty().trim().takeUnless { skipAccount },
-        account = account.value.orEmpty().trim().takeUnless { skipAccount },
-    )
+    private fun validateProfile(profile: UserModel): Int? = when {
+        profile.bankName == null && profile.account == null -> null
 
-    private fun validateProfile(profile: UserModel, skipAccount: Boolean): Int? = when {
-        !skipAccount && (profile.bankName.isNullOrBlank() || profile.account.isNullOrBlank()) ->
+        profile.bankName.isNullOrBlank() || profile.account.isNullOrBlank() ->
             R.string.signup_account_required
 
-        !skipAccount && profile.account.orEmpty().any { it !in '0'..'9' } ->
+        profile.account.orEmpty().any { it !in '0'..'9' } ->
             R.string.signup_account_invalid
 
         else -> null
     }
-
-
 
 
     fun confirmEmailVerification() {
@@ -188,9 +202,9 @@ class SignUpViewModel : ViewModel() {
     }
 
     fun isEmailValid(): Boolean {
-        val emailId = email.value.orEmpty().trim()
+        val emailId = email.trim()
         return emailId.isNotBlank() && '@' !in emailId &&
-            android.util.Patterns.EMAIL_ADDRESS.matcher("$emailId@dongyang.ac.kr").matches()
+                android.util.Patterns.EMAIL_ADDRESS.matcher("$emailId@dongyang.ac.kr").matches()
     }
 
     fun sendVerificationEmail() {
@@ -229,12 +243,6 @@ class SignUpViewModel : ViewModel() {
     private fun isVerificationBusy(): Boolean =
         _isSendingVerification.value == true || _isConfirmingVerification.value == true
 
-    private fun createSignUpRequest() = SignUpRequest(
-        email = "${email.value.orEmpty().trim()}@dongyang.ac.kr",
-        password = password.value.orEmpty(),
-        passwordConfirm = passwordConfirm.value.orEmpty(),
-    )
-
     private fun validateSignUp(request: SignUpRequest): Int? = when {
         !isEmailValid() -> R.string.signup_invalid_email
         request.password.length < 6 -> R.string.signup_password_too_short
@@ -267,10 +275,4 @@ class SignUpViewModel : ViewModel() {
 
         else -> R.string.signup_completion_failed
     }
-
-    private data class SignUpRequest(
-        val email: String,
-        val password: String,
-        val passwordConfirm: String,
-    )
 }

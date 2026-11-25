@@ -92,8 +92,8 @@ class PasswordFragment : Fragment() {
     }
 
     private fun setUpPasswordInputs() {
-        binding.editPassword.setText(viewModel.password.value)
-        binding.editPasswordConfirm.setText(viewModel.passwordConfirm.value)
+        binding.editPassword.setText(viewModel.password)
+        binding.editPasswordConfirm.setText(viewModel.passwordConfirm)
 
         binding.editPassword.doAfterTextChanged { text ->
             viewModel.setPassword(text?.toString().orEmpty())

@@ -42,7 +42,7 @@ class AccountInfoFragment : Fragment() {
         binding.spinnerBank.adapter = ArrayAdapter(
             requireContext(), android.R.layout.simple_spinner_dropdown_item, banks,
         )
-        val selectedBank = banks.indexOf(viewModel.bankName.value)
+        val selectedBank = banks.indexOf(viewModel.bankName)
         if (selectedBank >= 0) binding.spinnerBank.setSelection(selectedBank)
         binding.spinnerBank.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -58,14 +58,22 @@ class AccountInfoFragment : Fragment() {
                 viewModel.setBankName("")
             }
         }
-        binding.editAccount.setText(viewModel.account.value)
+        binding.editAccount.setText(viewModel.account)
         binding.editAccount.doAfterTextChanged { viewModel.setAccount(it?.toString().orEmpty()) }
     }
 
     private fun setUpListeners() {
         binding.buttonPrevious.setOnClickListener { findNavController().popBackStack() }
-        binding.buttonSkip.setOnClickListener { viewModel.finishRegistration(skipAccount = true) }
-        binding.buttonFinish.setOnClickListener { viewModel.finishRegistration(skipAccount = false) }
+        binding.buttonSkip.setOnClickListener {
+            viewModel.setBankName(null)
+            viewModel.setAccount(null)
+            viewModel.finishRegistration()
+        }
+        binding.buttonFinish.setOnClickListener {
+            viewModel.setBankName(binding.spinnerBank.selectedItem as? String ?: "")
+            viewModel.setAccount(binding.editAccount.text?.toString().orEmpty())
+            viewModel.finishRegistration()
+        }
     }
 
     private fun observeRegistrationState() {

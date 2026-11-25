@@ -30,8 +30,8 @@ class EmailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        restoreEmail()
         setUpListeners()
-        observeEmail()
     }
 
     private fun setUpListeners() {
@@ -51,13 +51,10 @@ class EmailFragment : Fragment() {
         }
     }
 
-    private fun observeEmail() {
-        viewModel.email.observe(viewLifecycleOwner) { email ->
-            if (binding.editEmail.text?.toString() != email) {
-                binding.editEmail.setText(email)
-                binding.editEmail.setSelection(email.length)
-            }
-        }
+    private fun restoreEmail() {
+        val email = viewModel.email
+        binding.editEmail.setText(email)
+        binding.editEmail.setSelection(email.length)
     }
 
     override fun onDestroyView() {
