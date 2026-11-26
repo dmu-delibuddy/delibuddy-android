@@ -23,4 +23,24 @@
     <string name="my_order_saved">주문을 저장했어요</string>
     <string name="my_order_save_error">주문을 저장하지 못했어요. 다시 시도해 주세요</string>
     <string name="my_order_memo_count">%1$d/100</string>
+    <string name="order_sheet_title">주문확인서</string>
+    <string name="order_sheet_count">%1$d/%2$d</string>
+    <string name="order_sheet_summary">참여 %1$d명 · 주문 제출 %2$d/%1$d명</string>
+    <string name="order_sheet_food_total">음식 합계</string>
+    <string name="order_sheet_delivery_fee">배달비</string>
+    <string name="order_sheet_total_payment">총 결제 금액</string>
+    <string name="order_sheet_copy">목록 복사</string>
+    <string name="order_sheet_confirm">확인</string>
+    <string name="order_sheet_load_error">주문 정보를 불러오지 못했어요</string>
+    <string name="order_sheet_no_order">아직 주문을 올리지 않았어요</string>
+    <string name="order_sheet_cart_photo">장바구니 사진</string>
+    <string name="order_sheet_food_share">음식값</string>
+    <string name="order_sheet_delivery_share">배달비</string>
+    <string name="order_sheet_amount">낼 금액</string>
+    <string name="order_sheet_custom">직접 정산</string>
+    <string name="order_sheet_copied">주문 목록을 복사했어요.</string>
+    <string name="order_sheet_copy_title">[주문확인서] %s</string>
+    <string name="order_sheet_copy_row">- %1$s : %2$s</string>
+    <string name="order_sheet_copy_row_host">- %1$s(방장) : %2$s</string>
+    <string name="order_sheet_copy_total">총 결제 금액 : %s</string>
 </resources>

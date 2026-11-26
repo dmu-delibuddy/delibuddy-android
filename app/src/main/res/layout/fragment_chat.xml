@@ -7,7 +7,6 @@
     android:background="@drawable/app_bg"
     tools:context=".ui.chat.ChatFragment">
 
-    <!-- 상단 방 제목 -->
     <include
         android:id="@+id/chat_header"
         layout="@layout/layout_chat_header"
@@ -17,7 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 방 상태 공지 (접기/펼치기) -->
     <include
         android:id="@+id/chat_notice"
         layout="@layout/layout_chat_notice"
@@ -32,7 +30,6 @@
         app:layout_constraintTop_toBottomOf=
             "@id/chat_header" />
 
-    <!-- 메시지 목록 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_messages"
         android:layout_width="0dp"
@@ -46,7 +43,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chat_notice" />
 
-    <!-- 입력창 + 전송 버튼 -->
+    <LinearLayout
+        android:id="@+id/button_order_sheet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="12dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="4dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chat_notice">
+
+        <ImageView
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/receipt_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/order_sheet_title"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/layout_input"
         android:layout_width="0dp"
@@ -63,7 +88,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- 사진 보내기 -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_image"
             android:layout_width="wrap_content"
@@ -124,7 +148,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 방 없음 / 불러오기 실패 안내 -->
     <TextView
         android:id="@+id/text_message"
         android:layout_width="wrap_content"
