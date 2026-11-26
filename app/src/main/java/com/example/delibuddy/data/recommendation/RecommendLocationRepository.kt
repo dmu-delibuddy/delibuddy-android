@@ -15,7 +15,7 @@ import org.json.JSONArray
 class RecommendLocationRepository {
     private val imageRepository: ImageRepository = ImageRepository()
 
-    suspend fun getLocations(assets: AssetManager): List<RecommendLocationModel> = coroutineScope {
+    suspend fun getLocations(assets: AssetManager): List<RecommendLocationModel> = withContext(Dispatchers.IO) {
         loadLocations(assets).map { location ->
             async {
                 if (location.imagePath.isBlank()) return@async location

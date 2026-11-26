@@ -10,9 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.data.recommendation.RecommendLocationModel
 import com.example.delibuddy.data.recommendation.RecommendLocationRepository
 import com.example.delibuddy.ui.room.create.CreateRoomViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RecommendationViewModel(
     private val repository: RecommendLocationRepository = RecommendLocationRepository(),
@@ -26,9 +24,8 @@ class RecommendationViewModel(
 
     fun loadLocations(context: Context) {
         viewModelScope.launch {
-            _locations.value = withContext(Dispatchers.IO) {
+            _locations.value =
                 repository.getLocations(context.assets)
-            }
         }
     }
 
