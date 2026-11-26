@@ -76,7 +76,7 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         viewModel.locations.observe(viewLifecycleOwner) { locations ->
             displayMarkers(locations)
         }
-        viewModel.loadLocations(requireContext())
+        viewModel.loadLocations()
     }
 
     private fun displayMarkers(locations: List<RecommendLocationModel>) {

@@ -1,13 +1,11 @@
 package com.example.delibuddy.ui.room.create
 
-import android.app.Application
-import android.content.res.AssetManager
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
 import com.example.delibuddy.data.chat.ChatRepository
@@ -27,9 +25,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 class CreateRoomViewModel(
-    application: Application,
     savedStateHandle: SavedStateHandle,
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val roomRepository = RoomRepository()
     private val chatRepository = ChatRepository()
@@ -92,7 +89,7 @@ class CreateRoomViewModel(
         if (placeId.isNullOrBlank()) return
         viewModelScope.launch {
             try {
-                val location = placeRepository.getPlace(getApplication<Application>().assets, placeId)
+                val location = placeRepository.getPlace(placeId)
                 if (location != null && _place.value == null) selectPlace(location)
             } catch (e: CancellationException) {
                 throw e
@@ -102,11 +99,11 @@ class CreateRoomViewModel(
         }
     }
 
-    fun loadPlaces(assets: AssetManager) {
+    fun loadPlaces() {
         if (_places.value.orEmpty().isNotEmpty()) return
         viewModelScope.launch {
             try {
-                _places.value = placeRepository.getPlaces(assets)
+                _places.value = placeRepository.getPlaces()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

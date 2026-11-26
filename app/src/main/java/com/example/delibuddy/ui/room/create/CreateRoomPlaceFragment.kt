@@ -52,7 +52,7 @@ class CreateRoomPlaceFragment : Fragment() {
     }
 
     private fun setUpPlaceSelect() {
-        viewModel.loadPlaces(requireContext().assets)
+        viewModel.loadPlaces()
         binding.textPlace.setOnClickListener { showPlacePicker() }
     }
 
