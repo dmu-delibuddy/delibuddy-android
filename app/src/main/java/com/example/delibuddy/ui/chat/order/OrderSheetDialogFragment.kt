@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.DialogOrderSheetBinding
 import com.example.delibuddy.ui.common.FullscreenImageDialogFragment
+import com.example.delibuddy.ui.common.GlobalAlertDialog
 import com.example.delibuddy.ui.room.deliveryAppLabel
 
 class OrderSheetDialogFragment : DialogFragment() {
@@ -63,11 +63,24 @@ class OrderSheetDialogFragment : DialogFragment() {
 
     private fun observeSheet() {
         viewModel.sheet.observe(viewLifecycleOwner) { sheet ->
-            binding.textError.isVisible = sheet == null
-            binding.layoutSummary.isVisible = sheet != null
-            adapter.submitList(sheet?.rows.orEmpty())
-            if (sheet != null) renderSummary(sheet)
+            if (sheet == null) {
+                closeWithError()
+                return@observe
+            }
+            adapter.submitList(sheet.rows)
+            renderSummary(sheet)
         }
+    }
+
+    private fun closeWithError() = binding.root.post {
+        if (!isAdded) return@post
+        val manager = parentFragmentManager
+        dismissAllowingStateLoss()
+        GlobalAlertDialog.show(
+            fragmentManager = manager,
+            type = GlobalAlertDialog.Type.INFO,
+            title = getString(R.string.order_sheet_load_error),
+        )
     }
 
     private fun renderSummary(sheet: OrderSheet) = with(binding) {
