@@ -5,35 +5,6 @@ import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.GeoPoint
 
-// 방 상태 : 모집 중 -> 주문 확정 -> 주문 완료 -> 음식 수령 완료 -> 완료
-enum class RoomStatus {
-    RECRUITING, ORDER_CONFIRMED, ORDERED, RECEIVED, COMPLETED;
-
-    val next : RoomStatus?
-        get() = entries.getOrNull(ordinal + 1)
-}
-
-// 방 모드 : 픽업 / 밥친구
-enum class RoomMode { PICKUP_ONLY, MEAL_BUDDY }
-
-// 음식 카테고리 : 한식 / 중식 / 일식 / 양식 / 기타
-enum class FoodCategory { KOR, CHN, JPN, WEST, ETC }
-
-// 음식값 정산 방법 : 방장 부담 / 1/N / 개인 메누 / 직접 입력
-enum class FoodCostSplitMethod { HOST_PAYS, EQUAL_SPLIT, PROPORTIONAL_SPLIT, CUSTOM }
-
-// 배달비 정산 방법 : 방장 부담 / 1/N / 직접 입력
-enum class DeliveryFeeSplitMethod { HOST_PAYS, EQUAL_SPLIT, CUSTOM }
-
-// 사용할 배달 앱 : 배달의 민족 / 쿠팡이츠 / 요기요 / 그 외(직접 입력)
-enum class DeliveryApp { BAEMIN, COUPANG_EATS, YOGIYO, OTHER }
-
-/*
-    * Firestore rooms / {roodId} 문서
-    * toObject() 로 변환 위해 인자 없는 생성자가 필요 -> 모든 값에 기본값을 둔다.
-    * enum : Firestore 에 이름 문자열로 저장됨.
-*/
-
 data class RoomModel(
     @DocumentId val id: String = "",
     val title: String = "",
@@ -43,10 +14,10 @@ data class RoomModel(
     val mode: RoomMode = RoomMode.PICKUP_ONLY,
     val category: FoodCategory = FoodCategory.ETC,
     val restaurant: String = "",
-    val deliveryApp: DeliveryApp = DeliveryApp.OTHER,  // 예전 방은 OTHER 로 읽힘
-    val deliveryAppName: String = "",                  // OTHER 일 때 직접 입력한 앱 이름
-    val location: GeoPoint? = null,                    // 수령 장소 좌표 (직접 입력이면 null)
-    val locationName: String = "",                     // 수령 장소 이름 (예전 방은 빈 값)
+    val deliveryApp: DeliveryApp = DeliveryApp.OTHER,
+    val deliveryAppName: String = "",
+    val location: GeoPoint? = null,
+    val locationName: String = "",
     val minOrderAmount: Int = 0,
     val estimatedDeliveryFee: Int = 0,
     val foodCostSplitMethod: FoodCostSplitMethod = FoodCostSplitMethod.EQUAL_SPLIT,
@@ -54,12 +25,9 @@ data class RoomModel(
     val status: RoomStatus = RoomStatus.RECRUITING,
     val createdAt: Timestamp? = null,
 ) {
-    // 화면에서만 쓰는 값. Firestore 에 저장 X
-
     @get:Exclude
     val currentCount: Int get() = participantIds.size
 
-    // 1인당 예상 배달비 (현재 인원 기준, 최소 1명)
     @get:Exclude
     val deliveryFeePerPerson: Int get() = estimatedDeliveryFee / maxOf(currentCount, 1)
 
@@ -67,14 +35,11 @@ data class RoomModel(
     val isFull : Boolean
         get() = currentCount >= maxParticipants
 
-    // 지금 새로 참여할 수 있는지
     @get:Exclude
     val isJoinable: Boolean
         get() = status == RoomStatus.RECRUITING && !isFull
 
-    // 이 uid 가 방장인지
     fun isHost(uid: String?): Boolean = uid != null && uid == hostId
 
-    // 이 uid 가 참여자인지 (방장 포함)
     fun isParticipant(uid: String?): Boolean = uid != null && uid in participantIds
 }
