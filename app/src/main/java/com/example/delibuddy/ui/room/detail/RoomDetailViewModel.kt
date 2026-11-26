@@ -20,8 +20,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.delibuddy.data.chat.ChatRepository
-import com.example.delibuddy.data.chat.SystemMessage
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
 import com.example.delibuddy.data.user.UserRepository
@@ -88,9 +86,6 @@ class RoomDetailViewModel(
     val actionState: LiveData<ActionState> =
         _actionState
 
-    // 참여 성공 시 채팅방에 시스템 안내를 남긴다.
-    private val chatRepository = ChatRepository()
-
     // 버튼 동작 실행 -> 성공 | 실패 상태 전달
     fun joinRoom(price: Long, photo: Uri, memo: String?, resolver: ContentResolver) {
         require(price > 0)
@@ -101,7 +96,6 @@ class RoomDetailViewModel(
             _actionState.value = try {
                 requireAccount()
                 joinWithOrder(price, photo, memo, resolver)
-                notifyChat()
                 ActionState.Done
             } catch (e: CancellationException) {
                 throw e
@@ -164,17 +158,6 @@ class RoomDetailViewModel(
         val user = userRepository.getById(uid)
         if (user?.bankName.isNullOrBlank() || user?.account.isNullOrBlank()) {
             throw RoomAccountRequiredException()
-        }
-    }
-
-    // 채팅방에 시스템 안내 남기기. 실패해도 본 동작은 계속
-    private suspend fun notifyChat() {
-        try {
-            chatRepository.sendSystem(roomId, SystemMessage.JOINED)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Log.w(TAG, "참여 시스템 메시지 실패", e)
         }
     }
 

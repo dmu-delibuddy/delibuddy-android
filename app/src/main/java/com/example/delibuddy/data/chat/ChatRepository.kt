@@ -70,16 +70,6 @@ class ChatRepository {
         ).await()
     }
 
-    suspend fun sendSystem(roomId: String, content: String) {
-        messages(roomId).document().set(
-            ChatModel(
-                senderId = null,
-                type = MessageType.SYSTEM,
-                content = content,
-            )
-        ).await()
-    }
-
     companion object {
         private const val MESSAGE_LIMIT = 200L
     }

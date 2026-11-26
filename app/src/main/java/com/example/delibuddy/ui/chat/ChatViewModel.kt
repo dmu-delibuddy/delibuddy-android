@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import com.example.delibuddy.R
-import com.example.delibuddy.data.chat.SystemMessage
 
 /*
     * 채팅방 화면
@@ -181,10 +180,10 @@ class ChatViewModel(
 
     // 성공하면 별도 안내가 필요 없고 참여자 목록은 실시간 구독으로 갱신된다.
     @StringRes
-    suspend fun removeParticipant(userId: String): Int? {
+    suspend fun kickParticipant(userId: String): Int? {
         val id = roomId ?: return R.string.room_error_not_found
         return try {
-            roomRepository.removeParticipant(id, userId)
+            roomRepository.kickParticipant(id, userId)
             null
         } catch (e: CancellationException) {
             throw e
@@ -196,16 +195,13 @@ class ChatViewModel(
     fun advanceStatus() {
         val id = roomId ?: return
         val status = roomHeader.value?.status ?: return
-        val next = status.next ?: return
+        if (status.next == null) return
         if (changingStatus)
             return
         changingStatus = true
         viewModelScope.launch {
             try {
                 roomRepository.advanceStatus(id, status)
-                SystemMessage.forStatus(next)?.let {
-                    chatRepository.sendSystem(id, it)
-                }
             } catch (e : CancellationException) {
                 throw e
             } catch (e : Exception) {
