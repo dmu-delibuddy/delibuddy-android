@@ -6,6 +6,11 @@ import com.google.firebase.auth.FirebaseUser
 import com.example.delibuddy.data.profile.ProfileRepository
 import com.example.delibuddy.data.user.UserModel
 import com.example.delibuddy.data.user.UserRepository
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
 class AuthRepository {
@@ -13,19 +18,19 @@ class AuthRepository {
     private val userRepository = UserRepository()
     private val profileRepository = ProfileRepository()
 
-    suspend fun isLoggedIn(): Boolean {
-        val user = auth.currentUser ?: return false
+    suspend fun isLoggedIn(): Boolean = withErrorHandling {
+        val user = auth.currentUser ?: return@withErrorHandling false
         user.reload().await()
-        if (!user.isEmailVerified) return false
+        if (!user.isEmailVerified) return@withErrorHandling false
 
         user.getIdToken(true).await()
         val hasUserDocument = userRepository.exists(user.uid)
 
-        return hasUserDocument && auth.currentUser?.uid == user.uid
+        hasUserDocument && auth.currentUser?.uid == user.uid
     }
 
-    suspend fun signIn(email: String, password: String): AuthResult {
-        return auth.signInWithEmailAndPassword(email, password).await()
+    suspend fun signIn(email: String, password: String): AuthResult = withErrorHandling {
+        auth.signInWithEmailAndPassword(email, password).await()
     }
 
     suspend fun createFirebaseUser(email: String, password: String): FirebaseUser {
@@ -52,5 +57,25 @@ class AuthRepository {
         if (!user.isEmailVerified) throw EmailNotVerifiedException()
         user.getIdToken(true).await()
         return user
+    }
+
+    private suspend fun <T> withErrorHandling(action: suspend () -> T): T {
+        return try {
+            action()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            throw when (e) {
+                is FirebaseAuthInvalidCredentialsException -> AuthInvalidCredentialsException()
+                is FirebaseAuthInvalidUserException -> AuthInvalidUserException()
+                is FirebaseNetworkException -> AuthNetworkException()
+                is FirebaseFirestoreException -> when (e.code) {
+                    FirebaseFirestoreException.Code.UNAVAILABLE,
+                    FirebaseFirestoreException.Code.DEADLINE_EXCEEDED -> AuthNetworkException()
+                    else -> AuthUnknownException()
+                }
+                else -> AuthUnknownException()
+            }
+        }
     }
 }

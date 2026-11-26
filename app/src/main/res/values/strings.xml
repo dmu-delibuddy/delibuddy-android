@@ -55,8 +55,11 @@
     <string name="auth_signin">로그인</string>
     <string name="signin_loading">로그인 중이에요...</string>
     <string name="signin_password_required">비밀번호를 입력해 주세요.</string>
-    <string name="signin_signup_incomplete">이메일 인증과 회원가입을 먼저 완료해 주세요.</string>
-    <string name="signin_failed">로그인하지 못했습니다. 이메일, 비밀번호와 네트워크 상태를 확인하고 다시 시도해 주세요.</string>
+    <string name="signin_signup_incomplete">회원가입과 이메일 인증을 먼저 완료해주세요</string>
+    <string name="signin_invalid_credentials">이메일 또는 비밀번호를 확인해 주세요.</string>
+    <string name="signin_invalid_user">계정이 없거나 사용할 수 없는 상태예요. 가입 여부를 확인해 주세요.</string>
+    <string name="signin_network_error">서버에 연결하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.</string>
+    <string name="signin_failed">로그인하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
     <string name="auth_existing_account">이미 계정이 있다면 로그인해 주세요</string>
     <string name="home_logo">DELI-BUDDY</string>
     <string name="mode_pickup">픽업만</string>
