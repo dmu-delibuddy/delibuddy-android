@@ -1,6 +1,5 @@
 package com.example.delibuddy.data.recommendation
 
-import android.util.Log
 import com.example.delibuddy.data.image.ImageRepository
 import com.example.delibuddy.data.room.RoomMode
 import com.google.firebase.FirebaseApp
@@ -25,7 +24,6 @@ class RecommendLocationRepository {
                 try {
                     location.copy(imageUrl = imageRepository.getImageUrl(location.imagePath))
                 } catch (error: StorageException) {
-                    Log.w("RecommendLocationRepository", "Could not resolve ${location.imagePath}", error)
                     location
                 }
             }

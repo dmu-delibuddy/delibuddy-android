@@ -13,7 +13,6 @@ import com.example.delibuddy.data.order.OrderRepository
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -59,7 +58,6 @@ class RoomDetailViewModel(
             room?.let { DetailState.Loaded(it) } ?: DetailState.NotFound
         }
         .catch { e ->
-            Log.e(TAG, "observeRoom 실패: $roomId", e)
             emit(DetailState.Error(e.toRoomError(R.string.room_detail_load_error)))
         }
         .asLiveData()
@@ -100,7 +98,6 @@ class RoomDetailViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "참여 실패 : $roomId", e)
                 ActionState.Failed(
                     message = e.toRoomError(R.string.room_detail_action_error),
                     accountRequired = e is RoomAccountRequiredException,
@@ -172,6 +169,5 @@ class RoomDetailViewModel(
 
     companion object {
         const val ARG_ROOM_ID = "roomId"
-        private const val TAG = "RoomDetailVM"
     }
 }

@@ -1,7 +1,6 @@
 package com.example.delibuddy.ui.room.list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -106,9 +105,5 @@ class RoomListFragment : Fragment() {
         super.onDestroyView()
         binding.recyclerRooms.adapter = null   // 어댑터가 사라진 화면을 붙잡지 않게
         _binding = null
-    }
-
-    companion object {
-        private const val TAG = "RoomListFragment"
     }
 }

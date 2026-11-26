@@ -2,7 +2,6 @@ package com.example.delibuddy.ui.mypage.profile
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -85,7 +84,6 @@ class ProfileViewModel(
             }
             .onStart { emit(ProfileState.Loading) }
             .catch { e ->
-                Log.e(TAG, "프로필 구독 실패: $type", e)
                 val message = e.toProfileError(R.string.profile_load_error)
                 _message.value = message
                 emit(ProfileState.Error(message))
@@ -110,7 +108,6 @@ class ProfileViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "생년월일 불러오기 실패", e)
                 _message.value = R.string.profile_load_error
             }
         }
@@ -189,7 +186,6 @@ class ProfileViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "프로필 저장 실패", e)
                 _message.value = e.toProfileError(R.string.mypage_save_error)
             } finally {
                 _saving.value = false
@@ -211,8 +207,6 @@ class ProfileViewModel(
     }
 
     companion object {
-        private const val TAG = "ProfileVM"
-
         // 저장 형식(yyyy-MM-dd) -> 화면 표시 형식(yyyy. MM. dd)
         fun formatBirth(birthDate: String): String =
             birthDate.replace("-", ". ")

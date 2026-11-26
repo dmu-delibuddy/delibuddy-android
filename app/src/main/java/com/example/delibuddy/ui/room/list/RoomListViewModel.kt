@@ -1,6 +1,5 @@
 package com.example.delibuddy.ui.room.list
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -11,7 +10,6 @@ import com.example.delibuddy.data.room.RoomRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
 
 class RoomListViewModel(
     private val roomRepository: RoomRepository = RoomRepository()
@@ -24,8 +22,7 @@ class RoomListViewModel(
 
     // Firebase에서 받은 모집 중인 방
     private val recruitingRooms = roomRepository.observeRooms()
-        .onEach { Log.d(TAG, "rooms=${it.size}개") }
-        .catch { e -> Log.e(TAG, "observeRooms 실패", e) }
+        .catch { }
 
     // 화면에 보여줄 목록
     val rooms: LiveData<List<RoomModel>> =
@@ -54,9 +51,5 @@ class RoomListViewModel(
     // 검색어 변경
     fun setQuery(value: String) {
         query.value = value
-    }
-
-    companion object {
-        private const val TAG = "RoomListVM" // Logcat
     }
 }

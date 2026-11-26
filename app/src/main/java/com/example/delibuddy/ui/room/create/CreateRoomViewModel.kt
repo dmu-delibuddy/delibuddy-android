@@ -1,6 +1,5 @@
 package com.example.delibuddy.ui.room.create
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -91,7 +90,6 @@ class CreateRoomViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.w(TAG, "지도 장소 불러오기 실패: $placeId", e)
             }
         }
     }
@@ -104,7 +102,6 @@ class CreateRoomViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.w(TAG, "추천 장소 불러오기 실패", e)
             }
         }
     }
@@ -222,7 +219,6 @@ class CreateRoomViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.w("CreateRoom", "createRoom 실패", e)
                 SubmitState.Error(e.toRoomError(R.string.room_create_error_unknown))
             }
         }
@@ -265,7 +261,6 @@ class CreateRoomViewModel(
         const val MAX_PARTICIPANTS = 6
         const val DEFAULT_PARTICIPANTS = 3
         const val RESTAURANT_MAX = 30
-        private const val TAG = "CreateRoomVM"
 
         const val ARG_PLACE_ID = "placeId"
     }
