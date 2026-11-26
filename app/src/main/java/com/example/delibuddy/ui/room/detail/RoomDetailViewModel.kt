@@ -134,7 +134,7 @@ class RoomDetailViewModel(
                 try {
                     OrderRepository().saveMyOrder(
                         roomId,
-                        OrderModel(price = price, cartScreenshotUrl = image.url, memo = memo),
+                        OrderModel(price = price, imageId = image.id, memo = memo),
                     )
                 } catch (orderError: Exception) {
                     try {

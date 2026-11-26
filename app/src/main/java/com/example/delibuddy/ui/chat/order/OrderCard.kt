@@ -25,7 +25,7 @@ fun LayoutRoomDetailOrderBinding.fill(order: OrderModel, hasNewPhoto: Boolean, f
     val price = orderPriceAmount.editText
     if (price.text.isEmpty()) price.setText(order.price.toString())
     if (inputOrderMemo.text.isEmpty()) inputOrderMemo.setText(order.memo.orEmpty())
-    val url = order.cartScreenshotUrl
+    val url = order.imageUrl
     if (!hasNewPhoto && !url.isNullOrBlank()) {
         Glide.with(fragment).load(url).into(imageOrderPreview)
     }

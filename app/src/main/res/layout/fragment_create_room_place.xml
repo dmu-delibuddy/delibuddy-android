@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@drawable/app_bg"
+    tools:context=".ui.room.create.CreateRoomPlaceFragment">
+
+    <include
+        android:id="@+id/header"
+        layout="@layout/layout_create_room_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/create_step3_heading"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:alpha="0.7"
+                android:text="@string/create_step3_sub"
+                android:textColor="@color/black"
+                android:textSize="13sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/create_place_label"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/text_place"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_pixel_box"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:hint="@string/create_place_hint"
+                android:paddingStart="12dp"
+                android:paddingEnd="15dp"
+                android:textColor="@color/black"
+                android:textColorHint="#80000000"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/create_delivery_app_label"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <RadioGroup
+                android:id="@+id/group_delivery_app"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_app_baemin"
+                    style="@style/DeliveryAppIconChip"
+                    android:contentDescription="@string/delivery_app_baemin"
+                    android:drawableTop="@drawable/icon_delivery_baemin" />
+
+                <RadioButton
+                    android:id="@+id/radio_app_coupang"
+                    style="@style/DeliveryAppIconChip"
+                    android:contentDescription="@string/delivery_app_coupang_eats"
+                    android:drawableTop="@drawable/icon_delivery_coupang_eats" />
+
+                <RadioButton
+                    android:id="@+id/radio_app_yogiyo"
+                    style="@style/DeliveryAppIconChip"
+                    android:contentDescription="@string/delivery_app_yogiyo"
+                    android:drawableTop="@drawable/icon_delivery_yogiyo" />
+
+                <RadioButton
+                    android:id="@+id/radio_app_other"
+                    style="@style/SplitChip"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="0dp"
+                    android:text="@string/delivery_app_other" />
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/edit_delivery_app"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_pixel_box"
+                android:hint="@string/create_delivery_app_name_hint"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:maxLength="15"
+                android:paddingStart="12dp"
+                android:paddingEnd="15dp"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <include
+        android:id="@+id/bottom"
+        layout="@layout/layout_create_room_bottom"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -123,11 +123,43 @@
 
     </fragment>
 
-    <fragment
+    <navigation
         android:id="@+id/navigation_create_room"
-        android:name="com.example.delibuddy.ui.room.create.CreateRoomFragment"
-        android:label="방 만들기"
-        tools:layout="@layout/fragment_create_room" />
+        android:label="@string/create_room_title"
+        app:startDestination="@id/navigation_create_room_info">
+        <fragment
+            android:id="@+id/navigation_create_room_info"
+            android:name="com.example.delibuddy.ui.room.create.CreateRoomInfoFragment"
+            android:label="@string/create_room_title"
+            tools:layout="@layout/fragment_create_room_info">
+            <action
+                android:id="@+id/action_create_room_info_to_food"
+                app:destination="@id/navigation_create_room_food" />
+        </fragment>
+        <fragment
+            android:id="@+id/navigation_create_room_food"
+            android:name="com.example.delibuddy.ui.room.create.CreateRoomFoodFragment"
+            android:label="@string/create_room_title"
+            tools:layout="@layout/fragment_create_room_food">
+            <action
+                android:id="@+id/action_create_room_food_to_place"
+                app:destination="@id/navigation_create_room_place" />
+        </fragment>
+        <fragment
+            android:id="@+id/navigation_create_room_place"
+            android:name="com.example.delibuddy.ui.room.create.CreateRoomPlaceFragment"
+            android:label="@string/create_room_title"
+            tools:layout="@layout/fragment_create_room_place">
+            <action
+                android:id="@+id/action_create_room_place_to_amount"
+                app:destination="@id/navigation_create_room_amount" />
+        </fragment>
+        <fragment
+            android:id="@+id/navigation_create_room_amount"
+            android:name="com.example.delibuddy.ui.room.create.CreateRoomAmountFragment"
+            android:label="@string/create_room_title"
+            tools:layout="@layout/fragment_create_room_amount" />
+    </navigation>
 
     <fragment
         android:id="@+id/navigation_room_detail"

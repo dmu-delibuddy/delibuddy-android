@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="16dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_prev"
+        style="@style/ActionButton.Secondary"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:text="@string/create_room_prev"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_next"
+        style="@style/ActionButton.Primary"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_weight="2"
+        android:text="@string/create_room_next" />
+</LinearLayout>

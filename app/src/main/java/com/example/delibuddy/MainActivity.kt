@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_account_info,
                 R.id.navigation_signin,
                 R.id.navigation_create_room,
+                R.id.navigation_create_room_info,
+                R.id.navigation_create_room_food,
+                R.id.navigation_create_room_place,
+                R.id.navigation_create_room_amount,
                 R.id.navigation_room_detail,
                 R.id.navigation_chat_room,
             )
