@@ -2,7 +2,6 @@ package com.example.delibuddy.ui.chat.order
 
 import android.content.ContentResolver
 import android.net.Uri
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -91,7 +90,6 @@ class MyOrderViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "내 주문 불러오기 실패 : $roomId", e)
                 LoadState.Error(e.toOrderError(R.string.order_load_error))
             }
         }
@@ -133,7 +131,6 @@ class MyOrderViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "주문 저장 실패 : $roomId", e)
                 SaveState.Failed(e.toOrderError(R.string.my_order_save_error))
             }
         }
@@ -185,6 +182,5 @@ class MyOrderViewModel(
 
     companion object {
         const val ARG_ROOM_ID = "roomId"
-        private const val TAG = "MyOrderVM"
     }
 }
