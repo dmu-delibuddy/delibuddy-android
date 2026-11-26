@@ -75,7 +75,7 @@ class GlobalAlertDialog : DialogFragment() {
         binding.textDescription.isVisible = !description.isNullOrBlank()
         binding.buttonCancel.isVisible = alertType != Type.INFO
         binding.buttonConfirm.text = args.getString(ARG_CONFIRM_LABEL)
-            ?: getString(R.string.alert_confirm)
+            ?: getString(R.string.common_alert_confirm)
     }
 
     private fun setUpListeners() {

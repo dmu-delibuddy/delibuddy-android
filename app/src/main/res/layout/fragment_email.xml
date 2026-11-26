@@ -47,7 +47,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="@string/signup_email_hint">
+                android:hint="@string/auth_email_hint">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_email"
@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="@string/signup_email_domain"
+                android:text="@string/auth_email_domain"
                 android:textColor="@color/navy"
                 android:textSize="16sp" />
         </LinearLayout>

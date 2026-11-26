@@ -40,7 +40,7 @@ class EmailFragment : Fragment() {
                 GlobalAlertDialog.show(
                     fragmentManager = childFragmentManager,
                     type = GlobalAlertDialog.Type.INFO,
-                    title = getString(R.string.signup_invalid_email),
+                    title = getString(R.string.auth_email_invalid),
                 )
                 return@setOnClickListener
             }

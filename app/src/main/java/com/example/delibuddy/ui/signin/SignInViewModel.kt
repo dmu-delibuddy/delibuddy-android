@@ -35,7 +35,7 @@ class SignInViewModel : ViewModel() {
 
         val id = emailId.trim()
         if (!isValidEmailId(id)) {
-            _message.value = R.string.signup_invalid_email
+            _message.value = R.string.auth_email_invalid
             return
         }
 
@@ -70,7 +70,7 @@ class SignInViewModel : ViewModel() {
         is AuthInvalidCredentialsException -> R.string.signin_invalid_credentials
         is AuthInvalidUserException -> R.string.signin_invalid_user
         is AuthNetworkException -> R.string.signin_network_error
-        else -> R.string.signin_failed
+        else -> R.string.signin_error
     }
 
     private fun isValidEmailId(emailId: String): Boolean {

@@ -27,7 +27,7 @@
         app:layout_constraintBottom_toBottomOf="@id/image_participants"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/image_participants"
-        tools:text="@string/detail_status_recruiting" />
+        tools:text="@string/room_status_recruiting" />
 
     <ImageView
         android:id="@+id/image_participants"
@@ -92,7 +92,7 @@
             android:maxLines="1"
             android:textColor="@color/black"
             android:textSize="12sp"
-            tools:text="@string/delivery_app_baemin" />
+            tools:text="@string/room_delivery_app_baemin" />
     </LinearLayout>
 
     <TextView

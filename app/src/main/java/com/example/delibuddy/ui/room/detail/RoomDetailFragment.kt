@@ -107,7 +107,7 @@ class RoomDetailFragment : Fragment() {
                 GlobalAlertDialog.show(
                     fragmentManager = childFragmentManager,
                     type = GlobalAlertDialog.Type.INFO,
-                    title = getString(R.string.detail_join_order_alert),
+                    title = getString(R.string.room_detail_join_order_alert),
                 )
                 return
             }
@@ -134,7 +134,7 @@ class RoomDetailFragment : Fragment() {
         binding.buttonAction.isVisible = true
         binding.buttonAction.isEnabled = (joined || room.isJoinable) &&
                 viewModel.actionState.value != ActionState.Loading
-        binding.buttonAction.setText(if (joined) R.string.detail_go_chat else R.string.detail_action_join)
+        binding.buttonAction.setText(if (joined) R.string.room_detail_go_chat else R.string.room_detail_action_join)
         binding.buttonAction.backgroundTintList = ContextCompat.getColorStateList(
             requireContext(), if (joined) R.color.mode_off else R.color.button_red
         )
@@ -158,7 +158,7 @@ class RoomDetailFragment : Fragment() {
     private fun handleActionResult(state: ActionState) {
         when (state) {
             ActionState.Done -> {
-                toast(getString(R.string.detail_done_join))
+                toast(getString(R.string.room_detail_done_join))
                 viewModel.clearActionState()
                 openChat()
             }
@@ -169,7 +169,7 @@ class RoomDetailFragment : Fragment() {
                         fragmentManager = childFragmentManager,
                         type = GlobalAlertDialog.Type.INFO,
                         title = getString(
-                            R.string.detail_account_required_title),
+                            R.string.room_detail_account_required_title),
                         description = getString(state.message),
                     )
                 } else {
@@ -200,7 +200,7 @@ class RoomDetailFragment : Fragment() {
             when (state) {
                 is DetailState.Loaded -> renderRoom(state.room)
                 DetailState.NotFound -> binding.textMessage
-                    .setText(R.string.detail_not_found)
+                    .setText(R.string.room_detail_not_found)
 
                 is DetailState.Error -> binding.textMessage
                     .setText(state.message)
@@ -212,49 +212,49 @@ class RoomDetailFragment : Fragment() {
     private fun renderRoom(room: RoomModel) = with(binding) {
 
         textStatus.text = getString(statusLabel(room)) + " " +
-                getString(R.string.detail_count, room.currentCount, room.maxParticipants)
+                getString(R.string.room_detail_count, room.currentCount, room.maxParticipants)
         textStatus.setBackgroundResource(statusBackground(room))
         textStatus.isActivated = room.status != RoomStatus.RECRUITING || room.isFull
         textTitle.text = room.title
         textMode.root.displayedChild = if (room.mode == RoomMode.MEAL_BUDDY) 1 else 0
 
         information.textRestaurant.text = row(
-            R.string.detail_restaurant,
+            R.string.room_detail_restaurant,
             room.restaurant
         )
 
         information.textPlace.text = row(
-            R.string.detail_place,
-            room.locationName.ifBlank { getString(R.string.detail_place_none) }
+            R.string.room_detail_place,
+            room.locationName.ifBlank { getString(R.string.room_detail_place_none) }
         )
 
         information.textDeliveryApp.text = row(
-            R.string.detail_delivery_app,
+            R.string.room_detail_delivery_app,
             room.deliveryAppLabel(requireContext())
         )
 
 
         information.textMinOrder.text = row(
-            R.string.detail_min_order,
-            getString(R.string.detail_won, room.minOrderAmount)
+            R.string.room_detail_min_order,
+            getString(R.string.room_detail_won, room.minOrderAmount)
         )
 
         information.textDeliveryFee.text = row(
-            R.string.detail_delivery_fee,
-            getString(R.string.detail_won, room.estimatedDeliveryFee) +
+            R.string.room_detail_delivery_fee,
+            getString(R.string.room_detail_won, room.estimatedDeliveryFee) +
                     " (" + getString(
-                R.string.detail_fee_per_person,
+                R.string.room_detail_fee_per_person,
                 room.deliveryFeePerPerson
             ) + ")"
         )
 
         information.textFoodSplit.text = row(
-            R.string.detail_food_split,
+            R.string.room_detail_food_split,
             getString(foodSplitLabel(room.foodCostSplitMethod))
         )
 
         information.textDeliverySplit.text = row(
-            R.string.detail_delivery_split,
+            R.string.room_detail_delivery_split,
             getString(deliverySplitLabel(room.deliveryFeeSplitMethod))
         )
 
@@ -328,8 +328,8 @@ class RoomDetailFragment : Fragment() {
             buttonSaveOrder.isVisible = joined && editable // 참여 후 모집 중일 때만 저장
         }
         binding.order.textOrderMessage.text = when {
-            !joined && editable -> getString(R.string.detail_join_order_alert)
-            !joined -> getString(R.string.detail_join_closed) // 정원 마감 / 모집 마감
+            !joined && editable -> getString(R.string.room_detail_join_order_alert)
+            !joined -> getString(R.string.room_detail_join_closed) // 정원 마감 / 모집 마감
             !editable -> getString(R.string.my_order_locked)
             else -> ""
         }
@@ -355,29 +355,29 @@ class RoomDetailFragment : Fragment() {
     @StringRes
     private fun statusLabel(room: RoomModel) = when (room.status) {
         RoomStatus.RECRUITING ->
-            if (room.isFull) R.string.detail_status_full
-            else R.string.detail_status_recruiting
-        RoomStatus.ORDER_CONFIRMED -> R.string.detail_status_confirmed
-        RoomStatus.ORDERED -> R.string.detail_status_ordered
-        RoomStatus.RECEIVED -> R.string.detail_status_received
-        RoomStatus.COMPLETED -> R.string.detail_status_completed
+            if (room.isFull) R.string.room_status_full
+            else R.string.room_status_recruiting
+        RoomStatus.ORDER_CONFIRMED -> R.string.room_status_confirmed
+        RoomStatus.ORDERED -> R.string.room_status_ordered
+        RoomStatus.RECEIVED -> R.string.room_status_received
+        RoomStatus.COMPLETED -> R.string.room_status_completed
     }
 
     // 음식값 정산 방법 => 화면 표시 문구
     @StringRes
     private fun foodSplitLabel(m: FoodCostSplitMethod) = when (m) {
-        FoodCostSplitMethod.HOST_PAYS -> R.string.split_host
-        FoodCostSplitMethod.EQUAL_SPLIT -> R.string.split_equal
-        FoodCostSplitMethod.PROPORTIONAL_SPLIT -> R.string.split_by_menu
-        FoodCostSplitMethod.CUSTOM -> R.string.split_custom
+        FoodCostSplitMethod.HOST_PAYS -> R.string.room_split_host
+        FoodCostSplitMethod.EQUAL_SPLIT -> R.string.room_split_equal
+        FoodCostSplitMethod.PROPORTIONAL_SPLIT -> R.string.room_split_by_menu
+        FoodCostSplitMethod.CUSTOM -> R.string.room_split_custom
     }
 
     // 배달비 정산 방법 => 화면 표시 문구
     @StringRes
     private fun deliverySplitLabel(m: DeliveryFeeSplitMethod) = when (m) {
-        DeliveryFeeSplitMethod.HOST_PAYS -> R.string.split_host
-        DeliveryFeeSplitMethod.EQUAL_SPLIT -> R.string.split_equal
-        DeliveryFeeSplitMethod.CUSTOM -> R.string.split_custom
+        DeliveryFeeSplitMethod.HOST_PAYS -> R.string.room_split_host
+        DeliveryFeeSplitMethod.EQUAL_SPLIT -> R.string.room_split_equal
+        DeliveryFeeSplitMethod.CUSTOM -> R.string.room_split_custom
     }
 
     // 화면이 사라질 때 binding 해제 (메모리 누수 방지)

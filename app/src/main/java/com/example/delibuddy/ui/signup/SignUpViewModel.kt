@@ -244,7 +244,7 @@ class SignUpViewModel : ViewModel() {
         _isSendingVerification.value == true || _isConfirmingVerification.value == true
 
     private fun validateSignUp(request: SignUpRequest): Int? = when {
-        !isEmailValid() -> R.string.signup_invalid_email
+        !isEmailValid() -> R.string.auth_email_invalid
         request.password.length < 6 -> R.string.signup_password_too_short
         request.password != request.passwordConfirm -> R.string.signup_password_mismatch
         else -> null
@@ -256,23 +256,23 @@ class SignUpViewModel : ViewModel() {
         is SignUpSessionMissingException,
         is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
 
-        else -> R.string.signup_verification_failed
+        else -> R.string.signup_verification_error
     }
 
     private fun Exception.toConfirmationError(): Int = when (this) {
         is EmailNotVerifiedException -> R.string.signup_email_not_verified
-        is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
+        is FirebaseNetworkException -> R.string.signup_verification_check_network_error
         is SignUpSessionMissingException,
         is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
 
-        else -> R.string.signup_completion_failed
+        else -> R.string.signup_completion_error
     }
 
     private fun Exception.toProfileError(): Int = when (this) {
-        is FirebaseNetworkException -> R.string.signup_verification_check_network_failed
+        is FirebaseNetworkException -> R.string.signup_verification_check_network_error
         is SignUpSessionMissingException,
         is FirebaseAuthInvalidUserException -> R.string.signup_session_expired
 
-        else -> R.string.signup_completion_failed
+        else -> R.string.signup_completion_error
     }
 }

@@ -70,7 +70,7 @@ class ProfileViewModel(
             .map { it ?: ProfileModel(type = type) }
             .catch { e ->
                 Log.e(TAG, "프로필 구독 실패: $type", e)
-                _message.value = R.string.mypage_load_error
+                _message.value = R.string.profile_load_error
                 emit(ProfileModel(type = type))
             }
 
@@ -94,7 +94,7 @@ class ProfileViewModel(
                 throw e
             } catch (e: Exception) {
                 Log.e(TAG, "생년월일 불러오기 실패", e)
-                _message.value = R.string.mypage_load_error
+                _message.value = R.string.profile_load_error
             }
         }
     }

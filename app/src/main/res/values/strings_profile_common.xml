@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_image_description">프로필 사진</string>
+    <string name="profile_count_empty">-</string>
+    <string name="profile_load_error">프로필 정보를 불러오지 못했어요</string>
+</resources>

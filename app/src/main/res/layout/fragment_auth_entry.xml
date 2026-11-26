@@ -92,7 +92,7 @@
         android:layout_marginStart="28dp"
         android:layout_marginTop="28dp"
         android:layout_marginEnd="28dp"
-        android:text="@string/auth_entry_start"
+        android:text="@string/auth_entry_signup"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/button_auth_entry_signin"

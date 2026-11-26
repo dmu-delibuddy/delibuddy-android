@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_step4_heading"
+                android:text="@string/room_create_step4_heading"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
 
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:alpha="0.7"
-                android:text="@string/create_step4_sub"
+                android:text="@string/room_create_step4_description"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/create_min_order_label"
+                android:text="@string/room_create_min_order_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="6dp"
-                android:hint="@string/create_min_order_hint"
+                android:hint="@string/room_create_min_order_hint"
                 android:maxLength="7"
                 app:amountEditId="@+id/edit_min_order" />
 
@@ -69,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/create_delivery_fee_label"
+                android:text="@string/room_create_delivery_fee_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -79,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="6dp"
-                android:hint="@string/create_delivery_fee_hint"
+                android:hint="@string/room_create_delivery_fee_hint"
                 android:maxLength="7"
                 app:amountEditId="@+id/edit_delivery_fee" />
 
@@ -96,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/create_food_split_label"
+                android:text="@string/room_create_food_split_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -111,23 +111,23 @@
                 <RadioButton
                     android:id="@+id/radio_food_host"
                     style="@style/SplitChip"
-                    android:text="@string/split_host" />
+                    android:text="@string/room_split_host" />
 
                 <RadioButton
                     android:id="@+id/radio_food_equal"
                     style="@style/SplitChip"
-                    android:text="@string/split_equal" />
+                    android:text="@string/room_split_equal" />
 
                 <RadioButton
                     android:id="@+id/radio_food_by_menu"
                     style="@style/SplitChip"
-                    android:text="@string/split_by_menu"
+                    android:text="@string/room_split_by_menu"
                     android:checked="true" />
 
                 <RadioButton
                     android:id="@+id/radio_food_custom"
                     style="@style/SplitChip"
-                    android:text="@string/split_custom" />
+                    android:text="@string/room_split_custom" />
             </RadioGroup>
 
             <TextView
@@ -143,7 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/create_delivery_split_label"
+                android:text="@string/room_create_delivery_split_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -159,18 +159,18 @@
                 <RadioButton
                     android:id="@+id/radio_delivery_host"
                     style="@style/SplitChip"
-                    android:text="@string/split_host" />
+                    android:text="@string/room_split_host" />
 
                 <RadioButton
                     android:id="@+id/radio_delivery_equal"
                     style="@style/SplitChip"
-                    android:text="@string/split_equal"
+                    android:text="@string/room_split_equal"
                     android:checked="true" />
 
                 <RadioButton
                     android:id="@+id/radio_delivery_custom"
                     style="@style/SplitChip"
-                    android:text="@string/split_custom" />
+                    android:text="@string/room_split_custom" />
             </RadioGroup>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="chat_menu_account_share">내 계좌 공유</string>
+    <string name="chat_account_share_title">이 방에 계좌번호를 공유할까요?</string>
+    <string name="chat_account_share_preview">%1$s\n%2$s\n이 방의 참여자가 계좌번호를 볼 수 있어요.</string>
+    <string name="chat_account_share_missing">마이페이지에서 계좌를 먼저 등록해 주세요.</string>
+    <string name="chat_account_share_error">계좌 정보를 불러오지 못했습니다.</string>
+    <string name="chat_account_copy">복사하기</string>
+    <string name="chat_account_copied">계좌번호를 복사했어요.</string>
+    <string name="chat_participant_order_view">메뉴 확인</string>
+    <string name="chat_participant_remove">강제 퇴장</string>
+    <string name="chat_participant_remove_title">이 참여자를 내보낼까요?</string>
+    <string name="chat_participant_remove_error">참여자를 내보내지 못했습니다.</string>
+    <string name="chat_camera_unavailable">사용할 수 있는 카메라 앱이 없습니다.</string>
+    <string name="chat_camera_error">카메라를 준비하지 못했습니다.</string>
+    <string name="chat_menu_photo">사진</string>
+    <string name="chat_menu_camera">카메라</string>
+    <string name="chat_menu_order">내 주문</string>
+    <string name="chat_menu_room_leave">방 나가기</string>
+    <string name="chat_room_leave_title">채팅방에서 나갈까요?</string>
+    <string name="chat_room_leave_description">나가면 이 방의 채팅을 볼 수 없어요.</string>
+    <string name="chat_room_leave_error">방에서 나가지 못했습니다. 다시 시도해 주세요.</string>
+    <string name="chat_panel_menu">메뉴</string>
+    <string name="chat_panel_participants">참여자</string>
+    <string name="chat_no_room">방 상세에서 채팅방에 들어가 주세요</string>
+    <string name="chat_load_error">채팅을 불러오지 못했어요\n방에 참여 중인지 확인해 주세요</string>
+    <string name="chat_input_hint">메시지를 입력하세요</string>
+    <string name="chat_send">전송</string>
+    <string name="chat_send_error_retry">전송 실패 · 다시 보내기</string>
+    <string name="chat_deleted">삭제된 메시지예요</string>
+    <string name="chat_sender_participant">참여자</string>
+    <string name="chat_profile_image_description">보낸 사람 프로필 사진</string>
+    <string name="chat_plus">+</string>
+    <string name="chat_image_description">채팅 사진</string>
+    <string name="chat_list_title">내 채팅방</string>
+    <string name="chat_list_empty">참여 중인 채팅방이 없어요</string>
+</resources>

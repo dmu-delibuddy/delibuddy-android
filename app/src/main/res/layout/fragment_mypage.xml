@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@string/my_page"
+            android:text="@string/nav_mypage"
             android:textColor="@color/black"
             android:textSize="22sp" />
     </LinearLayout>
@@ -70,7 +70,7 @@
                         android:id="@+id/text_manner_score"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/mypage_count_empty"
+                        android:text="@string/profile_count_empty"
                         android:textColor="@color/point_orange"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -102,7 +102,7 @@
                         android:id="@+id/text_review_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/mypage_count_empty"
+                        android:text="@string/profile_count_empty"
                         android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -134,7 +134,7 @@
                         android:id="@+id/text_join_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/mypage_count_empty"
+                        android:text="@string/profile_count_empty"
                         android:textColor="@color/black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -197,7 +197,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="0.6"
-                        android:text="@string/mypage_menu_history_desc"
+                        android:text="@string/mypage_menu_history_description"
                         android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -255,7 +255,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:alpha="0.6"
-                        android:text="@string/mypage_menu_settings_desc"
+                        android:text="@string/mypage_menu_settings_description"
                         android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>

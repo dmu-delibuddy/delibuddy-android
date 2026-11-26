@@ -28,7 +28,7 @@ class EditAccountDialogFragment : DialogFragment() {
 
     // 은행 목록 (strings.xml 의 mypage_bank_list)
     private val banks: Array<String> by lazy {
-        resources.getStringArray(R.array.mypage_bank_list)
+        resources.getStringArray(R.array.account_bank_list)
     }
 
     // 창 레이아웃(ViewBinding) 생성

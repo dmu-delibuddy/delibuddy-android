@@ -24,6 +24,6 @@
         android:minHeight="48dp"
         android:background="@drawable/bg_pixel_button"
         android:theme="@style/GlobalAlertDialogDangerTheme"
-        android:text="@string/chat_copy_account"
+        android:text="@string/chat_account_copy"
         android:textColor="@color/white" />
 </LinearLayout>

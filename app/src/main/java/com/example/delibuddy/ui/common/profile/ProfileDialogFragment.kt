@@ -114,7 +114,7 @@ class ProfileDialogFragment : DialogFragment() {
                     // ProfileModel 의 bio / imageUrl 은 String? 이라 orEmpty() 로 null 처리
                     textBio.text = profile.bio.orEmpty().ifBlank { getString(R.string.profile_dialog_bio_empty) }
                     // TODO: 리뷰(reviews) 기능이 생기면 받은 리뷰 평균 별점으로 교체
-                    textManner.text = getString(R.string.profile_dialog_manner, getString(R.string.mypage_count_empty))
+                    textManner.text = getString(R.string.profile_dialog_manner, getString(R.string.profile_count_empty))
                     // 사진이 없으면 레이아웃의 기본 사진(mypage_icon)을 그대로 둔다
                     val imageUrl = profile.imageUrl.orEmpty()
                     if (imageUrl.isNotBlank()) {
@@ -122,7 +122,7 @@ class ProfileDialogFragment : DialogFragment() {
                     }
                 }
                 is ProfileUiState.NotFound -> textMessage.setText(R.string.profile_dialog_not_found)
-                is ProfileUiState.Error -> textMessage.setText(R.string.mypage_load_error)
+                is ProfileUiState.Error -> textMessage.setText(R.string.profile_load_error)
                 is ProfileUiState.Loading -> Unit
             }
         }

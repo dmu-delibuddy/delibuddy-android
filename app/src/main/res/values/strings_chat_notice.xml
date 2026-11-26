@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="chat_notice_summary_recruiting">%1$d/%2$d명 · %3$d명 더 모이면 마감</string>
+    <string name="chat_notice_summary_recruiting_full">%1$d/%2$d명 · 정원이 찼어요</string>
+    <string name="chat_notice_summary_confirmed">메뉴 확정 · 방장이 주문 준비 중</string>
+    <string name="chat_notice_summary_ordered">배달 기다리는 중</string>
+    <string name="chat_notice_summary_received">음식이 도착했어요</string>
+    <string name="chat_notice_summary_completed">거래가 끝난 방이에요</string>
+    <string name="chat_notice_hint_recruiting">모두 메뉴를 입력하면 방장이 주문을 확정해요</string>
+    <string name="chat_notice_hint_confirmed">방장이 배달 앱에서 주문하면 다음 단계로 넘어가요</string>
+    <string name="chat_notice_hint_ordered">음식을 받으면 방장이 수령 완료를 눌러요</string>
+    <string name="chat_notice_hint_received">음식을 나누고 정산까지 끝나면 완료해 주세요</string>
+    <string name="chat_notice_hint_completed">함께해 주셔서 고마워요</string>
+    <string name="chat_notice_action_confirm">주문 확정하기</string>
+    <string name="chat_notice_action_ordered">주문 완료했어요</string>
+    <string name="chat_notice_action_received">음식 받았어요</string>
+    <string name="chat_notice_action_complete">완료하기</string>
+    <string name="chat_notice_confirm_title_confirm">주문을 확정할까요?</string>
+    <string name="chat_notice_confirm_title_ordered">배달 앱에서 주문을 완료했나요?</string>
+    <string name="chat_notice_confirm_title_received">음식을 받았나요?</string>
+    <string name="chat_notice_confirm_title_complete">공동 주문을 완료할까요?</string>
+    <string name="chat_notice_confirm_message">다음 단계로 넘기면 되돌릴 수 없어요. 진행할까요?</string>
+    <string name="chat_notice_action_error">상태를 바꾸지 못했어요. 다시 시도해 주세요</string>
+    <string name="chat_notice_expand_description">공지 펼치기</string>
+    <string name="chat_notice_step_recruiting">모집</string>
+    <string name="chat_notice_step_confirmed">확정</string>
+    <string name="chat_notice_step_ordered">주문</string>
+    <string name="chat_notice_step_received">수령</string>
+    <string name="chat_notice_step_completed">완료</string>
+</resources>

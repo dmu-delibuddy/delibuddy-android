@@ -117,9 +117,9 @@ class ChatFragment : Fragment() {
             GlobalAlertDialog.show(
                 fragmentManager = childFragmentManager,
                 type = GlobalAlertDialog.Type.DANGER,
-                title = getString(R.string.chat_leave_room_title),
-                description = getString(R.string.chat_leave_room_description),
-                confirmLabel = getString(R.string.chat_menu_leave_room),
+                title = getString(R.string.chat_room_leave_title),
+                description = getString(R.string.chat_room_leave_description),
+                confirmLabel = getString(R.string.chat_menu_room_leave),
                 requestKey = REQUEST_LEAVE_ROOM,
             )
         }
@@ -201,8 +201,8 @@ class ChatFragment : Fragment() {
             GlobalAlertDialog.show(
                 fragmentManager = childFragmentManager,
                 type = GlobalAlertDialog.Type.DANGER,
-                title = getString(R.string.profile_remove_participant_title),
-                confirmLabel = getString(R.string.profile_remove_participant),
+                title = getString(R.string.chat_participant_remove_title),
+                confirmLabel = getString(R.string.chat_participant_remove),
                 requestKey = REQUEST_CONFIRM_REMOVE,
                 result = bundleOf(userKey to userId),
             )
@@ -223,23 +223,23 @@ class ChatFragment : Fragment() {
             val result = viewModel.loadParticipantOrder(userId)
             if (!canManageParticipant(userId) || childFragmentManager.isStateSaved) return@launch
             val order = result.getOrElse {
-                Toast.makeText(requireContext(), R.string.profile_order_error, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.order_load_error, Toast.LENGTH_SHORT).show()
                 return@launch
             }
             val message = if (order == null) {
-                getString(R.string.profile_order_empty)
+                getString(R.string.participant_order_empty)
             } else {
                 getString(
-                    R.string.profile_order_summary, order.price,
-                    order.memo.orEmpty().ifBlank { getString(R.string.profile_order_no_memo) },
+                    R.string.participant_order_summary, order.price,
+                    order.memo.orEmpty().ifBlank { getString(R.string.participant_order_no_memo) },
                 )
             }
             val dialog = MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.profile_view_order)
+                .setTitle(R.string.chat_participant_order_view)
                 .setMessage(message)
                 .setPositiveButton(R.string.profile_dialog_close, null)
             order?.imageUrl?.takeIf { it.isNotBlank() }?.let { url ->
-                dialog.setNeutralButton(R.string.profile_order_photo) { _, _ ->
+                dialog.setNeutralButton(R.string.participant_order_photo) { _, _ ->
                     FullscreenImageDialogFragment.show(childFragmentManager, url)
                 }
             }
@@ -268,22 +268,22 @@ class ChatFragment : Fragment() {
                 try {
                     val account = viewModel.getMySharedAccount()
                     if (account == null) {
-                        Toast.makeText(requireContext(), R.string.chat_share_account_missing, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), R.string.chat_account_share_missing, Toast.LENGTH_SHORT).show()
                         return@launch
                     }
                     GlobalAlertDialog.show(
                         fragmentManager = childFragmentManager,
                         type = GlobalAlertDialog.Type.CONFIRM,
-                        title = getString(R.string.chat_share_account_title),
-                        description = getString(R.string.chat_share_account_preview, account.bankName, account.number),
-                        confirmLabel = getString(R.string.chat_menu_share_account),
+                        title = getString(R.string.chat_account_share_title),
+                        description = getString(R.string.chat_account_share_preview, account.bankName, account.number),
+                        confirmLabel = getString(R.string.chat_menu_account_share),
                         requestKey = REQUEST_SHARE_ACCOUNT,
                         result = bundleOf(RESULT_BANK_NAME to account.bankName, RESULT_ACCOUNT_NUMBER to account.number),
                     )
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    Toast.makeText(requireContext(), R.string.chat_share_account_error, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.chat_account_share_error, Toast.LENGTH_SHORT).show()
                 } finally {
                     button.isEnabled = true
                 }
@@ -444,7 +444,7 @@ class ChatFragment : Fragment() {
             binding.chatHeader.textRestaurant.isVisible = !room?.restaurant.isNullOrBlank()
             binding.chatHeader.textCount.text = room?.let {
                 getString(
-                    R.string.chat_header_participant_count,
+                    R.string.room_participant_count,
                     it.currentCount,
                     it.maxParticipants
                 )
@@ -474,13 +474,13 @@ class ChatFragment : Fragment() {
             viewModel.roomHeader.value?.status ?: return
         val title = when (status) {
             RoomStatus.RECRUITING ->
-                R.string.notice_confirm_title_confirm
+                R.string.chat_notice_confirm_title_confirm
             RoomStatus.ORDER_CONFIRMED ->
-                R.string.notice_confirm_title_ordered
+                R.string.chat_notice_confirm_title_ordered
             RoomStatus.ORDERED ->
-                R.string.notice_confirm_title_received
+                R.string.chat_notice_confirm_title_received
             RoomStatus.RECEIVED ->
-                R.string.notice_confirm_title_complete
+                R.string.chat_notice_confirm_title_complete
             RoomStatus.COMPLETED ->
                 return
         }
@@ -490,7 +490,7 @@ class ChatFragment : Fragment() {
             type = GlobalAlertDialog.Type.CONFIRM,
             title = getString(title),
             description = getString(
-                R.string.notice_confirm_message),
+                R.string.chat_notice_confirm_message),
             confirmLabel = binding.chatNotice
                 .buttonAction.text.toString(),
             requestKey = REQUEST_ADVANCE_STATUS,
@@ -547,15 +547,15 @@ class ChatFragment : Fragment() {
     private fun noticeBadge(status: RoomStatus) =
         when (status) {
             RoomStatus.RECRUITING ->
-                R.string.notice_badge_recruiting
+                R.string.room_status_recruiting
             RoomStatus.ORDER_CONFIRMED ->
-                R.string.notice_badge_confirmed
+                R.string.room_status_confirmed
             RoomStatus.ORDERED ->
-                R.string.notice_badge_ordered
+                R.string.room_status_ordered
             RoomStatus.RECEIVED ->
-                R.string.notice_badge_received
+                R.string.room_status_received
             RoomStatus.COMPLETED ->
-                R.string.notice_badge_completed
+                R.string.room_status_completed
         }
 
     @DrawableRes
@@ -579,20 +579,20 @@ class ChatFragment : Fragment() {
         return when (room.status) {
             RoomStatus.RECRUITING ->
                 if (room.isFull) getString(
-                    R.string.notice_summary_recruiting_full,
+                    R.string.chat_notice_summary_recruiting_full,
                     now, max
                 ) else getString(
-                    R.string.notice_summary_recruiting,
+                    R.string.chat_notice_summary_recruiting,
                     now, max, max - now
                 )
             RoomStatus.ORDER_CONFIRMED ->
-                getString(R.string.notice_summary_confirmed)
+                getString(R.string.chat_notice_summary_confirmed)
             RoomStatus.ORDERED ->
-                getString(R.string.notice_summary_ordered)
+                getString(R.string.chat_notice_summary_ordered)
             RoomStatus.RECEIVED ->
-                getString(R.string.notice_summary_received)
+                getString(R.string.chat_notice_summary_received)
             RoomStatus.COMPLETED ->
-                getString(R.string.notice_summary_completed)
+                getString(R.string.chat_notice_summary_completed)
         }
     }
 
@@ -600,15 +600,15 @@ class ChatFragment : Fragment() {
     private fun noticeHint(status: RoomStatus) =
         when (status) {
             RoomStatus.RECRUITING ->
-                R.string.notice_hint_recruiting
+                R.string.chat_notice_hint_recruiting
             RoomStatus.ORDER_CONFIRMED ->
-                R.string.notice_hint_confirmed
+                R.string.chat_notice_hint_confirmed
             RoomStatus.ORDERED ->
-                R.string.notice_hint_ordered
+                R.string.chat_notice_hint_ordered
             RoomStatus.RECEIVED ->
-                R.string.notice_hint_received
+                R.string.chat_notice_hint_received
             RoomStatus.COMPLETED ->
-                R.string.notice_hint_completed
+                R.string.chat_notice_hint_completed
         }
 
     // 방장 버튼 문구 (완료면 버튼 숨김)
@@ -616,13 +616,13 @@ class ChatFragment : Fragment() {
     private fun noticeAction(status: RoomStatus): Int? =
         when (status) {
             RoomStatus.RECRUITING ->
-                R.string.notice_action_confirm
+                R.string.chat_notice_action_confirm
             RoomStatus.ORDER_CONFIRMED ->
-                R.string.notice_action_ordered
+                R.string.chat_notice_action_ordered
             RoomStatus.ORDERED ->
-                R.string.notice_action_received
+                R.string.chat_notice_action_received
             RoomStatus.RECEIVED ->
-                R.string.notice_action_complete
+                R.string.chat_notice_action_complete
             RoomStatus.COMPLETED -> null
         }
 

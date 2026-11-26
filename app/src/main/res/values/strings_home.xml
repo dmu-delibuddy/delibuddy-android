@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_logo">DELI-BUDDY</string>
+    <string name="home_search_hint">위치, 메뉴, 가게 검색…</string>
+    <string name="home_category_all">전체</string>
+    <string name="home_category_kor">한식</string>
+    <string name="home_category_chn">중식</string>
+    <string name="home_category_jpn">일식</string>
+    <string name="home_category_west">양식</string>
+    <string name="home_category_etc">기타</string>
+    <string name="home_empty_rooms">아직 모집 중인 방이 없어요.\n첫 방을 만들어 보세요!</string>
+    <string name="home_create_room">+ 방 만들기</string>
+</resources>

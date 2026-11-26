@@ -80,7 +80,7 @@ class CreateRoomPlaceFragment : Fragment() {
         sheet.buttonPlaceCustom.setOnClickListener {
             val name = sheet.editPlace.text?.toString().orEmpty()
             if (name.isBlank()) {
-                sheet.editPlace.error = getString(R.string.create_error_place_name)
+                sheet.editPlace.error = getString(R.string.room_create_error_place_name)
                 return@setOnClickListener
             }
             viewModel.setCustomPlace(name)

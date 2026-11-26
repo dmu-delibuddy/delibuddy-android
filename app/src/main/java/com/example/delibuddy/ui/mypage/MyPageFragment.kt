@@ -61,7 +61,7 @@ class MyPageFragment : Fragment() {
             if (saving) {
                 GlobalLoadingDialog.show(
                     childFragmentManager,
-                    getString(R.string.mypage_saving_profile)
+                    getString(R.string.mypage_profile_saving)
                 )
             } else {
                 GlobalLoadingDialog.hide(childFragmentManager)

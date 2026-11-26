@@ -39,7 +39,7 @@
                 android:layout_width="180dp"
                 android:layout_height="180dp"
                 android:background="@drawable/bg_pixel_box"
-                android:contentDescription="@string/chat_image_desc"
+                android:contentDescription="@string/chat_image_description"
                 android:paddingStart="4dp"
                 android:paddingTop="4dp"
                 android:paddingEnd="7dp"
@@ -74,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:padding="4dp"
-        android:text="@string/chat_failed_retry"
+        android:text="@string/chat_send_error_retry"
         android:textColor="@color/button_red"
         android:textSize="12sp"
         android:visibility="gone" />

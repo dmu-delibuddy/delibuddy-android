@@ -26,7 +26,7 @@ class ParticipantRenderer(
 
     fun render(room: RoomModel) {
         binding.textParticipantsTitle.text = fragment.getString(
-            R.string.detail_participants,
+            R.string.room_detail_participants,
             room.currentCount, room.maxParticipants
         )
 

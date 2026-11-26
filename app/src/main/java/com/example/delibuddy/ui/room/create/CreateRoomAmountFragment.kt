@@ -68,10 +68,10 @@ class CreateRoomAmountFragment : Fragment() {
         viewModel.foodCostSplit.observe(viewLifecycleOwner) { method ->
             binding.textFoodSplitDesc.setText(
                 when (method) {
-                    FoodCostSplitMethod.HOST_PAYS -> R.string.split_food_desc_host
-                    FoodCostSplitMethod.EQUAL_SPLIT -> R.string.split_food_desc_equal
-                    FoodCostSplitMethod.PROPORTIONAL_SPLIT -> R.string.split_food_desc_by_menu
-                    FoodCostSplitMethod.CUSTOM -> R.string.split_food_desc_custom
+                    FoodCostSplitMethod.HOST_PAYS -> R.string.room_food_split_host_description
+                    FoodCostSplitMethod.EQUAL_SPLIT -> R.string.room_food_split_equal_description
+                    FoodCostSplitMethod.PROPORTIONAL_SPLIT -> R.string.room_food_split_by_menu_description
+                    FoodCostSplitMethod.CUSTOM -> R.string.room_food_split_custom_description
                 }
             )
         }
@@ -98,10 +98,10 @@ class CreateRoomAmountFragment : Fragment() {
         val fee = viewModel.deliveryFee.value
         val people = viewModel.maxParticipants.value ?: CreateRoomViewModel.DEFAULT_PARTICIPANTS
         binding.textFeeNote.text = when (viewModel.deliveryFeeSplit.value) {
-            DeliveryFeeSplitMethod.HOST_PAYS -> getString(R.string.create_fee_note_host)
-            DeliveryFeeSplitMethod.CUSTOM -> getString(R.string.create_fee_note_custom)
+            DeliveryFeeSplitMethod.HOST_PAYS -> getString(R.string.room_create_fee_note_host)
+            DeliveryFeeSplitMethod.CUSTOM -> getString(R.string.room_create_fee_note_custom)
             else -> if (fee == null) "" else
-                getString(R.string.create_fee_note_equal, people, "%,d".format(fee / people))
+                getString(R.string.room_create_fee_note_equal, people, "%,d".format(fee / people))
         }
     }
 
@@ -117,14 +117,14 @@ class CreateRoomAmountFragment : Fragment() {
         binding.bottom.buttonNext.isEnabled = !loading
         binding.bottom.buttonPrev.isEnabled = !loading
         binding.bottom.buttonNext.setText(
-            if (loading) R.string.create_submitting else R.string.create_room_submit
+            if (loading) R.string.room_create_submitting else R.string.room_create_submit
         )
     }
 
     private fun handleSubmitResult(state: SubmitState) {
         when (state) {
             is SubmitState.Success -> {
-                showToast(R.string.create_success)
+                showToast(R.string.room_create_success)
                 findNavController().popBackStack(R.id.navigation_create_room, true)
             }
 

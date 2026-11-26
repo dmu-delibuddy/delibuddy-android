@@ -26,9 +26,9 @@ fun Fragment.setUpCreateRoomHeader(header: LayoutCreateRoomHeaderBinding, step: 
         GlobalAlertDialog.show(
             fragmentManager = childFragmentManager,
             type = GlobalAlertDialog.Type.DANGER,
-            title = getString(R.string.create_exit_title),
-            description = getString(R.string.create_exit_desc),
-            confirmLabel = getString(R.string.create_exit_confirm),
+            title = getString(R.string.room_create_exit_title),
+            description = getString(R.string.room_create_exit_description),
+            confirmLabel = getString(R.string.room_create_exit_confirm),
             requestKey = REQUEST_EXIT,
         )
     }
@@ -42,8 +42,8 @@ fun Fragment.setUpCreateRoomBottom(
     bottom.buttonPrev.isVisible = step > 1
     bottom.buttonPrev.setOnClickListener { findNavController().navigateUp() }
     bottom.buttonNext.setText(
-        if (step == CreateRoomViewModel.LAST_STEP) R.string.create_room_submit
-        else R.string.create_room_next
+        if (step == CreateRoomViewModel.LAST_STEP) R.string.room_create_submit
+        else R.string.room_create_next
     )
     bottom.buttonNext.setOnClickListener { onNext() }
 }

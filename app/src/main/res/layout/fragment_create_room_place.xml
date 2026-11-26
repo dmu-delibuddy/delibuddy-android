@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_step3_heading"
+                android:text="@string/room_create_step3_heading"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
 
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:alpha="0.7"
-                android:text="@string/create_step3_sub"
+                android:text="@string/room_create_step3_description"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/create_place_label"
+                android:text="@string/room_create_place_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -65,7 +65,7 @@
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
-                android:hint="@string/create_place_hint"
+                android:hint="@string/room_create_place_hint"
                 android:paddingStart="12dp"
                 android:paddingEnd="15dp"
                 android:textColor="@color/black"
@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/create_delivery_app_label"
+                android:text="@string/room_create_delivery_app_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -91,19 +91,19 @@
                 <RadioButton
                     android:id="@+id/radio_app_baemin"
                     style="@style/DeliveryAppIconChip"
-                    android:contentDescription="@string/delivery_app_baemin"
+                    android:contentDescription="@string/room_delivery_app_baemin"
                     android:drawableTop="@drawable/icon_delivery_baemin" />
 
                 <RadioButton
                     android:id="@+id/radio_app_coupang"
                     style="@style/DeliveryAppIconChip"
-                    android:contentDescription="@string/delivery_app_coupang_eats"
+                    android:contentDescription="@string/room_delivery_app_coupang_eats"
                     android:drawableTop="@drawable/icon_delivery_coupang_eats" />
 
                 <RadioButton
                     android:id="@+id/radio_app_yogiyo"
                     style="@style/DeliveryAppIconChip"
-                    android:contentDescription="@string/delivery_app_yogiyo"
+                    android:contentDescription="@string/room_delivery_app_yogiyo"
                     android:drawableTop="@drawable/icon_delivery_yogiyo" />
 
                 <RadioButton
@@ -111,7 +111,7 @@
                     style="@style/SplitChip"
                     android:layout_height="48dp"
                     android:layout_marginEnd="0dp"
-                    android:text="@string/delivery_app_other" />
+                    android:text="@string/room_delivery_app_other" />
             </RadioGroup>
 
             <EditText
@@ -120,7 +120,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_pixel_box"
-                android:hint="@string/create_delivery_app_name_hint"
+                android:hint="@string/room_create_delivery_app_name_hint"
                 android:importantForAutofill="no"
                 android:inputType="text"
                 android:maxLength="15"

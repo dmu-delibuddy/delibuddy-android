@@ -148,25 +148,25 @@ class CreateRoomViewModel(
 
     @StringRes
     fun validateStep(step: Int): Int? = when (step) {
-        1 -> if (_title.value.isNullOrBlank()) R.string.create_error_title else null
+        1 -> if (_title.value.isNullOrBlank()) R.string.room_create_error_title else null
         2 -> when {
-            _category.value == null -> R.string.create_error_category
-            _restaurant.value.isNullOrBlank() -> R.string.create_error_restaurant
+            _category.value == null -> R.string.room_create_error_category
+            _restaurant.value.isNullOrBlank() -> R.string.room_create_error_restaurant
             else -> null
         }
 
         3 -> when {
-            _place.value == null -> R.string.create_error_place
-            _deliveryApp.value == null -> R.string.create_error_delivery_app
+            _place.value == null -> R.string.room_create_error_place
+            _deliveryApp.value == null -> R.string.room_create_error_delivery_app
             _deliveryApp.value == DeliveryApp.OTHER &&
-                    _deliveryAppName.value.isNullOrBlank() -> R.string.create_error_delivery_app_name
+                    _deliveryAppName.value.isNullOrBlank() -> R.string.room_create_error_delivery_app_name
 
             else -> null
         }
 
         4 -> when {
-            _minOrderAmount.value == null -> R.string.create_error_min_order
-            _deliveryFee.value == null -> R.string.create_error_delivery_fee
+            _minOrderAmount.value == null -> R.string.room_create_error_min_order
+            _deliveryFee.value == null -> R.string.room_create_error_delivery_fee
             else -> null
         }
 
@@ -207,7 +207,7 @@ class CreateRoomViewModel(
                 throw e
             } catch (e: Exception) {
                 Log.w("CreateRoom", "createRoom 실패", e)
-                SubmitState.Error(e.toRoomError(R.string.create_error_unknown))
+                SubmitState.Error(e.toRoomError(R.string.room_create_error_unknown))
             }
         }
     }

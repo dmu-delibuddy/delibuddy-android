@@ -14,7 +14,7 @@ import com.example.delibuddy.data.room.RoomAccountRequiredException
 
 @StringRes
 internal fun Throwable.toRoomError(@StringRes fallback: Int): Int = when (this) {
-    is RoomNotLoggedInException -> R.string.create_error_not_logged_in
+    is RoomNotLoggedInException -> R.string.common_error_not_logged_in
     is RoomNotFoundException -> R.string.room_error_not_found
     is RoomClosedException -> R.string.room_error_closed
     is RoomFullException -> R.string.room_error_full

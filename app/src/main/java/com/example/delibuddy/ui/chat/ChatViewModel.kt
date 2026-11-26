@@ -92,7 +92,7 @@ class ChatViewModel(
                 throw e
             } catch (e: Exception) {
                 Log.e(TAG, "방 나가기 실패: $id", e)
-                LeaveRoomState.Failed(e.toRoomError(R.string.chat_leave_room_error))
+                LeaveRoomState.Failed(e.toRoomError(R.string.chat_room_leave_error))
             }
         }
     }
@@ -189,7 +189,7 @@ class ChatViewModel(
             throw e
         } catch (e: Exception) {
             Log.w(TAG, "참여자 강제 퇴장 실패", e)
-            e.toRoomError(R.string.profile_remove_participant_error)
+            e.toRoomError(R.string.chat_participant_remove_error)
         }
     }
 
@@ -210,7 +210,7 @@ class ChatViewModel(
                 throw e
             } catch (e : Exception) {
                 Log.e(TAG, "방 상태 변경 실패 : $id", e)
-                _statusError.value = e.toRoomError(R.string.notice_action_failed)
+                _statusError.value = e.toRoomError(R.string.chat_notice_action_error)
             } finally {
                 changingStatus = false
             }

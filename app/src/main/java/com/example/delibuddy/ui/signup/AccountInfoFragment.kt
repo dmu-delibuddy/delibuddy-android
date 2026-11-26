@@ -38,7 +38,7 @@ class AccountInfoFragment : Fragment() {
     }
 
     private fun setUpAccountInput() {
-        val banks = resources.getStringArray(R.array.mypage_bank_list)
+        val banks = resources.getStringArray(R.array.account_bank_list)
         binding.spinnerBank.adapter = ArrayAdapter(
             requireContext(), android.R.layout.simple_spinner_dropdown_item, banks,
         )
@@ -86,7 +86,7 @@ class AccountInfoFragment : Fragment() {
             if (saving) {
                 GlobalLoadingDialog.show(
                     childFragmentManager,
-                    getString(R.string.signup_saving_profile)
+                    getString(R.string.signup_profile_saving)
                 )
             } else {
                 GlobalLoadingDialog.hide(childFragmentManager)

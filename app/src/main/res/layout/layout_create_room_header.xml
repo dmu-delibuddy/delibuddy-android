@@ -13,7 +13,7 @@
         android:layout_height="48dp"
         android:layout_marginStart="4dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/create_room_back"
+        android:contentDescription="@string/common_back"
         android:src="?attr/homeAsUpIndicator"
         app:tint="@color/black"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:text="@string/create_room_title"
+            android:text="@string/room_create_title"
             android:textColor="@color/black"
             android:textSize="20sp" />
     </LinearLayout>

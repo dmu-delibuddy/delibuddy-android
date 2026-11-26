@@ -72,7 +72,7 @@ class StartupFragment : Fragment() {
         binding.buttonRetry.isVisible = isError
         binding.buttonLogin.isVisible = isError
         binding.loadingContent.loadingMessage.setText(
-            if (isError) R.string.startup_check_failed else R.string.startup_checking_login,
+            if (isError) R.string.startup_check_error else R.string.startup_checking_login,
         )
         if (state == StartupState.CHECKING) {
             animation?.start()
