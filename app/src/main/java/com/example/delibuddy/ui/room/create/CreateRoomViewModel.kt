@@ -1,33 +1,35 @@
 package com.example.delibuddy.ui.room.create
 
+import android.app.Application
 import android.content.res.AssetManager
 import android.util.Log
 import androidx.annotation.StringRes
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
 import com.example.delibuddy.data.chat.ChatRepository
 import com.example.delibuddy.data.chat.SystemMessage
 import com.example.delibuddy.data.recommendation.RecommendLocationModel
 import com.example.delibuddy.data.recommendation.RecommendLocationRepository
-import com.example.delibuddy.data.room.RoomMode
-import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.DeliveryApp
 import com.example.delibuddy.data.room.DeliveryFeeSplitMethod
+import com.example.delibuddy.data.room.FoodCategory
 import com.example.delibuddy.data.room.FoodCostSplitMethod
-import com.example.delibuddy.ui.room.toRoomError
+import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.room.RoomModel
 import com.example.delibuddy.data.room.RoomRepository
+import com.example.delibuddy.ui.room.toRoomError
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 class CreateRoomViewModel(
+    application: Application,
     savedStateHandle: SavedStateHandle,
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val roomRepository = RoomRepository()
     private val chatRepository = ChatRepository()
@@ -79,8 +81,26 @@ class CreateRoomViewModel(
     val places: LiveData<List<RecommendLocationModel>> = _places
 
     // 지도에서 "해당 위치로 방 만들기"로 왔으면 그 장소로 시작 (아니면 null)
-    private val _place = MutableLiveData(placeFromArgs(savedStateHandle))
+    private val _place = MutableLiveData<Place?>(null)
     val place: LiveData<Place?> = _place
+    init {
+        loadPlaceFromMap(savedStateHandle[ARG_PLACE_ID])
+    }
+
+    // 넘겨받은 id 의 추천 장소를 Repository 에서 찾아 선택 (id 가 없거나 못 찾으면 그대로)
+    private fun loadPlaceFromMap(placeId: String?) {
+        if (placeId.isNullOrBlank()) return
+        viewModelScope.launch {
+            try {
+                val location = placeRepository.getPlace(getApplication<Application>().assets, placeId)
+                if (location != null && _place.value == null) selectPlace(location)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w(TAG, "지도 장소 불러오기 실패: $placeId", e)
+            }
+        }
+    }
 
     fun loadPlaces(assets: AssetManager) {
         if (_places.value.orEmpty().isNotEmpty()) return
@@ -264,19 +284,7 @@ class CreateRoomViewModel(
         const val RESTAURANT_MAX = 30
         private const val TAG = "CreateRoomVM"
 
-        const val ARG_PLACE_NAME = "placeName"
-        const val ARG_PLACE_LAT = "placeLat"
-        const val ARG_PLACE_LON = "placeLon"
-
-        private fun placeFromArgs(handle: SavedStateHandle): Place? {
-            val name = handle.get<String>(ARG_PLACE_NAME)?.takeIf { it.isNotBlank() }
-                ?: return null
-            return Place(
-                name,
-                handle.get<Double>(ARG_PLACE_LAT),
-                handle.get<Double>(ARG_PLACE_LON),
-            )
-        }
+        const val ARG_PLACE_ID = "placeId"
     }
 
     data class Place(

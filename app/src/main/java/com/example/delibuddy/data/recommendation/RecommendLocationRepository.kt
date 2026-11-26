@@ -34,6 +34,10 @@ class RecommendLocationRepository {
     suspend fun getPlaces(assets: AssetManager): List<RecommendLocationModel> =
         withContext(Dispatchers.IO) { loadLocations(assets) }
 
+    // 지도에서 넘어온 장소 하나 : id 로 찾기 (없으면 null)
+    suspend fun getPlace(assets: AssetManager, id: String): RecommendLocationModel? =
+        getPlaces(assets).firstOrNull { it.id == id }
+
     private fun loadLocations(assets: AssetManager): List<RecommendLocationModel> {
         return try {
             val jsonString = assets.open("recommend-locations.json").bufferedReader().use { it.readText() }

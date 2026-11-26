@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,6 +21,7 @@ import com.example.delibuddy.data.recommendation.RecommendLocationModel
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.databinding.BottomSheetLocationInfoBinding
 import com.example.delibuddy.databinding.FragmentRecommendationBinding
+import com.example.delibuddy.ui.room.create.CreateRoomViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
@@ -51,18 +53,6 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpMap()
-        observeCreateRoom()
-    }
-
-    private fun observeCreateRoom() {
-        viewModel.createRoomArgs.observe(viewLifecycleOwner) { args ->
-            if (args == null) return@observe
-            val navController = findNavController()
-            if (navController.currentDestination?.id == R.id.navigation_recommendation) {
-                navController.navigate(R.id.action_recommendation_to_create_room, args)
-            }
-            viewModel.onCreateRoomNavigated()
-        }
     }
 
     private fun setUpMap() {
@@ -136,7 +126,12 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         sheet.textLocationName.text = location.name
         sheet.buttonCreateRoomHere.setOnClickListener {
             dialog.dismiss()
-            viewModel.createRoomAt(location)
+            findNavController().navigate(
+                R.id.action_recommendation_to_create_room,
+                bundleOf(
+                    CreateRoomViewModel.ARG_PLACE_ID to location.id
+                ),
+            )
         }
         dialog.setContentView(sheet.root)
         dialog.show()
