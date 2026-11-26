@@ -8,8 +8,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
-import com.example.delibuddy.data.chat.ChatRepository
-import com.example.delibuddy.data.chat.SystemMessage
 import com.example.delibuddy.data.recommendation.RecommendLocationModel
 import com.example.delibuddy.data.recommendation.RecommendLocationRepository
 import com.example.delibuddy.data.room.DeliveryApp
@@ -29,7 +27,6 @@ class CreateRoomViewModel(
 ) : ViewModel() {
 
     private val roomRepository = RoomRepository()
-    private val chatRepository = ChatRepository()
 
     private val _title = MutableLiveData("")
     val title: LiveData<String> = _title
@@ -220,25 +217,14 @@ class CreateRoomViewModel(
         _submitState.value = SubmitState.Loading
         viewModelScope.launch {
             _submitState.value = try {
-                val id = roomRepository.createRoom(room)
-                notifyRoomCreated(id)
-                SubmitState.Success(id)
+                roomRepository.createRoom(room)
+                SubmitState.Success
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 Log.w("CreateRoom", "createRoom 실패", e)
                 SubmitState.Error(e.toRoomError(R.string.room_create_error_unknown))
             }
-        }
-    }
-
-    private suspend fun notifyRoomCreated(roomId: String) {
-        try {
-            chatRepository.sendSystem(roomId, SystemMessage.ROOM_CREATED)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Log.w(TAG, "시스템 메시지 실패 : $roomId", e)
         }
     }
 
@@ -296,9 +282,7 @@ class CreateRoomViewModel(
     sealed interface SubmitState {
         data object Idle : SubmitState
         data object Loading : SubmitState
-        data class Success(
-            val roomId: String
-        ) : SubmitState
+        data object Success : SubmitState
 
         data class Error(
             @StringRes val message: Int,

@@ -123,7 +123,7 @@ class CreateRoomAmountFragment : Fragment() {
 
     private fun handleSubmitResult(state: SubmitState) {
         when (state) {
-            is SubmitState.Success -> {
+            SubmitState.Success -> {
                 showToast(R.string.room_create_success)
                 findNavController().popBackStack(R.id.navigation_create_room, true)
             }

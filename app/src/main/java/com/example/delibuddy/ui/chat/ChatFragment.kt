@@ -210,7 +210,7 @@ class ChatFragment : Fragment() {
         childFragmentManager.setFragmentResultListener(REQUEST_CONFIRM_REMOVE, viewLifecycleOwner) { _, result ->
             val userId = result.getString(userKey) ?: return@setFragmentResultListener
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.removeParticipant(userId)?.let { message ->
+                viewModel.kickParticipant(userId)?.let { message ->
                     Toast.makeText(requireContext(), getString(message), Toast.LENGTH_SHORT).show()
                 }
             }

@@ -1,6 +1,9 @@
 package com.example.delibuddy.data.room
 
 import android.util.Log
+import com.example.delibuddy.data.chat.ChatModel
+import com.example.delibuddy.data.chat.MessageType
+import com.example.delibuddy.data.chat.SystemMessage
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -18,13 +21,10 @@ class RoomRepository {
 
     private val rooms = db.collection("rooms")
 
-    // 로그인한 내 uid. 로그인 안 했으면 NOT_LOGGED_IN 예외
-    private fun requireUid(): String =
-        auth.currentUser?.uid ?: throw RoomNotLoggedInException()
+    val myUid: String get() = auth.currentUser?.uid ?: throw RoomNotLoggedInException()
 
-    // -------------------- 방 생성 ---------------------
-    suspend fun createRoom(room: RoomModel): String {
-        val uid = requireUid()
+    suspend fun createRoom(room: RoomModel) {
+        val uid = myUid
         val ref = rooms.document()
         val newRoom = room.copy(
             hostId = uid,
@@ -32,12 +32,29 @@ class RoomRepository {
             status = RoomStatus.RECRUITING,
             createdAt = Timestamp.now(),
         )
-        ref.set(newRoom).await()
-        return ref.id
+        db.runBatch { batch ->
+            batch.set(ref, newRoom)
+            batch.set(
+                ref.collection("messages").document(),
+                createSystemMessage(SystemMessage.ROOM_CREATED)
+            )
+        }.await()
     }
 
-    // ----------------- 방 리스트 / 상세 ---------------------
-    // 홈 화면에서 모집 중인 방을 실시간으로 구독한다.
+    suspend fun getRoom(roomId: String): RoomModel? =
+        rooms.document(roomId).get().await().toObject(RoomModel::class.java)
+
+    fun observeRoom(roomId: String): Flow<RoomModel?> = callbackFlow {
+        val registration = rooms.document(roomId).addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+            trySend(snapshot?.toObject(RoomModel::class.java))
+        }
+        awaitClose { registration.remove() }
+    }
+
     fun observeRooms(
         mode: RoomMode? = null,
         category: FoodCategory? = null,
@@ -51,70 +68,59 @@ class RoomRepository {
                 close(error)
                 return@addSnapshotListener
             }
-            // 문서를 하나씩 변환. 형식이 잘못된 문서는 로그만 남기고 건너뜀 (앱 사망 방지)
-            val list = snapshot?.documents.orEmpty()
-                .mapNotNull { doc ->
-                    try {
-                        doc.toObject(RoomModel::class.java)
-                    } catch (e: RuntimeException) {
-                        Log.w("RoomRepo", "방 문서 변환 실패: ${doc.id}", e)
-                        null
-                    }
-                }
-                .sortedByDescending { it.createdAt?.seconds ?: 0L }
+            val list = snapshot?.documents.orEmpty().mapNotNull { doc ->
+                    doc.toObject(RoomModel::class.java)
+                }.sortedByDescending { it.createdAt?.seconds ?: 0L }
             trySend(list)
         }
         awaitClose { registration.remove() }
     }
 
-    // 방 상세 한 번 조회
-    suspend fun getRoom(roomId: String): RoomModel? =
-        rooms.document(roomId).get().await().toObject(RoomModel::class.java)
-
-    // 방 상세 실시간 구독 (참여 인원, 상태 변화 바로 반영)
-    fun observeRoom(roomId: String): Flow<RoomModel?> = callbackFlow {
-        val registration = rooms.document(roomId).addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error)
-                return@addSnapshotListener
+    fun observeMyRooms(uid: String): Flow<List<RoomModel>> = callbackFlow {
+        val registration =
+            rooms.whereArrayContains("participantIds", uid).addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val list =
+                    snapshot?.documents.orEmpty().mapNotNull { it.toObject(RoomModel::class.java) }
+                        .sortedWith(compareBy<RoomModel> {
+                            it.status == RoomStatus.COMPLETED
+                        }.thenByDescending {
+                            it.createdAt?.seconds ?: 0L
+                        })
+                trySend(list)
             }
-            trySend(snapshot?.toObject(RoomModel::class.java))
-        }
         awaitClose { registration.remove() }
     }
 
-    // ------------------- 방 상태관리 ---------------------------
-
-    // 방 참여. 트랜잭션으로 정원 / 중복 / 모집 상태를 검사해서 동시에 눌러도 정원을 넘지 않음.
     suspend fun joinRoom(roomId: String) {
-        val uid = requireUid()
+        val uid = myUid
         val ref = rooms.document(roomId)
+        val messageRef = ref.collection("messages").document()
         db.runTransaction { tx ->
-            val room = tx.get(ref).toObject(RoomModel::class.java)
-                ?: throw RoomNotFoundException()
+            val room = tx.get(ref).toObject(RoomModel::class.java) ?: throw RoomNotFoundException()
             when {
-                room.isParticipant(uid) ->
-                    throw RoomAlreadyJoinedException()
-                room.status != RoomStatus.RECRUITING ->
-                    throw RoomClosedException()
-                room.isFull ->
-                    throw RoomFullException()
+                room.isParticipant(uid) -> throw RoomAlreadyJoinedException()
+
+                room.status != RoomStatus.RECRUITING -> throw RoomClosedException()
+
+                room.isFull -> throw RoomFullException()
             }
             tx.update(ref, "participantIds", FieldValue.arrayUnion(uid))
+            tx.set(messageRef, createSystemMessage(SystemMessage.JOINED))
         }.await()
     }
 
-    // 모집 중이거나 완료된 방에서 나가고, 방장이 나가면 남은 첫 참여자에게 승계한다.
     suspend fun leaveRoom(roomId: String) {
-        val uid = requireUid()
+        val uid = myUid
         val ref = rooms.document(roomId)
+        val messageRef = ref.collection("messages").document()
         db.runTransaction { tx ->
-            val room = tx.get(ref).toObject(RoomModel::class.java)
-                ?: throw RoomNotFoundException()
-            if (!room.isParticipant(uid))
-                return@runTransaction
-            if (room.status != RoomStatus.RECRUITING && room.status != RoomStatus.COMPLETED)
-                throw RoomCannotLeaveInProgressException()
+            val room = tx.get(ref).toObject(RoomModel::class.java) ?: throw RoomNotFoundException()
+            if (!room.isParticipant(uid)) return@runTransaction
+            if (room.status != RoomStatus.RECRUITING && room.status != RoomStatus.COMPLETED) throw RoomCannotLeaveInProgressException()
 
             val remaining = room.participantIds.filterNot { it == uid }
             if (remaining.isEmpty()) {
@@ -123,16 +129,22 @@ class RoomRepository {
                 val updates = mutableMapOf<String, Any>("participantIds" to remaining)
                 if (room.isHost(uid)) updates["hostId"] = remaining.first()
                 tx.update(ref, updates)
+                tx.set(messageRef, createSystemMessage(SystemMessage.LEFT))
             }
         }.await()
     }
 
-    suspend fun removeParticipant(roomId: String, participantId: String) {
-        val uid = requireUid()
+    suspend fun advanceStatus(roomId: String, from: RoomStatus) {
+        val to = from.next ?: throw RoomInvalidStateException()
+        changeStatusAsHost(roomId, setOf(from), to)
+    }
+
+    suspend fun kickParticipant(roomId: String, participantId: String) {
+        val uid = myUid
         val ref = rooms.document(roomId)
+        val messageRef = ref.collection("messages").document()
         db.runTransaction { tx ->
-            val room = tx.get(ref).toObject(RoomModel::class.java)
-                ?: throw RoomNotFoundException()
+            val room = tx.get(ref).toObject(RoomModel::class.java) ?: throw RoomNotFoundException()
             if (!room.isHost(uid)) throw RoomNotHostException()
             if (participantId == uid || !room.isParticipant(participantId)) {
                 throw RoomInvalidStateException()
@@ -141,46 +153,28 @@ class RoomRepository {
                 throw RoomCannotLeaveInProgressException()
             }
             tx.update(ref, "participantIds", FieldValue.arrayRemove(participantId))
+            tx.set(messageRef, createSystemMessage(SystemMessage.REMOVED))
         }.await()
     }
 
-    suspend fun advanceStatus (roomId : String, from : RoomStatus) {
-        val to = from.next ?: throw RoomInvalidStateException()
-        changeStatusAsHost(roomId, setOf(from), to)
-    }
-
-    // 방장만, 허용된 상태(from)일 때만 방 상태를 to 로 변경 (트랜잭션)
     private suspend fun changeStatusAsHost(roomId: String, from: Set<RoomStatus>, to: RoomStatus) {
-        val uid = requireUid()
+        val uid = myUid
         val ref = rooms.document(roomId)
+        val messageRef = ref.collection("messages").document()
         db.runTransaction { tx ->
-            val room = tx.get(ref).toObject(RoomModel::class.java)
-                ?: throw RoomNotFoundException()
+            val room = tx.get(ref).toObject(RoomModel::class.java) ?: throw RoomNotFoundException()
             if (!room.isHost(uid)) throw RoomNotHostException()
             if (room.status !in from) throw RoomInvalidStateException()
             tx.update(ref, "status", to.name)
+            SystemMessage.forStatus(to)?.let { content ->
+                tx.set(messageRef, createSystemMessage(content))
+            }
         }.await()
     }
 
-    fun observeMyRooms(uid: String): Flow<List<RoomModel>> = callbackFlow {
-        val registration = rooms
-            .whereArrayContains("participantIds", uid)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
-                val list = snapshot?.documents.orEmpty()
-                    .mapNotNull { it.toObject(RoomModel::class.java) }
-                    .sortedWith (
-                        compareBy<RoomModel> {
-                            it.status == RoomStatus.COMPLETED
-                        }.thenByDescending {
-                            it.createdAt?.seconds ?: 0L
-                        }
-                    )
-                trySend(list)
-            }
-        awaitClose { registration.remove() }
-    }
+    private fun createSystemMessage(content: String) = ChatModel(
+        senderId = null,
+        type = MessageType.SYSTEM,
+        content = content,
+    )
 }

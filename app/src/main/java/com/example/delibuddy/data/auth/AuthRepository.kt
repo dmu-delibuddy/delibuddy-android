@@ -1,6 +1,5 @@
 package com.example.delibuddy.data.auth
 
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.example.delibuddy.data.profile.ProfileRepository
@@ -29,8 +28,11 @@ class AuthRepository {
         hasUserDocument && auth.currentUser?.uid == user.uid
     }
 
-    suspend fun signIn(email: String, password: String): AuthResult = withErrorHandling {
+    suspend fun signIn(email: String, password: String): Unit = withErrorHandling {
         auth.signInWithEmailAndPassword(email, password).await()
+        val user = requireVerifiedUser()
+        if (!userRepository.exists(user.uid)) throw SignUpIncompleteException()
+        if (auth.currentUser?.uid != user.uid) throw SignUpSessionMissingException()
     }
 
     suspend fun createFirebaseUser(email: String, password: String): FirebaseUser {
@@ -66,6 +68,9 @@ class AuthRepository {
             throw e
         } catch (e: Exception) {
             throw when (e) {
+                is SignUpSessionMissingException,
+                is EmailNotVerifiedException,
+                is SignUpIncompleteException -> e
                 is FirebaseAuthInvalidCredentialsException -> AuthInvalidCredentialsException()
                 is FirebaseAuthInvalidUserException -> AuthInvalidUserException()
                 is FirebaseNetworkException -> AuthNetworkException()

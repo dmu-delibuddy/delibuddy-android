@@ -14,10 +14,12 @@ service cloud.firestore {
       match /messages/{messageId} {
         allow read: if isRoomMember(roomId);
         // 일반 메시지는 본인 이름으로만, 시스템 메시지는 보낸 사람 없이
-        allow create: if isRoomMember(roomId) && (
-          request.resource.data.senderId == request.auth.uid
+        allow create: if request.auth != null && (
+          (isRoomMember(roomId)
+              && request.resource.data.senderId == request.auth.uid)
           || (request.resource.data.type == 'SYSTEM'
-              && request.resource.data.senderId == null)
+              && request.resource.data.senderId == null
+              && (isRoomMember(roomId) || isRoomMemberAfter(roomId)))
         );
       }
 
@@ -51,7 +53,15 @@ service cloud.firestore {
 
     function isRoomMember(roomId) {
       return request.auth != null
+        && exists(/databases/$(database)/documents/rooms/$(roomId))
         && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
+    }
+
+    // 방 생성·참여와 함께 기록하는 시스템 메시지는 변경 후 참여자를 확인한다.
+    function isRoomMemberAfter(roomId) {
+      return request.auth != null
+        && existsAfter(/databases/$(database)/documents/rooms/$(roomId))
+        && request.auth.uid in getAfter(/databases/$(database)/documents/rooms/$(roomId)).data.participantIds;
     }
 
     match /test/{docId} {
