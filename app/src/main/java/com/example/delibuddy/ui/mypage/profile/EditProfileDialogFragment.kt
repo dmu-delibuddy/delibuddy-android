@@ -63,6 +63,11 @@ class EditProfileDialogFragment : DialogFragment() {
     // 현재 값 채우기 (회전 후에는 저장해 둔 값 복원) + 버튼 연결
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (viewModel.currentProfile == null) {
+            Toast.makeText(requireContext(), R.string.profile_load_error, Toast.LENGTH_SHORT).show()
+            dismiss()
+            return
+        }
         renderTitle()
         if (savedInstanceState == null) fillCurrentValues()
         else restoreState(savedInstanceState)
@@ -71,6 +76,9 @@ class EditProfileDialogFragment : DialogFragment() {
         setUpImageButtons()
         setUpBirthPicker()
         setUpBottomButtons()
+        viewModel.profileState.observe(viewLifecycleOwner) {
+            binding.buttonSave.isEnabled = viewModel.currentProfile != null
+        }
     }
 
     // 창 배경을 투명하게, 가로는 화면 폭에 맞춤 (픽셀 박스 배경이 보이게)
@@ -96,7 +104,7 @@ class EditProfileDialogFragment : DialogFragment() {
 
     // 지금 프로필 / 생년월일을 입력칸에 채우기
     private fun fillCurrentValues() {
-        val profile = viewModel.profile.value
+        val profile = viewModel.currentProfile
         binding.editNickname.setText(profile?.nickname.orEmpty())
         binding.editBio.setText(profile?.bio.orEmpty())
         birthDate = viewModel.birthDate.value
@@ -144,7 +152,7 @@ class EditProfileDialogFragment : DialogFragment() {
     // 보여줄 사진이 있을 때만 "기본 사진으로" 버튼 표시
     private fun renderImage() {
         val image = binding.imageProfile
-        val currentUrl = viewModel.profile.value?.imageUrl.orEmpty()
+        val currentUrl = viewModel.currentProfile?.imageUrl.orEmpty()
         val source: Any? = when {
             newImage != null -> newImage
             removeImage || currentUrl.isBlank() -> null

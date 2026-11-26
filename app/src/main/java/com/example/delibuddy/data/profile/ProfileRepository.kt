@@ -10,12 +10,12 @@ class ProfileRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val users = firestore.collection("users")
 
-    private fun profileDocument(userId: String, type: ProfileType) =
+    private fun getProfileRef(userId: String, type: ProfileType) =
         users.document(userId).collection("profiles").document(type.name)
 
     suspend fun createInitialProfiles(userId: String) {
         val initialProfiles = ProfileType.values().map { type ->
-            profileDocument(userId, type) to ProfileModel(
+            getProfileRef(userId, type) to ProfileModel(
                 type = type,
                 nickname = RandomNicknameGenerator.generate()
             )
@@ -34,11 +34,11 @@ class ProfileRepository {
         }.await()
     }
 
-    suspend fun getById(userId: String, type: ProfileType): ProfileModel? =
-        profileDocument(userId, type).get().await().toObject(ProfileModel::class.java)
+    suspend fun getProfile(userId: String, type: ProfileType): ProfileModel? =
+        getProfileRef(userId, type).get().await().toObject(ProfileModel::class.java)
 
     suspend fun update(userId: String, profile: ProfileModel) {
-        profileDocument(userId, profile.type).update(
+        getProfileRef(userId, profile.type).update(
             mapOf(
                 "type" to profile.type.name,
                 "nickname" to profile.nickname,
@@ -48,9 +48,8 @@ class ProfileRepository {
         ).await()
     }
 
-    // 모드별 프로필 실시간 구독 (마이페이지). 문서가 없으면 null
     fun observe(userId: String, type: ProfileType): Flow<ProfileModel?> = callbackFlow {
-        val registration = profileDocument(userId, type)
+        val registration = getProfileRef(userId, type)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
@@ -60,11 +59,4 @@ class ProfileRepository {
             }
         awaitClose { registration.remove() }
     }
-
-    // 모드별 프로필 저장. 문서가 없으면 새로 만듦
-    // (#28 이전에 가입해 프로필 문서가 없는 계정도 저장되도록 update 대신 set)
-    suspend fun save(userId: String, profile: ProfileModel) {
-        profileDocument(userId, profile.type).set(profile).await()
-    }
-
 }

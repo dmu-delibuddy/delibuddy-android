@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import com.example.delibuddy.R
-import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.data.chat.SystemMessage
 
 /*
@@ -339,7 +338,7 @@ class ChatViewModel(
             .forEach { key ->
                 viewModelScope.launch {
                     try {
-                        profileRepository.getById(key.first, key.second)?.let { profile ->
+                        profileRepository.getProfile(key.first, key.second)?.let { profile ->
                             profiles.update { it + (key to profile) }
                         }
                     } catch (e: CancellationException) {

@@ -99,7 +99,7 @@ class ParticipantRenderer(
                 }
                 fragment.viewLifecycleOwner.lifecycleScope.launch {
                     val profile = try {
-                        profileRepository.getById(uid, profileType)
+                        profileRepository.getProfile(uid, profileType)
                     } catch (e: CancellationException) {
                         throw e
                     } catch (_: Exception) {

@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 /*
@@ -56,22 +57,34 @@ class ProfileViewModel(
     private val _selectedType = MutableStateFlow(ProfileType.PICKUP_ONLY)
     val selectedType: LiveData<ProfileType> = _selectedType.asLiveData()
 
-    // 고른 모드의 프로필 실시간 구독 (모드를 바꾸면 그 모드 프로필로 바꿔 구독)
-    // 문서가 없으면 그 모드의 빈 프로필
+    sealed interface ProfileState {
+        data object Loading : ProfileState
+        data class Success(val profile: ProfileModel) : ProfileState
+        data object NotFound : ProfileState
+        data object Error : ProfileState
+    }
+
+    // 모드별 조회 상태를 구분하고 실제 조회된 프로필만 수정에 사용한다.
     @OptIn(ExperimentalCoroutinesApi::class)
-    val profile: LiveData<ProfileModel> =
+    val profileState: LiveData<ProfileState> =
         _selectedType
             .flatMapLatest { type -> observeProfile(type) }
             .asLiveData()
 
-    // 한 모드의 프로필 구독. 실패하면 안내 문구 + 빈 프로필
+    val currentProfile: ProfileModel?
+        get() = (profileState.value as? ProfileState.Success)?.profile
+            ?.takeIf { it.type == _selectedType.value }
+
     private fun observeProfile(type: ProfileType) =
         (userId?.let { profileRepository.observe(it, type) } ?: flowOf(null))
-            .map { it ?: ProfileModel(type = type) }
+            .map<ProfileModel?, ProfileState> { profile ->
+                if (profile == null) ProfileState.NotFound else ProfileState.Success(profile)
+            }
+            .onStart { emit(ProfileState.Loading) }
             .catch { e ->
                 Log.e(TAG, "프로필 구독 실패: $type", e)
                 _message.value = R.string.profile_load_error
-                emit(ProfileModel(type = type))
+                emit(ProfileState.Error)
             }
 
     // 내 생년월일 (yyyy-MM-dd, 없으면 null)
@@ -106,8 +119,11 @@ class ProfileViewModel(
 
     // 입력 검사. 문제 있으면 안내 문구, 없으면 null
     @StringRes
-    fun validate(nickname: String): Int? =
-        if (nickname.isBlank()) R.string.mypage_nickname_required else null
+    fun validate(nickname: String): Int? = when {
+        currentProfile == null -> R.string.profile_load_error
+        nickname.isBlank() -> R.string.mypage_nickname_required
+        else -> null
+    }
 
     // 지금 고른 모드의 프로필 저장
     // 새 사진이 있으면 먼저 업로드, removeImage 면 기본 사진으로
@@ -121,15 +137,18 @@ class ProfileViewModel(
     ) {
         val id = userId ?: return
         val type = _selectedType.value
-        val current = profile.value?.takeIf { it.type == type }
-            ?: ProfileModel(type = type)
+        val current = currentProfile
+        if (current == null) {
+            _message.value = R.string.profile_load_error
+            return
+        }
         launchSave(R.string.mypage_profile_saved) {
             val imageUrl = when {
                 newImage != null -> uploadImage(newImage)
                 removeImage -> ""
                 else -> current.imageUrl.orEmpty()
             }
-            profileRepository.save(
+            profileRepository.update(
                 id,
                 current.copy(
                     type = type,
