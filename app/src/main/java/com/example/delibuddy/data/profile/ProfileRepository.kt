@@ -18,25 +18,15 @@ class ProfileRepository {
         users.document(userId).collection("profiles").document(type.name)
 
     suspend fun createInitialProfiles(userId: String): Unit = withErrorHandling {
-        val initialProfiles = ProfileType.values().map { type ->
-            getProfileRef(userId, type) to ProfileModel(
-                type = type,
-                nickname = RandomNicknameGenerator.generate()
-            )
+        ProfileType.values().forEach { type ->
+            val document = getProfileRef(userId, type)
+            document.set(
+                ProfileModel(
+                    type = type,
+                    nickname = RandomNicknameGenerator.generate()
+                )
+            ).await()
         }
-
-        firestore.runTransaction<Void> { transaction ->
-            val snapshots = initialProfiles.map { (document, _) ->
-                transaction.get(document)
-            }
-            initialProfiles.forEachIndexed { index, (document, profile) ->
-                if (!snapshots[index].exists()) {
-                    transaction.set(document, profile)
-                }
-            }
-            null
-        }.await()
-        Unit
     }
 
     suspend fun getProfile(userId: String, type: ProfileType): ProfileModel? = withErrorHandling {
@@ -55,23 +45,24 @@ class ProfileRepository {
         Unit
     }
 
-    fun observe(userId: String, type: ProfileType): Flow<ProfileModel?> = callbackFlow<ProfileModel?> {
-        val registration = getProfileRef(userId, type)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+    fun observe(userId: String, type: ProfileType): Flow<ProfileModel?> =
+        callbackFlow<ProfileModel?> {
+            val registration = getProfileRef(userId, type)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    try {
+                        trySend(snapshot?.toObject(ProfileModel::class.java))
+                    } catch (e: Exception) {
+                        close(e)
+                    }
                 }
-                try {
-                    trySend(snapshot?.toObject(ProfileModel::class.java))
-                } catch (e: Exception) {
-                    close(e)
-                }
-            }
-        awaitClose { registration.remove() }
-    }.catch { e ->
-        withErrorHandling { throw e }
-    }
+            awaitClose { registration.remove() }
+        }.catch { e ->
+            withErrorHandling { throw e }
+        }
 
     private suspend fun <T> withErrorHandling(action: suspend () -> T): T {
         return try {
