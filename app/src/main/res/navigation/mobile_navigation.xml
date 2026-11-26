@@ -179,7 +179,11 @@
         android:id="@+id/navigation_recommendation"
         android:name="com.example.delibuddy.ui.recommendation.RecommendationFragment"
         android:label="@string/nav_recommendation"
-        tools:layout="@layout/fragment_recommendation" />
+        tools:layout="@layout/fragment_recommendation">
+        <action
+            android:id="@+id/action_recommendation_to_create_room"
+            app:destination="@+id/navigation_create_room" />
+    </fragment>
 
     <!-- 하단 탭 "채팅" : 내 채팅방 목록으로 교체 -->
     <fragment

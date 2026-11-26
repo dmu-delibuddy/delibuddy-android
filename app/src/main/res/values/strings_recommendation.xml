@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="recommend_location_name">위치 이름</string>
+    <string name="recommend_location_description">픽업 장소 사진</string>
+    <string name="recommend_create_room_here">해당 위치로 방 만들기</string>
+</resources>

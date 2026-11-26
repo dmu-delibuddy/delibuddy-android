@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="room_create_title">방 만들기</string>
+    
     <string name="room_create_prev">이전</string>
     <string name="room_create_next">다음</string>
     <string name="room_create_submit">방 개설하기</string>

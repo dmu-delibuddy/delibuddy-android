@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -19,6 +21,7 @@ import com.example.delibuddy.data.recommendation.RecommendLocationModel
 import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.databinding.BottomSheetLocationInfoBinding
 import com.example.delibuddy.databinding.FragmentRecommendationBinding
+import com.example.delibuddy.ui.room.create.CreateRoomViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraUpdate
@@ -73,7 +76,7 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         viewModel.locations.observe(viewLifecycleOwner) { locations ->
             displayMarkers(locations)
         }
-        viewModel.loadLocations(requireContext())
+        viewModel.loadLocations()
     }
 
     private fun displayMarkers(locations: List<RecommendLocationModel>) {
@@ -121,7 +124,15 @@ class RecommendationFragment : Fragment(), OnMapReadyCallback {
         sheet.textRecommendBadge.root.displayedChild = if (location.mode == RoomMode.MEAL_BUDDY) 1 else 0
 
         sheet.textLocationName.text = location.name
-        sheet.buttonCreateRoomHere.setOnClickListener { dialog.dismiss() }
+        sheet.buttonCreateRoomHere.setOnClickListener {
+            dialog.dismiss()
+            findNavController().navigate(
+                R.id.action_recommendation_to_create_room,
+                bundleOf(
+                    CreateRoomViewModel.ARG_PLACE_ID to location.id
+                ),
+            )
+        }
         dialog.setContentView(sheet.root)
         dialog.show()
 
