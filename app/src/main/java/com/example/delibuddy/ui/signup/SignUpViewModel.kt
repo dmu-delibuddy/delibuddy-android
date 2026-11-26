@@ -1,5 +1,8 @@
 package com.example.delibuddy.ui.signup
 
+import com.example.delibuddy.data.profile.ProfileNetworkException
+import com.example.delibuddy.data.profile.ProfileNotFoundException
+import com.example.delibuddy.data.profile.ProfilePermissionDeniedException
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -269,6 +272,9 @@ class SignUpViewModel : ViewModel() {
     }
 
     private fun Exception.toProfileError(): Int = when (this) {
+        is ProfileNetworkException -> R.string.profile_network_error
+        is ProfileNotFoundException -> R.string.profile_not_found
+        is ProfilePermissionDeniedException -> R.string.profile_permission_error
         is FirebaseNetworkException -> R.string.signup_verification_check_network_error
         is SignUpSessionMissingException,
         is FirebaseAuthInvalidUserException -> R.string.signup_session_expired

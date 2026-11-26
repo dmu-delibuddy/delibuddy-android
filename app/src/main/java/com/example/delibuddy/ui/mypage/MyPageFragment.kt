@@ -129,7 +129,7 @@ class MyPageFragment : Fragment() {
         textNickname.setText(
             when (state) {
                 ProfileViewModel.ProfileState.NotFound -> R.string.profile_not_found
-                ProfileViewModel.ProfileState.Error -> R.string.profile_load_error
+                is ProfileViewModel.ProfileState.Error -> state.message
                 else -> R.string.profile_loading
             }
         )

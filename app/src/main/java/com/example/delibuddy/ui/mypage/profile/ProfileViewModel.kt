@@ -16,6 +16,9 @@ import com.example.delibuddy.data.profile.ProfileRepository
 import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.data.user.UserRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.example.delibuddy.data.profile.ProfileNetworkException
+import com.example.delibuddy.data.profile.ProfileNotFoundException
+import com.example.delibuddy.data.profile.ProfilePermissionDeniedException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +64,7 @@ class ProfileViewModel(
         data object Loading : ProfileState
         data class Success(val profile: ProfileModel) : ProfileState
         data object NotFound : ProfileState
-        data object Error : ProfileState
+        data class Error(@StringRes val message: Int) : ProfileState
     }
 
     // 모드별 조회 상태를 구분하고 실제 조회된 프로필만 수정에 사용한다.
@@ -83,8 +86,9 @@ class ProfileViewModel(
             .onStart { emit(ProfileState.Loading) }
             .catch { e ->
                 Log.e(TAG, "프로필 구독 실패: $type", e)
-                _message.value = R.string.profile_load_error
-                emit(ProfileState.Error)
+                val message = e.toProfileError(R.string.profile_load_error)
+                _message.value = message
+                emit(ProfileState.Error(message))
             }
 
     // 내 생년월일 (yyyy-MM-dd, 없으면 null)
@@ -186,11 +190,19 @@ class ProfileViewModel(
                 throw e
             } catch (e: Exception) {
                 Log.e(TAG, "프로필 저장 실패", e)
-                _message.value = R.string.mypage_save_error
+                _message.value = e.toProfileError(R.string.mypage_save_error)
             } finally {
                 _saving.value = false
             }
         }
+    }
+
+    @StringRes
+    private fun Throwable.toProfileError(@StringRes fallback: Int): Int = when (this) {
+        is ProfileNetworkException -> R.string.profile_network_error
+        is ProfileNotFoundException -> R.string.profile_not_found
+        is ProfilePermissionDeniedException -> R.string.profile_permission_error
+        else -> fallback
     }
 
     // 토스트를 보여준 뒤 비우기 (화면 회전 시 중복 방지)
