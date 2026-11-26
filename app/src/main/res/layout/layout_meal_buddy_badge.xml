@@ -4,4 +4,4 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_badge_red"
-    android:text="@string/mode_meal_buddy" />
+    android:text="@string/common_mode_meal_buddy" />

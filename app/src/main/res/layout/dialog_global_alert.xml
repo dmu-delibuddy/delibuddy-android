@@ -69,7 +69,7 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:background="@drawable/bg_pixel_button"
-            android:text="@string/alert_cancel"
+            android:text="@string/common_alert_cancel"
             android:textColor="@color/navy"
             android:theme="@style/GlobalAlertDialogCancelButtonTheme"
             android:textSize="15sp"
@@ -82,11 +82,11 @@
             android:minHeight="48dp"
             android:layout_weight="1"
             android:background="@drawable/bg_pixel_button"
-            android:text="@string/alert_confirm"
+            android:text="@string/common_alert_confirm"
             android:textColor="?attr/globalAlertConfirmTextColor"
             android:textSize="15sp"
             android:textStyle="bold"
-            tools:text="@string/alert_confirm" />
+            tools:text="@string/common_alert_confirm" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

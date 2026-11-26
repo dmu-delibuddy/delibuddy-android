@@ -2,7 +2,6 @@ package com.example.delibuddy.ui.chat.order
 
 import android.content.ContentResolver
 import android.net.Uri
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -91,8 +90,7 @@ class MyOrderViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "내 주문 불러오기 실패 : $roomId", e)
-                LoadState.Error(e.toOrderError(R.string.profile_order_error))
+                LoadState.Error(e.toOrderError(R.string.order_load_error))
             }
         }
     }
@@ -133,7 +131,6 @@ class MyOrderViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "주문 저장 실패 : $roomId", e)
                 SaveState.Failed(e.toOrderError(R.string.my_order_save_error))
             }
         }
@@ -144,7 +141,7 @@ class MyOrderViewModel(
         is InvalidOrderRoomIdException -> R.string.my_order_room_invalid
         is InvalidOrderUserIdException -> R.string.my_order_user_invalid
         is InvalidOrderPriceException -> R.string.my_order_price_invalid
-        is OrderNotLoggedInException -> R.string.create_error_not_logged_in
+        is OrderNotLoggedInException -> R.string.common_error_not_logged_in
         is OrderRoomNotFoundException -> R.string.my_order_room_not_found
         is OrderNotParticipantException -> R.string.my_order_not_participant
         is OrderRoomClosedException -> R.string.my_order_room_closed
@@ -185,6 +182,5 @@ class MyOrderViewModel(
 
     companion object {
         const val ARG_ROOM_ID = "roomId"
-        private const val TAG = "MyOrderVM"
     }
 }

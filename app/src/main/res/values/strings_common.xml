@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_mode_pickup">픽업만</string>
+    <string name="common_mode_meal_buddy">밥친구</string>
+    <string name="common_back">뒤로가기</string>
+    <string name="common_currency_won">원</string>
+    <string name="common_error_not_logged_in">로그인이 풀렸어요. 다시 로그인해 주세요</string>
+    <string-array name="account_bank_list">
+        <item>국민은행</item>
+        <item>농협은행</item>
+        <item>신한은행</item>
+        <item>IBK기업은행</item>
+        <item>카카오뱅크</item>
+        <item>토스뱅크</item>
+        <item>하나은행</item>
+        <item>우리은행</item>
+        <item>수협은행</item>
+    </string-array>
+    <string name="common_alert_confirm">확인</string>
+    <string name="common_alert_cancel">취소</string>
+</resources>

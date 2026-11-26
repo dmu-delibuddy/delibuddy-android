@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="room_participant_count">%1$d/%2$d</string>
+    <string name="room_delivery_app_baemin">배달의 민족</string>
+    <string name="room_delivery_app_coupang_eats">쿠팡이츠</string>
+    <string name="room_delivery_app_yogiyo">요기요</string>
+    <string name="room_delivery_app_other">직접 입력</string>
+    <string name="room_delivery_app_unknown">기타</string>
+    <string name="room_split_host">방장 부담</string>
+    <string name="room_split_equal">1/N 정산</string>
+    <string name="room_split_by_menu">개인 메뉴 정산</string>
+    <string name="room_split_custom">직접 입력</string>
+    <string name="room_food_split_host_description">방장이 음식값을 모두 내요</string>
+    <string name="room_food_split_equal_description">음식값 합계를 인원수로 똑같이 나눠요</string>
+    <string name="room_food_split_by_menu_description">각자 주문한 메뉴 금액만큼 내요</string>
+    <string name="room_food_split_custom_description">참여자별 금액을 직접 정해요</string>
+    <string name="room_status_full">정원 마감</string>
+    <string name="room_status_confirmed">주문 확정</string>
+    <string name="room_status_ordered">주문 완료</string>
+    <string name="room_status_received">수령 완료</string>
+    <string name="room_status_completed">완료</string>
+    <string name="room_host">방장</string>
+    <string name="room_error_not_found">방을 찾을 수 없습니다.</string>
+    <string name="room_error_closed">모집이 마감된 방입니다.</string>
+    <string name="room_error_full">정원이 가득 찼습니다.</string>
+    <string name="room_error_already_joined">이미 참여 중인 방입니다.</string>
+    <string name="room_error_not_host">방장만 할 수 있습니다.</string>
+    <string name="room_error_cannot_leave_in_progress">모집 중이거나 완료된 방에서만 나갈 수 있습니다.</string>
+    <string name="room_error_invalid_state">지금 상태에서는 할 수 없습니다.</string>
+    <string name="room_error_account_required">송금 계좌를 등록해야 참여할 수 있어요. 마이페이지에서 등록해 주세요.</string>
+    <string name="room_status_recruiting">모집 중</string>
+</resources>

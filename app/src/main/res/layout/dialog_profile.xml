@@ -36,7 +36,7 @@
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:background="@drawable/bg_pixel_box"
-                    android:contentDescription="@string/mypage_profile_image_desc"
+                    android:contentDescription="@string/profile_image_description"
                     android:paddingStart="4dp"
                     android:paddingTop="4dp"
                     android:paddingEnd="7dp"
@@ -114,7 +114,7 @@
             android:minHeight="48dp"
             android:background="@drawable/bg_pixel_button"
             android:theme="@style/GlobalAlertDialogCancelButtonTheme"
-            android:text="@string/profile_view_order"
+            android:text="@string/chat_participant_order_view"
             android:textColor="@color/navy"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -128,7 +128,7 @@
             android:minHeight="48dp"
             android:background="@drawable/bg_pixel_button"
             android:theme="@style/GlobalAlertDialogDangerTheme"
-            android:text="@string/profile_remove_participant"
+            android:text="@string/chat_participant_remove"
             android:textColor="@color/white"
             android:textSize="15sp"
             android:textStyle="bold" />

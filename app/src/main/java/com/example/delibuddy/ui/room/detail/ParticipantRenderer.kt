@@ -26,7 +26,7 @@ class ParticipantRenderer(
 
     fun render(room: RoomModel) {
         binding.textParticipantsTitle.text = fragment.getString(
-            R.string.detail_participants,
+            R.string.room_detail_participants,
             room.currentCount, room.maxParticipants
         )
 
@@ -99,7 +99,7 @@ class ParticipantRenderer(
                 }
                 fragment.viewLifecycleOwner.lifecycleScope.launch {
                     val profile = try {
-                        profileRepository.getById(uid, profileType)
+                        profileRepository.getProfile(uid, profileType)
                     } catch (e: CancellationException) {
                         throw e
                     } catch (_: Exception) {

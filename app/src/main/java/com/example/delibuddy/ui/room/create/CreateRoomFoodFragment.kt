@@ -49,8 +49,8 @@ class CreateRoomFoodFragment : Fragment() {
 
     private fun setUpCategorySpinner() {
         val categories = FoodCategory.entries
-        val labels = listOf(getString(R.string.create_category_hint)) +
-                resources.getStringArray(R.array.create_category_labels)
+        val labels = listOf(getString(R.string.room_create_category_hint)) +
+                resources.getStringArray(R.array.room_create_category_labels)
 
         binding.spinnerCategory.adapter = ArrayAdapter(
             requireContext(), android.R.layout.simple_spinner_item, labels

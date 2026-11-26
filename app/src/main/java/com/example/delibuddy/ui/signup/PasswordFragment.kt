@@ -114,8 +114,8 @@ class PasswordFragment : Fragment() {
         binding.editPasswordConfirm.isEnabled = !isBusy
 
         val loadingMessage = when {
-            viewModel.isConfirmingVerification.value == true -> R.string.signup_checking_verification
-            viewModel.isSendingVerification.value == true -> R.string.signup_sending_verification_email
+            viewModel.isConfirmingVerification.value == true -> R.string.signup_verification_checking
+            viewModel.isSendingVerification.value == true -> R.string.signup_verification_email_sending
             else -> null
         }
         if (loadingMessage != null) {

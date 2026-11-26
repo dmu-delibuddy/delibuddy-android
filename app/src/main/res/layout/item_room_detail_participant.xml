@@ -28,7 +28,7 @@
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_marginEnd="3dp"
-            android:contentDescription="@string/detail_host"
+            android:contentDescription="@string/room_host"
             android:src="@drawable/crown_icon"
             android:visibility="gone" />
 
@@ -46,7 +46,7 @@
         android:id="@+id/text_me"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/detail_me"
+        android:text="@string/room_detail_me"
         android:textColor="@color/black"
         android:textSize="12sp"
         android:visibility="gone" />

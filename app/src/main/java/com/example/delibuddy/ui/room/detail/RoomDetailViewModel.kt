@@ -62,7 +62,7 @@ class RoomDetailViewModel(
         }
         .catch { e ->
             Log.e(TAG, "observeRoom 실패: $roomId", e)
-            emit(DetailState.Error(e.toRoomError(R.string.detail_load_error)))
+            emit(DetailState.Error(e.toRoomError(R.string.room_detail_load_error)))
         }
         .asLiveData()
 
@@ -108,7 +108,7 @@ class RoomDetailViewModel(
             } catch (e: Exception) {
                 Log.e(TAG, "참여 실패 : $roomId", e)
                 ActionState.Failed(
-                    message = e.toRoomError(R.string.detail_action_error),
+                    message = e.toRoomError(R.string.room_detail_action_error),
                     accountRequired = e is RoomAccountRequiredException,
                 )
             }

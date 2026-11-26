@@ -45,7 +45,7 @@ class ChatParticipantAdapter(private val onProfileClick: (String) -> Unit) :
                 .into(binding.imageProfile)
             binding.imageProfile.contentDescription =
                 participant.nickname.takeIf { it.isNotBlank() }
-                    ?: binding.root.context.getString(R.string.chat_profile_image_desc)
+                    ?: binding.root.context.getString(R.string.chat_profile_image_description)
         }
     }
 

@@ -63,7 +63,7 @@ class AccountViewModel(
                 throw e
             } catch (e: Exception) {
                 Log.e(TAG, "계좌 불러오기 실패", e)
-                _message.value = R.string.mypage_load_error
+                _message.value = R.string.profile_load_error
             }
         }
     }

@@ -15,7 +15,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginEnd="8dp"
-        android:contentDescription="@string/chat_profile_image_desc"
+        android:contentDescription="@string/chat_profile_image_description"
         android:scaleType="centerCrop"
         android:src="@drawable/mypage_icon" />
 
@@ -37,7 +37,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="4dp"
-                android:contentDescription="@string/detail_host"
+                android:contentDescription="@string/room_host"
                 android:src="@drawable/crown_icon"
                 android:visibility="gone"
                 tools:visibility="visible" />
@@ -70,7 +70,7 @@
                     android:layout_width="180dp"
                     android:layout_height="180dp"
                     android:background="@drawable/bg_pixel_box"
-                    android:contentDescription="@string/chat_image_desc"
+                    android:contentDescription="@string/chat_image_description"
                     android:paddingStart="4dp"
                     android:paddingTop="4dp"
                     android:paddingEnd="7dp"

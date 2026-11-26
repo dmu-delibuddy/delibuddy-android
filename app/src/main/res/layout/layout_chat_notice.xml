@@ -53,7 +53,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:contentDescription=
-                "@string/notice_expand_desc"
+                "@string/chat_notice_expand_description"
             android:src=
                 "@android:drawable/arrow_down_float"
             app:tint="@color/black" />
@@ -156,35 +156,35 @@
 
             <TextView
                 style="@style/NoticeStepLabel"
-                android:text="@string/notice_step_recruiting"
+                android:text="@string/chat_notice_step_recruiting"
                 app:layout_constraintStart_toStartOf="@id/step_1"
                 app:layout_constraintEnd_toEndOf="@id/step_1"
                 app:layout_constraintTop_toBottomOf="@id/step_1" />
 
             <TextView
                 style="@style/NoticeStepLabel"
-                android:text="@string/notice_step_confirmed"
+                android:text="@string/chat_notice_step_confirmed"
                 app:layout_constraintStart_toStartOf="@id/step_2"
                 app:layout_constraintEnd_toEndOf="@id/step_2"
                 app:layout_constraintTop_toBottomOf="@id/step_2" />
 
             <TextView
                 style="@style/NoticeStepLabel"
-                android:text="@string/notice_step_ordered"
+                android:text="@string/chat_notice_step_ordered"
                 app:layout_constraintStart_toStartOf="@id/step_3"
                 app:layout_constraintEnd_toEndOf="@id/step_3"
                 app:layout_constraintTop_toBottomOf="@id/step_3" />
 
             <TextView
                 style="@style/NoticeStepLabel"
-                android:text="@string/notice_step_received"
+                android:text="@string/chat_notice_step_received"
                 app:layout_constraintStart_toStartOf="@id/step_4"
                 app:layout_constraintEnd_toEndOf="@id/step_4"
                 app:layout_constraintTop_toBottomOf="@id/step_4" />
 
             <TextView
                 style="@style/NoticeStepLabel"
-                android:text="@string/notice_step_completed"
+                android:text="@string/chat_notice_step_completed"
                 app:layout_constraintStart_toStartOf="@id/step_5"
                 app:layout_constraintEnd_toEndOf="@id/step_5"
                 app:layout_constraintTop_toBottomOf="@id/step_5" />

@@ -61,7 +61,7 @@ class MyPageFragment : Fragment() {
             if (saving) {
                 GlobalLoadingDialog.show(
                     childFragmentManager,
-                    getString(R.string.mypage_saving_profile)
+                    getString(R.string.mypage_profile_saving)
                 )
             } else {
                 GlobalLoadingDialog.hide(childFragmentManager)
@@ -92,7 +92,9 @@ class MyPageFragment : Fragment() {
 
     // "프로필 수정하기" : 프로필 수정 창 열기
     private fun setUpEditProfileButton() {
+        binding.cardProfile.buttonEditProfile.isEnabled = false
         binding.cardProfile.buttonEditProfile.setOnClickListener {
+            if (profileViewModel.currentProfile == null) return@setOnClickListener
             EditProfileDialogFragment()
                 .show(childFragmentManager, EditProfileDialogFragment.TAG)
         }
@@ -101,6 +103,7 @@ class MyPageFragment : Fragment() {
     // 고른 모드에 맞게 모드 버튼 체크
     private fun observeSelectedMode() {
         profileViewModel.selectedType.observe(viewLifecycleOwner) { type ->
+            binding.cardProfile.buttonEditProfile.isEnabled = profileViewModel.currentProfile != null
             val modeId =
                 if (type == ProfileType.MEAL_BUDDY) R.id.radio_meal_buddy
                 else R.id.radio_pickup
@@ -111,9 +114,28 @@ class MyPageFragment : Fragment() {
 
     // 프로필이 바뀔 때마다 카드 다시 그리기
     private fun observeProfile() {
-        profileViewModel.profile.observe(viewLifecycleOwner) { profile ->
-            renderProfile(profile)
+        profileViewModel.profileState.observe(viewLifecycleOwner) { state ->
+            val profile = profileViewModel.currentProfile
+            binding.cardProfile.buttonEditProfile.isEnabled = profile != null
+            if (profile != null) {
+                renderProfile(profile)
+            } else {
+                renderProfileUnavailable(state)
+            }
         }
+    }
+
+    private fun renderProfileUnavailable(state: ProfileViewModel.ProfileState) = with(binding.cardProfile) {
+        textNickname.setText(
+            when (state) {
+                ProfileViewModel.ProfileState.NotFound -> R.string.profile_not_found
+                is ProfileViewModel.ProfileState.Error -> state.message
+                else -> R.string.profile_loading
+            }
+        )
+        textBio.text = ""
+        Glide.with(imageProfile).clear(imageProfile)
+        imageProfile.setImageResource(R.drawable.mypage_icon)
     }
 
     // 닉네임, 소개, 사진 표시 (비어 있으면 안내 문구 / 기본 사진)

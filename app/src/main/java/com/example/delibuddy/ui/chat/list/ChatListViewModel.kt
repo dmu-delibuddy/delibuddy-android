@@ -1,6 +1,5 @@
 package com.example.delibuddy.ui.chat.list
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -22,13 +21,9 @@ class ChatListViewModel(
         (FirebaseAuth.getInstance().currentUser?.uid
             ?.let { uid -> roomRepository.observeMyRooms(uid) }
             ?: flowOf(emptyList()))
-            .catch { e ->
-                Log.e(TAG, "내 채팅방 구독 실패", e)
+            .catch {
                 emit(emptyList())
             }
             .asLiveData()
 
-    companion object {
-        private const val TAG = "ChatListVM"
-    }
 }

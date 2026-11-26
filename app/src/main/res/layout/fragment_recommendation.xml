@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@string/location_recommendation"
+            android:text="@string/nav_recommendation"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -75,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="@string/mode_meal_buddy"
+                android:text="@string/common_mode_meal_buddy"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -98,7 +98,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="@string/mode_pickup"
+                android:text="@string/common_mode_pickup"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>

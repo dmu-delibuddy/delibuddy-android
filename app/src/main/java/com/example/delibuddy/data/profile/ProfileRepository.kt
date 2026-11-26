@@ -1,44 +1,40 @@
 package com.example.delibuddy.data.profile
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.tasks.await
 
 class ProfileRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val users = firestore.collection("users")
 
-    private fun profileDocument(userId: String, type: ProfileType) =
+    private fun getProfileRef(userId: String, type: ProfileType) =
         users.document(userId).collection("profiles").document(type.name)
 
-    suspend fun createInitialProfiles(userId: String) {
-        val initialProfiles = ProfileType.values().map { type ->
-            profileDocument(userId, type) to ProfileModel(
-                type = type,
-                nickname = RandomNicknameGenerator.generate()
-            )
+    suspend fun createInitialProfiles(userId: String): Unit = withErrorHandling {
+        ProfileType.values().forEach { type ->
+            val document = getProfileRef(userId, type)
+            document.set(
+                ProfileModel(
+                    type = type,
+                    nickname = RandomNicknameGenerator.generate()
+                )
+            ).await()
         }
-
-        firestore.runTransaction<Void> { transaction ->
-            val snapshots = initialProfiles.map { (document, _) ->
-                transaction.get(document)
-            }
-            initialProfiles.forEachIndexed { index, (document, profile) ->
-                if (!snapshots[index].exists()) {
-                    transaction.set(document, profile)
-                }
-            }
-            null
-        }.await()
     }
 
-    suspend fun getById(userId: String, type: ProfileType): ProfileModel? =
-        profileDocument(userId, type).get().await().toObject(ProfileModel::class.java)
+    suspend fun getProfile(userId: String, type: ProfileType): ProfileModel? = withErrorHandling {
+        getProfileRef(userId, type).get().await().toObject(ProfileModel::class.java)
+    }
 
-    suspend fun update(userId: String, profile: ProfileModel) {
-        profileDocument(userId, profile.type).update(
+    suspend fun update(userId: String, profile: ProfileModel): Unit = withErrorHandling {
+        getProfileRef(userId, profile.type).update(
             mapOf(
                 "type" to profile.type.name,
                 "nickname" to profile.nickname,
@@ -46,25 +42,45 @@ class ProfileRepository {
                 "imageUrl" to profile.imageUrl
             )
         ).await()
+        Unit
     }
 
-    // 모드별 프로필 실시간 구독 (마이페이지). 문서가 없으면 null
-    fun observe(userId: String, type: ProfileType): Flow<ProfileModel?> = callbackFlow {
-        val registration = profileDocument(userId, type)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
+    fun observe(userId: String, type: ProfileType): Flow<ProfileModel?> =
+        callbackFlow<ProfileModel?> {
+            val registration = getProfileRef(userId, type)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        close(error)
+                        return@addSnapshotListener
+                    }
+                    try {
+                        trySend(snapshot?.toObject(ProfileModel::class.java))
+                    } catch (e: Exception) {
+                        close(e)
+                    }
                 }
-                trySend(snapshot?.toObject(ProfileModel::class.java))
+            awaitClose { registration.remove() }
+        }.catch { e ->
+            withErrorHandling { throw e }
+        }
+
+    private suspend fun <T> withErrorHandling(action: suspend () -> T): T {
+        return try {
+            action()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            throw when (e) {
+                is FirebaseNetworkException -> ProfileNetworkException()
+                is FirebaseFirestoreException -> when (e.code) {
+                    FirebaseFirestoreException.Code.UNAVAILABLE,
+                    FirebaseFirestoreException.Code.DEADLINE_EXCEEDED -> ProfileNetworkException()
+                    FirebaseFirestoreException.Code.NOT_FOUND -> ProfileNotFoundException()
+                    FirebaseFirestoreException.Code.PERMISSION_DENIED -> ProfilePermissionDeniedException()
+                    else -> ProfileUnknownException()
+                }
+                else -> ProfileUnknownException()
             }
-        awaitClose { registration.remove() }
+        }
     }
-
-    // 모드별 프로필 저장. 문서가 없으면 새로 만듦
-    // (#28 이전에 가입해 프로필 문서가 없는 계정도 저장되도록 update 대신 set)
-    suspend fun save(userId: String, profile: ProfileModel) {
-        profileDocument(userId, profile.type).set(profile).await()
-    }
-
 }

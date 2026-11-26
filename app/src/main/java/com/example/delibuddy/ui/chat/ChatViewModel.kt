@@ -8,7 +8,6 @@ import android.app.Application
 import androidx.annotation.StringRes
 import com.example.delibuddy.ui.room.toRoomError
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,6 +15,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.data.chat.ChatModel
+import com.example.delibuddy.data.chat.ChatNotLoggedInException
 import com.example.delibuddy.data.chat.ChatRepository
 import com.example.delibuddy.data.chat.MessageType
 import com.example.delibuddy.data.order.OrderModel
@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import com.example.delibuddy.R
-import com.example.delibuddy.data.room.RoomStatus
 import com.example.delibuddy.data.chat.SystemMessage
 
 /*
@@ -91,8 +90,7 @@ class ChatViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "방 나가기 실패: $id", e)
-                LeaveRoomState.Failed(e.toRoomError(R.string.chat_leave_room_error))
+                LeaveRoomState.Failed(e.toRoomError(R.string.chat_room_leave_error))
             }
         }
     }
@@ -133,8 +131,7 @@ class ChatViewModel(
                     loadFailed.value = false
                     requestImageUrls(list)
                 }
-                .catch { e ->
-                    Log.e(TAG, "메시지 구독 실패: $id", e)
+                .catch {
                     loadFailed.value = true
                     emit(emptyList())
                 }
@@ -164,7 +161,12 @@ class ChatViewModel(
 
     private var changingStatus = false
 
-    fun isHost(room : RoomModel) : Boolean = room.isHost(chatRepository.myUid)
+    fun isHost(room: RoomModel): Boolean = try {
+        room.isHost(chatRepository.myUid)
+    } catch (e: ChatNotLoggedInException) {
+        loadFailed.value = true
+        false
+    }
 
     suspend fun loadParticipantOrder(userId: String): Result<OrderModel?> {
         val id = roomId ?: return Result.failure(RoomNotFoundException())
@@ -173,7 +175,6 @@ class ChatViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Log.w(TAG, "참여자 주문 조회 실패", e)
             Result.failure(e)
         }
     }
@@ -188,8 +189,7 @@ class ChatViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Log.w(TAG, "참여자 강제 퇴장 실패", e)
-            e.toRoomError(R.string.profile_remove_participant_error)
+            e.toRoomError(R.string.chat_participant_remove_error)
         }
     }
 
@@ -209,8 +209,7 @@ class ChatViewModel(
             } catch (e : CancellationException) {
                 throw e
             } catch (e : Exception) {
-                Log.e(TAG, "방 상태 변경 실패 : $id", e)
-                _statusError.value = e.toRoomError(R.string.notice_action_failed)
+                _statusError.value = e.toRoomError(R.string.chat_notice_action_error)
             } finally {
                 changingStatus = false
             }
@@ -259,6 +258,10 @@ class ChatViewModel(
         ) { server, local, room, urls, profiles ->
             if (room != null) requestProfiles(server, room.mode)
             buildItems(server, local, room, urls, profiles)
+        }.catch { e ->
+            if (e !is ChatNotLoggedInException) throw e
+            loadFailed.value = true
+            emit(emptyList())
         }.asLiveData()
 
     // 서버 메시지 뒤에, 서버에 아직 없는 내 메시지를 붙임
@@ -335,13 +338,12 @@ class ChatViewModel(
             .forEach { key ->
                 viewModelScope.launch {
                     try {
-                        profileRepository.getById(key.first, key.second)?.let { profile ->
+                        profileRepository.getProfile(key.first, key.second)?.let { profile ->
                             profiles.update { it + (key to profile) }
                         }
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
-                        Log.w(TAG, "프로필 조회 실패: ${key.first}", e)
                     }
                 }
             }
@@ -378,7 +380,6 @@ class ChatViewModel(
                     } catch (e: CancellationException) {
                         throw e
                     } catch (e: Exception) {
-                        Log.w(TAG, "사진 주소 받기 실패: $imageId", e)
                         requestedImageIds.remove(imageId) // 다음 목록 갱신 때 다시 시도
                     }
                 }
@@ -403,7 +404,7 @@ class ChatViewModel(
     }
 
     suspend fun getMySharedAccount(): SharedAccount? {
-        val uid = chatRepository.myUid ?: return null
+        val uid = chatRepository.myUid
         val user = UserRepository().getById(uid) ?: return null
         val bank = user.bankName.orEmpty().trim()
         val number = user.account.orEmpty().trim()
@@ -442,7 +443,6 @@ class ChatViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "메시지 전송 실패: ${sending.id}", e)
                 // 업로드까지 끝났다면 이미지 ID가 담긴 최신 값을 실패로 남김
                 val latest = pending.value[sending.id] ?: sending
                 putPending(latest.copy(failed = true))
@@ -469,6 +469,5 @@ class ChatViewModel(
 
     companion object {
         const val ARG_ROOM_ID = "roomId"
-        private const val TAG = "ChatVM"
     }
 }

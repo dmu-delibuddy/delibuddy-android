@@ -43,7 +43,7 @@ class ProfileViewModel : ViewModel() {
         _state.value = ProfileUiState.Loading
         viewModelScope.launch {
             _state.value = try {
-                val profile = profileRepository.getById(userId, type)
+                val profile = profileRepository.getProfile(userId, type)
                 if (profile == null) ProfileUiState.NotFound else ProfileUiState.Success(profile)
             } catch (e: CancellationException) {
                 throw e

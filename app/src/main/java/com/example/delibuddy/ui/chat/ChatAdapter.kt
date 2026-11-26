@@ -103,7 +103,7 @@ class ChatAdapter(
 
         fun bind(item: ChatItem.Bubble) = with(binding) {
             val fallback =
-                if (item.isFromHost) R.string.detail_host else R.string.chat_sender_participant
+                if (item.isFromHost) R.string.room_host else R.string.chat_sender_participant
             textSender.text = item.senderNickname ?: textSender.context.getString(fallback)
             imageSenderCrown.isVisible = item.isFromHost
             Glide.with(imageProfile)
@@ -166,7 +166,7 @@ class ChatAdapter(
 
     private fun copyAccount(number: String, context: Context) {
         val clipboard = context.getSystemService(ClipboardManager::class.java) ?: return
-        val clip = ClipData.newPlainText(context.getString(R.string.chat_menu_share_account), number)
+        val clip = ClipData.newPlainText(context.getString(R.string.chat_menu_account_share), number)
         clip.description.extras = PersistableBundle().apply {
             putBoolean("android.content.extra.IS_SENSITIVE", true)
         }

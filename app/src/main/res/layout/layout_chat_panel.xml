@@ -157,7 +157,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
-                    android:text="@string/chat_menu_leave_room"
+                    android:text="@string/chat_menu_room_leave"
                     android:textColor="@color/black"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -183,7 +183,7 @@
                     android:layout_height="52dp"
                     android:padding="3dp"
                     android:src="@drawable/coin_icon"
-                    android:contentDescription="@string/chat_menu_share_account" />
+                    android:contentDescription="@string/chat_menu_account_share" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -191,7 +191,7 @@
                     android:gravity="center"
                     android:maxLines="1"
                     android:paddingTop="4dp"
-                    android:text="@string/chat_menu_share_account"
+                    android:text="@string/chat_menu_account_share"
                     android:textColor="@color/black"
                     android:textSize="15sp" />
             </LinearLayout>

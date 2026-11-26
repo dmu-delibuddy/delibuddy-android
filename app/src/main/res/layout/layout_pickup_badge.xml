@@ -4,4 +4,4 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_badge_orange"
-    android:text="@string/mode_pickup" />
+    android:text="@string/common_mode_pickup" />

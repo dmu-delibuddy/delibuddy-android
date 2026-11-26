@@ -1,11 +1,15 @@
 package com.example.delibuddy.ui.signin
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.delibuddy.R
 import com.example.delibuddy.data.auth.AuthRepository
+import com.example.delibuddy.data.auth.AuthInvalidCredentialsException
+import com.example.delibuddy.data.auth.AuthInvalidUserException
+import com.example.delibuddy.data.auth.AuthNetworkException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -31,7 +35,7 @@ class SignInViewModel : ViewModel() {
 
         val id = emailId.trim()
         if (!isValidEmailId(id)) {
-            _message.value = R.string.signup_invalid_email
+            _message.value = R.string.auth_email_invalid
             return
         }
 
@@ -54,11 +58,19 @@ class SignInViewModel : ViewModel() {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _message.value = R.string.signin_failed
+                _message.value = e.toSignInError()
             } finally {
                 _isSigningIn.value = false
             }
         }
+    }
+
+    @StringRes
+    private fun Exception.toSignInError(): Int = when (this) {
+        is AuthInvalidCredentialsException -> R.string.signin_invalid_credentials
+        is AuthInvalidUserException -> R.string.signin_invalid_user
+        is AuthNetworkException -> R.string.signin_network_error
+        else -> R.string.signin_error
     }
 
     private fun isValidEmailId(emailId: String): Boolean {

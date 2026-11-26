@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_step1_heading"
+                android:text="@string/room_create_step1_heading"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
 
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:alpha="0.7"
-                android:text="@string/create_step1_sub"
+                android:text="@string/room_create_step1_description"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/create_title_label"
+                android:text="@string/room_create_title_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -61,7 +61,7 @@
                 android:layout_height="48dp"
                 android:layout_marginTop="6dp"
                 android:background="@drawable/bg_pixel_box"
-                android:hint="@string/create_title_hint"
+                android:hint="@string/room_create_title_hint"
                 android:importantForAutofill="no"
                 android:inputType="text"
                 android:maxLength="30"
@@ -85,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/create_participants_label"
+                android:text="@string/room_create_participants_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -137,7 +137,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/create_mode_label"
+                android:text="@string/room_create_mode_label"
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
@@ -159,7 +159,7 @@
                     android:button="@null"
                     android:checked="true"
                     android:gravity="center"
-                    android:text="@string/create_mode_pickup"
+                    android:text="@string/room_create_mode_pickup"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
 
@@ -171,7 +171,7 @@
                     android:background="@drawable/bg_mode_button"
                     android:button="@null"
                     android:gravity="center"
-                    android:text="@string/create_mode_meal_buddy"
+                    android:text="@string/room_create_mode_meal_buddy"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
             </RadioGroup>

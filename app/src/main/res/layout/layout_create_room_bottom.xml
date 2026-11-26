@@ -14,7 +14,7 @@
         android:layout_height="52dp"
         android:layout_marginEnd="8dp"
         android:layout_weight="1"
-        android:text="@string/create_room_prev"
+        android:text="@string/room_create_prev"
         android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
@@ -23,5 +23,5 @@
         android:layout_width="0dp"
         android:layout_height="52dp"
         android:layout_weight="2"
-        android:text="@string/create_room_next" />
+        android:text="@string/room_create_next" />
 </LinearLayout>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mypage_logout">로그아웃</string>
+    <string name="mypage_logout_title">로그아웃할까요?</string>
+    <string name="mypage_nickname_label">닉네임</string>
+    <string name="mypage_nickname_empty">닉네임을 설정해 주세요</string>
+    <string name="mypage_bio_label">한 줄 소개</string>
+    <string name="mypage_bio_empty">한 줄 소개를 입력해 주세요</string>
+    <string name="mypage_birth_label">생일</string>
+    <string name="mypage_birth_empty">미입력</string>
+    <string name="mypage_profile_edit">프로필 수정하기</string>
+    <string name="mypage_manner_score">매너 점수</string>
+    <string name="mypage_review_count">받은 리뷰</string>
+    <string name="mypage_join_count">참여 내역</string>
+    <string name="mypage_account_label">송금 계좌</string>
+    <string name="mypage_account_empty">송금 계좌를 등록해 주세요</string>
+    <string name="mypage_account_change">변경</string>
+    <string name="mypage_menu_history">참여 내역</string>
+    <string name="mypage_menu_history_description">지난 공동 주문과 리뷰</string>
+    <string name="mypage_menu_settings">설정</string>
+    <string name="mypage_menu_settings_description">위치 권한 · 약관 · 탈퇴</string>
+    <string name="mypage_profile_edit_title">프로필 수정</string>
+    <string name="mypage_profile_edit_mode_title">%s 프로필 수정</string>
+    <string name="mypage_profile_image_remove">기본 사진으로</string>
+    <string name="mypage_nickname_hint">닉네임을 입력하세요</string>
+    <string name="mypage_bio_hint">한 줄 소개를 입력하세요</string>
+    <string name="mypage_birth_hint">생년월일을 선택하세요</string>
+    <string name="mypage_account_edit_title">송금 계좌 변경</string>
+    <string name="mypage_bank_label">은행 선택</string>
+    <string name="mypage_account_number_label">계좌번호</string>
+    <string name="mypage_account_number_hint">- 없이 숫자만 입력</string>
+    <string name="mypage_cancel">취소</string>
+    <string name="mypage_save">저장</string>
+    <string name="mypage_save_error">저장하지 못했어요. 네트워크를 확인해 주세요</string>
+    <string name="mypage_profile_saved">프로필을 수정했어요</string>
+    <string name="mypage_account_saved">송금 계좌를 변경했어요</string>
+    <string name="mypage_nickname_required">닉네임을 입력해 주세요</string>
+    <string name="mypage_account_required">계좌번호를 입력해 주세요</string>
+    <string name="mypage_account_invalid">계좌번호는 숫자만 입력해 주세요</string>
+    <string name="mypage_profile_saving">프로필 수정 중이에요...</string>
+</resources>

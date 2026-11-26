@@ -43,14 +43,14 @@ class RoomAdapter(
             textStatus.setText(
                 when (room.status) {
                     RoomStatus.RECRUITING -> if (room.isFull) {
-                        R.string.detail_status_full
+                        R.string.room_status_full
                     } else {
-                        R.string.detail_status_recruiting
+                        R.string.room_status_recruiting
                     }
-                    RoomStatus.ORDER_CONFIRMED -> R.string.detail_status_confirmed
-                    RoomStatus.ORDERED -> R.string.detail_status_ordered
-                    RoomStatus.RECEIVED -> R.string.detail_status_received
-                    RoomStatus.COMPLETED -> R.string.detail_status_completed
+                    RoomStatus.ORDER_CONFIRMED -> R.string.room_status_confirmed
+                    RoomStatus.ORDERED -> R.string.room_status_ordered
+                    RoomStatus.RECEIVED -> R.string.room_status_received
+                    RoomStatus.COMPLETED -> R.string.room_status_completed
                 }
             )
             textStatus.setBackgroundResource(
@@ -70,7 +70,7 @@ class RoomAdapter(
             )
             textStatus.isActivated = room.status != RoomStatus.RECRUITING || room.isFull
             textParticipantCount.text = context.getString(
-                R.string.chat_header_participant_count, room.currentCount, room.maxParticipants,
+                R.string.room_participant_count, room.currentCount, room.maxParticipants,
             )
             textDeliveryFee.text = "배달비 1인당 %,d원".format(room.deliveryFeePerPerson)
             imageDeliveryApp.setImageResource(

@@ -35,7 +35,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="@string/signup_email_hint"
+                android:hint="@string/auth_email_hint"
                 app:boxBackgroundColor="@color/white"
                 app:boxBackgroundMode="outline"
                 app:boxStrokeColor="@color/navy"
@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="@string/signup_email_domain"
+                android:text="@string/auth_email_domain"
                 android:textColor="@color/navy"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/signup_password_hint"
+            android:hint="@string/auth_password_hint"
             app:boxBackgroundColor="@color/white"
             app:boxBackgroundMode="outline"
             app:boxStrokeColor="@color/navy"
