@@ -7,9 +7,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.delibuddy.R
 import com.example.delibuddy.databinding.ItemOrderSheetBinding
+import com.example.delibuddy.ui.common.loadImage
 
 class OrderSheetAdapter(
     private val onPhotoClick: (String) -> Unit,
@@ -39,11 +39,8 @@ class OrderSheetAdapter(
             val url = order?.imageUrl?.takeIf { it.isNotBlank() }
             imageCart.isVisible = url != null
             if (url != null) {
-                Glide.with(imageCart).load(url).into(imageCart)
+                imageCart.loadImage(url)
                 imageCart.setOnClickListener { onPhotoClick(url) }
-            } else {
-                Glide.with(imageCart).clear(imageCart)
-                imageCart.setOnClickListener(null)
             }
 
             val memo = order?.memo?.takeIf { it.isNotBlank() }
