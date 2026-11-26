@@ -64,6 +64,6 @@ class OrderSheetAdapter(
     }
 }
 
-fun Context.orderAmountText(amount: Long?): String =
+private fun Context.orderAmountText(amount: Long?): String =
     if (amount == null) getString(R.string.order_sheet_custom)
     else getString(R.string.room_detail_won, amount)

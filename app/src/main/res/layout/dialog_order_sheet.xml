@@ -220,15 +220,6 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_copy"
-                style="@style/ActionButton.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="52dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="@string/order_sheet_copy" />
-
-            <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_confirm"
                 style="@style/ActionButton.Primary"
                 android:layout_width="0dp"
