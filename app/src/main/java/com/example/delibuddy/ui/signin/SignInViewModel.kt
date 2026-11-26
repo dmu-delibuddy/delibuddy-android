@@ -10,6 +10,9 @@ import com.example.delibuddy.data.auth.AuthRepository
 import com.example.delibuddy.data.auth.AuthInvalidCredentialsException
 import com.example.delibuddy.data.auth.AuthInvalidUserException
 import com.example.delibuddy.data.auth.AuthNetworkException
+import com.example.delibuddy.data.auth.EmailNotVerifiedException
+import com.example.delibuddy.data.auth.SignUpIncompleteException
+import com.example.delibuddy.data.auth.SignUpSessionMissingException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -51,10 +54,7 @@ class SignInViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 authRepository.signIn(email, password)
-                _isLoggedIn.value = authRepository.isLoggedIn()
-                if (isLoggedIn.value != true) {
-                    _message.value = R.string.signin_signup_incomplete
-                }
+                _isLoggedIn.value = true
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -67,6 +67,9 @@ class SignInViewModel : ViewModel() {
 
     @StringRes
     private fun Exception.toSignInError(): Int = when (this) {
+        is EmailNotVerifiedException,
+        is SignUpIncompleteException -> R.string.signin_signup_incomplete
+        is SignUpSessionMissingException -> R.string.common_error_not_logged_in
         is AuthInvalidCredentialsException -> R.string.signin_invalid_credentials
         is AuthInvalidUserException -> R.string.signin_invalid_user
         is AuthNetworkException -> R.string.signin_network_error
