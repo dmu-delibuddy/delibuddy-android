@@ -47,7 +47,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:autofillHints="emailAddress"
                 android:background="@null"
                 android:hint="@string/signup_email_id_hint"
                 android:imeOptions="actionDone"
