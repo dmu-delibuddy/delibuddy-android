@@ -36,6 +36,7 @@ import com.example.delibuddy.ui.chat.ChatViewModel.LeaveRoomState
 import com.example.delibuddy.ui.chat.ChatViewModel.ScreenState
 import com.example.delibuddy.ui.common.FullscreenImageDialogFragment
 import com.example.delibuddy.ui.chat.order.MyOrderDialogFragment
+import com.example.delibuddy.ui.chat.order.OrderSheetDialogFragment
 import com.example.delibuddy.ui.common.GlobalAlertDialog
 import java.io.File
 import java.io.IOException
@@ -46,11 +47,6 @@ import com.example.delibuddy.data.room.RoomMode
 import com.example.delibuddy.data.profile.ProfileType
 import com.example.delibuddy.ui.common.profile.ProfileDialogFragment
 
-/*
-    * 채팅방
-    * - 방 상세의 채팅방 버튼 / 내 채팅방 목록에서 들어옴 (roomId 필수)
-    * - 글, 사진 보내기 / 사진 누르면 전체 화면으로 크게 보기
-*/
 class ChatFragment : Fragment() {
 
     private var _binding: FragmentChatBinding? = null
@@ -83,7 +79,6 @@ class ChatFragment : Fragment() {
         return binding.root
     }
 
-    // 목록, 입력창 연결과 상태 구독 시작
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpMessageList()
@@ -93,6 +88,7 @@ class ChatFragment : Fragment() {
         setUpPanelTabs()
         setUpShareAccountButton()
         setUpMyOrderButton()
+        setUpOrderSheetButton()
         setUpMessageInput()
         setUpSendButton()
         setUpPhotoButton()
@@ -144,7 +140,6 @@ class ChatFragment : Fragment() {
         binding.chatHeader.buttonBack.setOnClickListener { findNavController().navigateUp() }
     }
 
-    // 메시지 목록 : 아래부터 쌓이게
     private fun setUpMessageList() {
         chatAdapter = ChatAdapter(
             onRetryClick = { id -> viewModel.retry(id) },
@@ -291,11 +286,17 @@ class ChatFragment : Fragment() {
         }
     }
 
-    // 메뉴 탭 > 내 주문 : 내 주문 확인 / 변경 창
     private fun setUpMyOrderButton() {
         binding.chatPanel.menuOrder.setOnClickListener {
             val roomId = viewModel.roomId ?: return@setOnClickListener
             MyOrderDialogFragment.show(childFragmentManager, roomId)
+        }
+    }
+
+    private fun setUpOrderSheetButton() {
+        binding.buttonOrderSheet.setOnClickListener {
+            val roomId = viewModel.roomId ?: return@setOnClickListener
+            OrderSheetDialogFragment.show(childFragmentManager, roomId)
         }
     }
 
@@ -402,7 +403,6 @@ class ChatFragment : Fragment() {
         binding.chatPanel.panelParticipants.isVisible = participants
     }
 
-    // 보내기 성공하면 입력창 비우고 맨 아래로
     private fun sendMessage() {
         val text = binding.editMessage.text?.toString().orEmpty()
         if (viewModel.send(text)) {
@@ -411,13 +411,11 @@ class ChatFragment : Fragment() {
         }
     }
 
-    // 고른 사진 보내고 맨 아래로
     private fun sendImage(uri: Uri) {
         viewModel.sendImage(uri)
         scrollToBottom()
     }
 
-    // 방 없음 / 실패면 안내 문구, 정상이면 목록 + 입력창
     private fun observeScreenState() {
         viewModel.screenState.observe(viewLifecycleOwner) { state ->
             val ready = state == ScreenState.READY
@@ -436,7 +434,6 @@ class ChatFragment : Fragment() {
         }
     }
 
-    // 상단 방 제목
     private fun observeRoomHeader() {
         viewModel.roomHeader.observe(viewLifecycleOwner) { room ->
             binding.chatHeader.textRoomTitle.text = room?.title.orEmpty()
@@ -453,7 +450,6 @@ class ChatFragment : Fragment() {
         }
     }
 
-    // 상태 공지 펼치기/접기, 방장 버튼
     private fun setUpNotice() = with(binding.chatNotice) {
         rowSummary.setOnClickListener {
             val open = !layoutExpanded.isVisible
@@ -468,7 +464,6 @@ class ChatFragment : Fragment() {
             confirmAdvance()
         }
     }
-    // 되돌릴 수 없어서 공용 경고창으로 한 번 더 확인
     private fun confirmAdvance() {
         val status =
             viewModel.roomHeader.value?.status ?: return
@@ -497,9 +492,9 @@ class ChatFragment : Fragment() {
         )
     }
 
-    // 방 상태에 맞게 문구, 단계, 버튼 표시
     private fun renderNotice(room: RoomModel?) {
         binding.chatNotice.root.isVisible = room != null
+        binding.buttonOrderSheet.isVisible = room != null && viewModel.isHost(room)
         if (room == null) return
         val status = room.status
         with(binding.chatNotice) {
@@ -516,7 +511,6 @@ class ChatFragment : Fragment() {
         renderSteps(status)
     }
 
-    // 지난 단계는 체크, 지금 단계 노랑, 남은 단계 회색
     private fun renderSteps(status: RoomStatus) =
         with(binding.chatNotice) {
             val now =
@@ -611,7 +605,6 @@ class ChatFragment : Fragment() {
                 R.string.chat_notice_hint_completed
         }
 
-    // 방장 버튼 문구 (완료면 버튼 숨김)
     @StringRes
     private fun noticeAction(status: RoomStatus): Int? =
         when (status) {
@@ -626,7 +619,6 @@ class ChatFragment : Fragment() {
             RoomStatus.COMPLETED -> null
         }
 
-    // 상태 변경 실패 안내
     private fun observeStatusError() {
         viewModel.statusError.observe(viewLifecycleOwner) { msg ->
             msg ?: return@observe
@@ -637,7 +629,6 @@ class ChatFragment : Fragment() {
         }
     }
 
-    // 새 목록 반영. 맨 아래를 보고 있었을 때만 자동 스크롤
     private fun observeMessages() {
         viewModel.items.observe(viewLifecycleOwner) { items ->
             val wasAtBottom = isAtBottom()
@@ -647,17 +638,14 @@ class ChatFragment : Fragment() {
         }
     }
 
-    // 더 아래로 스크롤할 수 없으면 맨 아래
     private fun isAtBottom(): Boolean =
         !binding.recyclerMessages.canScrollVertically(1)
 
-    // 마지막 메시지로 이동
     private fun scrollToBottom() {
         val last = chatAdapter.itemCount - 1
         if (last >= 0) binding.recyclerMessages.scrollToPosition(last)
     }
 
-    // 화면이 사라질 때 어댑터 / binding 해제
     override fun onDestroyView() {
         super.onDestroyView()
         keyboardLayoutListener?.let {
