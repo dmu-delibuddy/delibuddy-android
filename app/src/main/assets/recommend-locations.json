@@ -1,8 +1,8 @@
 [
   {
     "id": "loc_1",
-    "name": "동양미래대학교 1호관",
-    "description": "동양미래대학교에 Main건물",
+    "name": "1호관",
+    "description": "도서관이 있는 건물",
     "lat": 37.499938,
     "lon": 126.868234,
     "imagePath": "recommend-locations/campus1.jpg",
@@ -10,8 +10,8 @@
   },
   {
     "id": "loc_2",
-    "name": "동양미래대학교 2호관",
-    "description": "경영학부가 사용하는 건물",
+    "name": "2호관",
+    "description": "정문에서 한눈에 보이는 건물",
     "lat": 37.5003125,
     "lon": 126.8688125,
     "imagePath": "recommend-locations/campus2.jpg",
@@ -19,8 +19,8 @@
   },
   {
     "id": "loc_3",
-    "name": "동양미래대학교 3호관",
-    "description": "컴퓨터공학부가 사용하는 건물",
+    "name": "3호관",
+    "description": "학교 중앙 광장에 있는 건물",
     "lat": 37.500713,
     "lon": 126.867891,
     "imagePath": "recommend-locations/campus3.jpg",
@@ -28,8 +28,8 @@
   },
   {
     "id": "loc_4",
-    "name": "동양미래대학교 4호관",
-    "description": "전자공학부가 사용하는 건물",
+    "name": "4호관",
+    "description": "운동장과 중앙 광장 사이에 있는 건물",
     "lat": 37.500813,
     "lon": 126.867063,
     "imagePath": "recommend-locations/campus4.jpg",
@@ -37,8 +37,8 @@
   },
   {
     "id": "loc_5",
-    "name": "동양미래대학교 5호관",
-    "description": "Lab과 함께 사용되는 건물",
+    "name": "5호관",
+    "description": "3호관 뒤편에 있는 건물",
     "lat": 37.501088,
     "lon": 126.867578,
     "imagePath": "recommend-locations/campus5.jpg",
@@ -46,8 +46,8 @@
   },
   {
     "id": "loc_6",
-    "name": "동양미래대학교 6호관",
-    "description": "건축과 및 교양강의를 주로하는 건물",
+    "name": "6호관",
+    "description": "축구장 옆에 있는 건물",
     "lat": 37.501538,
     "lon": 126.867047,
     "imagePath": "recommend-locations/campus6.jpg",
@@ -55,8 +55,8 @@
   },
   {
     "id": "loc_7",
-    "name": "동양미래대학교 7호관",
-    "description": "디자인과가 사용하는 건물, 제일 안 쪽에 위치해있다",
+    "name": "7호관",
+    "description": "지도 상에만 존재하는 건물로 유명하다.\n동양미래대학교 학생 중 누구도 7호관에 가본 적이 없다.\n찾아나선다면 돌아오지 못한다는 전설이 있다.",
     "lat": 37.502087,
     "lon": 126.866828,
     "imagePath": "recommend-locations/campus7.jpg",
@@ -64,8 +64,8 @@
   },
   {
     "id": "loc_8",
-    "name": "동양미래대학교 8호관",
-    "description": "학생식당과, 카페, 문구, 등이 있다",
+    "name": "8호관",
+    "description": "후문과 연결된 건물",
     "lat": 37.501113,
     "lon": 126.866609,
     "imagePath": "recommend-locations/campus8.jpg",
@@ -73,8 +73,8 @@
   },
   {
     "id": "loc_9",
-    "name": "동양미래대학교 기숙사 식당",
-    "description": "동양미래대학교 기숙사생끼리 식당에서 만나 먹을 수 있다",
+    "name": "기숙사 식당",
+    "description": "기숙사생끼리 함께 먹기에 적합한 장소다.",
     "lat": 37.499462,
     "lon": 126.864984,
     "imagePath": "recommend-locations/gisuksa.jpg",
@@ -82,8 +82,8 @@
   },
   {
     "id": "loc_10",
-    "name": "동양미래대학교 야외광장",
-    "description": "야외테라스에서 경치좋게 밥을 먹을 수 있다",
+    "name": "야외 광장",
+    "description": "날씨가 좋은 날에 사용하기 좋다.",
     "lat": 37.500338,
     "lon": 126.867359,
     "imagePath": "recommend-locations/outtable.jpg",
@@ -91,7 +91,7 @@
   },
   {
     "id": "loc_11",
-    "name": "동양미래대학교 정문",
+    "name": "정문",
     "description": "동양미래대학교 정문",
     "lat": 37.499837,
     "lon": 126.868578,
@@ -100,7 +100,7 @@
   },
   {
     "id": "loc_12",
-    "name": "동양미래대학교 후문",
+    "name": "후문",
     "description": "동양미래대학교 후문",
     "lat": 37.500912,
     "lon": 126.866391,
