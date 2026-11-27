@@ -41,7 +41,7 @@
             android:paddingStart="12dp"
             android:paddingEnd="15dp"
             android:text="@string/common_mode_meal_buddy"
-            android:textColor="@color/black" />
+            android:textColor="@color/meal_buddy_mode_text" />
     </RadioGroup>
 
     <!-- 프로필 사진 + 닉네임 -->
