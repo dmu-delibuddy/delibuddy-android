@@ -163,7 +163,6 @@ class RoomDetailFragment : Fragment() {
     private fun handleActionResult(state: ActionState) {
         when (state) {
             ActionState.Done -> {
-                toast(getString(R.string.room_detail_done_join))
                 viewModel.clearActionState()
                 openChat()
             }
