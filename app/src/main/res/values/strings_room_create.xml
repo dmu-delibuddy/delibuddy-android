@@ -62,7 +62,7 @@
     <string name="room_create_error_restaurant">음식점을 입력해 주세요</string>
     <string name="room_create_error_min_order">최소 주문 금액을 입력해 주세요</string>
     <string name="room_create_error_delivery_fee">예상 배달비를 입력해 주세요</string>
-    <string name="room_create_error_unknown">방을 만들지 못했어요. 네트워크를 확인하고 다시 시도해 주세요</string>
+    <string name="room_create_error_unknown">방을 만들지 못했어요. 다시 시도해 주세요</string>
     <string name="room_create_submitting">개설 중…</string>
     <string name="room_create_success">방을 만들었어요</string>
 </resources>

@@ -1,5 +1,8 @@
 package com.example.delibuddy.ui.room
 
+import com.example.delibuddy.data.room.RoomNetworkException
+import com.example.delibuddy.data.room.RoomPermissionDeniedException
+import com.example.delibuddy.data.room.RoomUnknownException
 import androidx.annotation.StringRes
 import com.example.delibuddy.R
 import com.example.delibuddy.data.room.RoomNotLoggedInException
@@ -23,5 +26,8 @@ internal fun Throwable.toRoomError(@StringRes fallback: Int): Int = when (this) 
     is RoomCannotLeaveInProgressException -> R.string.room_error_cannot_leave_in_progress
     is RoomInvalidStateException -> R.string.room_error_invalid_state
     is RoomAccountRequiredException -> R.string.room_error_account_required
+    is RoomNetworkException -> R.string.room_error_network
+    is RoomPermissionDeniedException -> R.string.room_error_permission_denied
+    is RoomUnknownException -> fallback
     else -> fallback
 }

@@ -3,6 +3,10 @@ package com.example.delibuddy.data.room
 import com.example.delibuddy.data.chat.ChatModel
 import com.example.delibuddy.data.chat.MessageType
 import com.example.delibuddy.data.chat.SystemMessage
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.catch
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -22,7 +26,7 @@ class RoomRepository {
 
     val myUid: String get() = auth.currentUser?.uid ?: throw RoomNotLoggedInException()
 
-    suspend fun createRoom(room: RoomModel) {
+    suspend fun createRoom(room: RoomModel): Unit = withErrorHandling {
         val uid = myUid
         val ref = rooms.document()
         val newRoom = room.copy(
@@ -38,26 +42,35 @@ class RoomRepository {
                 createSystemMessage(SystemMessage.ROOM_CREATED)
             )
         }.await()
+        Unit
     }
 
     suspend fun getRoom(roomId: String): RoomModel? =
-        rooms.document(roomId).get().await().toObject(RoomModel::class.java)
+        withErrorHandling {
+            rooms.document(roomId).get().await().toObject(RoomModel::class.java)
+        }
 
-    fun observeRoom(roomId: String): Flow<RoomModel?> = callbackFlow {
+    fun observeRoom(roomId: String): Flow<RoomModel?> = callbackFlow<RoomModel?> {
         val registration = rooms.document(roomId).addSnapshotListener { snapshot, error ->
             if (error != null) {
                 close(error)
                 return@addSnapshotListener
             }
-            trySend(snapshot?.toObject(RoomModel::class.java))
+            try {
+                trySend(snapshot?.toObject(RoomModel::class.java))
+            } catch (e: Exception) {
+                close(e)
+            }
         }
         awaitClose { registration.remove() }
+    }.catch { e ->
+        withErrorHandling { throw e }
     }
 
     fun observeRooms(
         mode: RoomMode? = null,
         category: FoodCategory? = null,
-    ): Flow<List<RoomModel>> = callbackFlow {
+    ): Flow<List<RoomModel>> = callbackFlow<List<RoomModel>> {
         var query: Query = rooms.whereEqualTo("status", RoomStatus.RECRUITING.name)
         if (mode != null) query = query.whereEqualTo("mode", mode.name)
         if (category != null) query = query.whereEqualTo("category", category.name)
@@ -67,34 +80,46 @@ class RoomRepository {
                 close(error)
                 return@addSnapshotListener
             }
-            val list = snapshot?.documents.orEmpty().mapNotNull { doc ->
+            try {
+                val list = snapshot?.documents.orEmpty().mapNotNull { doc ->
                     doc.toObject(RoomModel::class.java)
                 }.sortedByDescending { it.createdAt?.seconds ?: 0L }
-            trySend(list)
+                trySend(list)
+            } catch (e: Exception) {
+                close(e)
+            }
         }
         awaitClose { registration.remove() }
+    }.catch { e ->
+        withErrorHandling { throw e }
     }
 
-    fun observeMyRooms(uid: String): Flow<List<RoomModel>> = callbackFlow {
+    fun observeMyRooms(uid: String): Flow<List<RoomModel>> = callbackFlow<List<RoomModel>> {
         val registration =
             rooms.whereArrayContains("participantIds", uid).addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
                     return@addSnapshotListener
                 }
-                val list =
-                    snapshot?.documents.orEmpty().mapNotNull { it.toObject(RoomModel::class.java) }
-                        .sortedWith(compareBy<RoomModel> {
-                            it.status == RoomStatus.COMPLETED
-                        }.thenByDescending {
-                            it.createdAt?.seconds ?: 0L
-                        })
-                trySend(list)
+                try {
+                    val list =
+                        snapshot?.documents.orEmpty().mapNotNull { it.toObject(RoomModel::class.java) }
+                            .sortedWith(compareBy<RoomModel> {
+                                it.status == RoomStatus.COMPLETED
+                            }.thenByDescending {
+                                it.createdAt?.seconds ?: 0L
+                            })
+                    trySend(list)
+                } catch (e: Exception) {
+                    close(e)
+                }
             }
         awaitClose { registration.remove() }
+    }.catch { e ->
+        withErrorHandling { throw e }
     }
 
-    suspend fun joinRoom(roomId: String) {
+    suspend fun joinRoom(roomId: String): Unit = withErrorHandling {
         val uid = myUid
         val ref = rooms.document(roomId)
         val messageRef = ref.collection("messages").document()
@@ -110,9 +135,10 @@ class RoomRepository {
             tx.update(ref, "participantIds", FieldValue.arrayUnion(uid))
             tx.set(messageRef, createSystemMessage(SystemMessage.JOINED))
         }.await()
+        Unit
     }
 
-    suspend fun leaveRoom(roomId: String) {
+    suspend fun leaveRoom(roomId: String): Unit = withErrorHandling {
         val uid = myUid
         val ref = rooms.document(roomId)
         val messageRef = ref.collection("messages").document()
@@ -131,14 +157,16 @@ class RoomRepository {
                 tx.set(messageRef, createSystemMessage(SystemMessage.LEFT))
             }
         }.await()
+        Unit
     }
 
-    suspend fun advanceStatus(roomId: String, from: RoomStatus) {
+    suspend fun advanceStatus(roomId: String, from: RoomStatus): Unit = withErrorHandling {
         val to = from.next ?: throw RoomInvalidStateException()
         changeStatusAsHost(roomId, setOf(from), to)
+        Unit
     }
 
-    suspend fun kickParticipant(roomId: String, participantId: String) {
+    suspend fun kickParticipant(roomId: String, participantId: String): Unit = withErrorHandling {
         val uid = myUid
         val ref = rooms.document(roomId)
         val messageRef = ref.collection("messages").document()
@@ -154,9 +182,10 @@ class RoomRepository {
             tx.update(ref, "participantIds", FieldValue.arrayRemove(participantId))
             tx.set(messageRef, createSystemMessage(SystemMessage.REMOVED))
         }.await()
+        Unit
     }
 
-    private suspend fun changeStatusAsHost(roomId: String, from: Set<RoomStatus>, to: RoomStatus) {
+    private suspend fun changeStatusAsHost(roomId: String, from: Set<RoomStatus>, to: RoomStatus): Unit = withErrorHandling {
         val uid = myUid
         val ref = rooms.document(roomId)
         val messageRef = ref.collection("messages").document()
@@ -169,6 +198,42 @@ class RoomRepository {
                 tx.set(messageRef, createSystemMessage(content))
             }
         }.await()
+        Unit
+    }
+
+    private suspend fun <T> withErrorHandling(action: suspend () -> T): T {
+        return try {
+            action()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            throw when (e) {
+                is RoomNotLoggedInException,
+                is RoomNotFoundException,
+                is RoomClosedException,
+                is RoomFullException,
+                is RoomAlreadyJoinedException,
+                is RoomNotHostException,
+                is RoomCannotLeaveInProgressException,
+                is RoomInvalidStateException,
+                is RoomAccountRequiredException,
+                is RoomNetworkException,
+                is RoomPermissionDeniedException,
+                is RoomUnknownException -> e
+                is FirebaseNetworkException -> RoomNetworkException()
+                is FirebaseFirestoreException -> when (e.code) {
+                    FirebaseFirestoreException.Code.UNAVAILABLE,
+                    FirebaseFirestoreException.Code.DEADLINE_EXCEEDED -> RoomNetworkException()
+                    FirebaseFirestoreException.Code.UNAUTHENTICATED ->
+                        RoomNotLoggedInException()
+                    FirebaseFirestoreException.Code.NOT_FOUND ->
+                        RoomNotFoundException()
+                    FirebaseFirestoreException.Code.PERMISSION_DENIED -> RoomPermissionDeniedException()
+                    else -> RoomUnknownException()
+                }
+                else -> RoomUnknownException()
+            }
+        }
     }
 
     private fun createSystemMessage(content: String) = ChatModel(
