@@ -23,4 +23,5 @@
     <string name="room_detail_done_join">방에 참여했어요</string>
     <string name="room_detail_go_chat">채팅방으로 이동</string>
     <string name="room_detail_account_required_title">송금 계좌가 필요해요</string>
+    <string name="room_detail_joining">방에 참여하고 있어요</string>
 </resources>

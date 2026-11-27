@@ -149,6 +149,11 @@ class RoomDetailFragment : Fragment() {
     private fun observeActionState() {
         viewModel.actionState
             .observe(viewLifecycleOwner) { state ->
+                if (state == ActionState.Loading) {
+                    GlobalLoadingDialog.show(childFragmentManager, getString(R.string.room_detail_joining))
+                } else if (orderViewModel.saveState.value != SaveState.Saving) {
+                    GlobalLoadingDialog.hide(childFragmentManager)
+                }
                 currentRoom()?.let { renderActionButton(it) }
                 handleActionResult(state)
             }
