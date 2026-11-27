@@ -1,6 +1,5 @@
 package com.example.delibuddy.data.room
 
-import android.util.Log
 import com.example.delibuddy.data.chat.ChatModel
 import com.example.delibuddy.data.chat.MessageType
 import com.example.delibuddy.data.chat.SystemMessage

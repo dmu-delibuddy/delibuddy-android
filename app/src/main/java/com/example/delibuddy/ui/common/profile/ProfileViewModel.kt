@@ -1,6 +1,5 @@
 package com.example.delibuddy.ui.common.profile
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -48,13 +47,8 @@ class ProfileViewModel : ViewModel() {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "프로필 불러오기 실패: $userId / $type", e)
                 ProfileUiState.Error
             }
         }
-    }
-
-    companion object {
-        private const val TAG = "ProfileModalVM"
     }
 }

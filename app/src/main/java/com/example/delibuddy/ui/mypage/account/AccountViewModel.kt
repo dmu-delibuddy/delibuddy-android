@@ -1,6 +1,5 @@
 package com.example.delibuddy.ui.mypage.account
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -62,7 +61,6 @@ class AccountViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "계좌 불러오기 실패", e)
                 _message.value = R.string.profile_load_error
             }
         }
@@ -90,7 +88,6 @@ class AccountViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e(TAG, "계좌 저장 실패", e)
                 _message.value = R.string.mypage_save_error
             } finally {
                 _saving.value = false
@@ -101,9 +98,5 @@ class AccountViewModel(
     // 토스트를 보여준 뒤 비우기 (화면 회전 시 중복 방지)
     fun clearMessage() {
         _message.value = null
-    }
-
-    companion object {
-        private const val TAG = "AccountVM"
     }
 }
