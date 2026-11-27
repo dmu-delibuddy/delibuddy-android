@@ -14,16 +14,9 @@
         android:orientation="vertical"
         android:padding="28dp">
 
-        <ProgressBar
+        <include
             android:id="@+id/signup_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="12dp"
-            android:indeterminate="false"
-            android:max="4"
-            android:progress="3"
-            android:progressBackgroundTint="@color/white"
-            android:progressTint="@color/nav_selected" />
+            layout="@layout/layout_signup_progress" />
 
         <TextView
             android:layout_width="match_parent"
@@ -34,18 +27,35 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
+        <TextView
+            style="@style/SignupInputLabel"
+            android:layout_marginTop="32dp"
+            android:labelFor="@id/button_birth_date"
+            android:text="@string/signup_birth_date_label" />
+
         <com.google.android.material.button.MaterialButton
-            android:background="@drawable/bg_pixel_box"
-            android:textColor="@color/black"
-            android:textAllCaps="false"
-            app:backgroundTint="@null"
             android:id="@+id/button_birth_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="60dp"
-            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_pixel_box"
+            android:gravity="start|center_vertical"
+            android:letterSpacing="0"
+            android:minHeight="52dp"
+            android:paddingStart="14dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="17dp"
+            android:paddingBottom="15dp"
+            android:stateListAnimator="@null"
             android:text="@string/signup_birth_date_hint"
-            android:textSize="18sp" />
+            android:textAllCaps="false"
+            android:textColor="@color/navy"
+            android:textSize="16sp"
+            app:backgroundTint="@null"
+            app:icon="@drawable/ic_pixel_calendar"
+            app:iconGravity="end"
+            app:iconTint="@color/navy"
+            android:insetBottom="0dp"
+            android:insetTop="0dp" />
 
         <Space
             android:layout_width="match_parent"
@@ -58,26 +68,24 @@
             android:layout_marginTop="32dp"
             android:orientation="horizontal">
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/ActionButton.Secondary"
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button_skip"
+                style="@style/PixelButton.Yellow"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="@string/signup_skip"
-                android:textSize="18sp" />
+                android:text="@string/signup_skip" />
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/ActionButton.Primary"
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button_next"
+                style="@style/PixelButton.Red"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:enabled="false"
-                android:text="@string/signup_next"
-                android:textSize="18sp" />
+                android:text="@string/signup_next" />
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -178,6 +178,10 @@ class SignUpViewModel : ViewModel() {
 
     fun confirmEmailVerification() {
         if (_isConfirmingVerification.value == true || _isSendingVerification.value == true) return
+        if (_isEmailVerified.value == true) {
+            _isReadyForBirthDate.value = true
+            return
+        }
 
         _isConfirmingVerification.value = true
         _verificationMessage.value = null
@@ -185,6 +189,7 @@ class SignUpViewModel : ViewModel() {
             try {
                 authRepository.createUserDocument()
                 _isEmailVerified.value = true
+                _isReadyForBirthDate.value = true
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -193,15 +198,6 @@ class SignUpViewModel : ViewModel() {
                 _isConfirmingVerification.value = false
             }
         }
-    }
-
-    fun moveToBirthDate() {
-        if (_isEmailVerified.value != true) {
-            _isEmailVerified.value = false
-            _verificationMessage.value = R.string.signup_verification_required
-            return
-        }
-        _isReadyForBirthDate.value = true
     }
 
     fun isEmailValid(): Boolean {

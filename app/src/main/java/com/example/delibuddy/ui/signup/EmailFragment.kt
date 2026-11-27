@@ -30,6 +30,7 @@ class EmailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.signupProgress.setStep(STEP)
         restoreEmail()
         setUpListeners()
     }
@@ -60,5 +61,9 @@ class EmailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val STEP = 1
     }
 }

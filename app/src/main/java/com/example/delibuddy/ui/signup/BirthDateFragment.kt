@@ -31,6 +31,7 @@ class BirthDateFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.signupProgress.setStep(STEP)
         setUpListeners()
         updateBirthDate()
     }
@@ -96,5 +97,9 @@ class BirthDateFragment : Fragment() {
         datePicker = null
         _binding = null
         super.onDestroyView()
+    }
+
+    companion object {
+        private const val STEP = 3
     }
 }
