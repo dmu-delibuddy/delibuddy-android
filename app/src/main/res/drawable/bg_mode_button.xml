@@ -16,5 +16,20 @@
             </item>
         </layer-list>
     </item>
+    <item android:state_selected="true">
+        <layer-list>
+            <item android:left="@dimen/pixel_shadow" android:top="@dimen/pixel_shadow">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/black" />
+                </shape>
+            </item>
+            <item android:right="@dimen/pixel_shadow" android:bottom="@dimen/pixel_shadow">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/point_orange" />
+                    <stroke android:width="@dimen/pixel_stroke" android:color="@color/black" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
     <item android:drawable="@drawable/bg_mode_button_off" />
 </selector>

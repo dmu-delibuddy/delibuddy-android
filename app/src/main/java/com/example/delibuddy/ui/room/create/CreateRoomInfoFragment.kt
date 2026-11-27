@@ -69,10 +69,15 @@ class CreateRoomInfoFragment : Fragment() {
     }
 
     private fun setUpModeSelect() {
-        binding.groupCreateMode.setOnCheckedChangeListener { _, checkedId ->
-            viewModel.setMode(
-                if (checkedId == R.id.radio_create_meal_buddy) RoomMode.MEAL_BUDDY else RoomMode.PICKUP_ONLY
-            )
+        binding.buttonCreatePickup.setOnClickListener {
+            viewModel.setMode(RoomMode.PICKUP_ONLY)
+        }
+        binding.buttonCreateMealBuddy.setOnClickListener {
+            viewModel.setMode(RoomMode.MEAL_BUDDY)
+        }
+        viewModel.mode.observe(viewLifecycleOwner) { mode ->
+            binding.buttonCreatePickup.isSelected = mode == RoomMode.PICKUP_ONLY
+            binding.buttonCreateMealBuddy.isSelected = mode == RoomMode.MEAL_BUDDY
         }
     }
 

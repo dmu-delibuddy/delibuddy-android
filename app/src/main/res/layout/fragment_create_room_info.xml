@@ -141,7 +141,7 @@
                 android:textColor="@color/black"
                 android:textSize="14sp" />
 
-            <RadioGroup
+            <LinearLayout
                 android:id="@+id/group_create_mode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -149,32 +149,71 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 
-                <RadioButton
-                    android:id="@+id/radio_create_pickup"
+                <LinearLayout
+                    android:id="@+id/button_create_pickup"
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:minHeight="84dp"
+                    android:padding="12dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_mode_button"
-                    android:button="@null"
-                    android:checked="true"
-                    android:gravity="center"
-                    android:text="@string/room_create_mode_pickup"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
+                    android:background="@drawable/bg_mode_button">
 
-                <RadioButton
-                    android:id="@+id/radio_create_meal_buddy"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:textColor="@color/black"
+                        android:duplicateParentState="true"
+                        android:text="@string/room_create_mode_pickup" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:duplicateParentState="true"
+                        android:text="@string/room_create_mode_pickup_description" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/button_create_meal_buddy"
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_mode_button"
-                    android:button="@null"
+                    android:minHeight="84dp"
+                    android:padding="12dp"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:text="@string/room_create_mode_meal_buddy"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
-            </RadioGroup>
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/bg_meal_buddy_mode_button">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:duplicateParentState="true"
+                        android:text="@string/room_create_mode_meal_buddy"
+                        android:textColor="@color/meal_buddy_mode_text" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:textSize="14sp"
+                        android:duplicateParentState="true"
+                        android:text="@string/room_create_mode_meal_buddy_description"
+                        android:textColor="@color/meal_buddy_mode_text" />
+                </LinearLayout>
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
