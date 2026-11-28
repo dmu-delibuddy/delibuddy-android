@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,16 +13,9 @@
         android:orientation="vertical"
         android:padding="28dp">
 
-        <ProgressBar
+        <include
             android:id="@+id/signup_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="12dp"
-            android:indeterminate="false"
-            android:max="4"
-            android:progress="4"
-            android:progressBackgroundTint="@color/white"
-            android:progressTint="@color/nav_selected" />
+            layout="@layout/layout_signup_progress" />
 
         <TextView
             android:layout_width="match_parent"
@@ -43,41 +35,35 @@
             android:textSize="14sp" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/signup_bank_name_hint"
-            android:textColor="@color/navy" />
+            style="@style/SignupInputLabel"
+            android:labelFor="@id/spinner_bank"
+            android:text="@string/signup_bank_name_hint" />
 
         <Spinner
             android:id="@+id/spinner_bank"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/bg_pixel_box"
-            android:paddingStart="8dp"
-            android:paddingEnd="11dp" />
+            android:layout_height="52dp"
+            android:background="@drawable/bg_pixel_spinner"
+            android:paddingStart="6dp"
+            android:paddingEnd="44dp"
+            android:paddingBottom="@dimen/pixel_shadow" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <TextView
+            style="@style/SignupInputLabel"
+            android:labelFor="@id/edit_account"
+            android:text="@string/signup_account_hint" />
+
+        <EditText
+            android:id="@+id/edit_account"
+            style="@style/SignupEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="@string/signup_account_hint"
-            app:boxBackgroundColor="@color/white"
-            app:boxBackgroundMode="outline"
-            app:boxStrokeColor="@color/navy"
-            app:hintTextColor="@color/navy">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_account"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
-                android:inputType="number"
-                android:maxLines="1"
-                android:saveEnabled="false"
-                android:textColor="@color/navy" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:hint="@string/signup_account_placeholder"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLines="1"
+            android:saveEnabled="false" />
 
         <Space
             android:layout_width="match_parent"
@@ -90,34 +76,31 @@
             android:layout_marginTop="32dp"
             android:orientation="horizontal">
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/ActionButton.Secondary"
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button_previous"
+                style="@style/PixelButton.Yellow"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="@string/signup_previous"
-                android:textSize="18sp" />
+                android:text="@string/signup_previous" />
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/ActionButton.Secondary"
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button_skip"
+                style="@style/PixelButton.Yellow"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
-                android:text="@string/signup_skip"
-                android:textSize="18sp" />
+                android:text="@string/signup_skip" />
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            style="@style/ActionButton.Primary"
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_finish"
+            style="@style/PixelButton.Red"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="12dp"
-            android:text="@string/signup_finish"
-            android:textSize="18sp" />
+            android:text="@string/signup_finish" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

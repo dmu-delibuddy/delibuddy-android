@@ -13,4 +13,6 @@
     <color name="button_red">#CF4B35</color>
     <color name="alert_description">#666666</color>
     <color name="status_ordered">#4CAF50</color>
+    <color name="button_disabled">#EDE5C9</color>
+    <color name="button_disabled_line">#9A8F6F</color>
 </resources>

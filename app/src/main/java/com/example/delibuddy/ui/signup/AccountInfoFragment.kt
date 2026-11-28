@@ -32,6 +32,7 @@ class AccountInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.signupProgress.setStep(STEP)
         setUpAccountInput()
         setUpListeners()
         observeRegistrationState()
@@ -114,5 +115,9 @@ class AccountInfoFragment : Fragment() {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    companion object {
+        private const val STEP = 4
     }
 }

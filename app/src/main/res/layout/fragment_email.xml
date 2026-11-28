@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,16 +13,9 @@
         android:orientation="vertical"
         android:padding="28dp">
 
-        <ProgressBar
+        <include
             android:id="@+id/signup_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="12dp"
-            android:indeterminate="false"
-            android:max="4"
-            android:progress="1"
-            android:progressBackgroundTint="@color/white"
-            android:progressTint="@color/nav_selected" />
+            layout="@layout/layout_signup_progress" />
 
         <TextView
             android:layout_width="match_parent"
@@ -34,38 +26,52 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
+        <TextView
+            style="@style/SignupInputLabel"
+            android:layout_marginTop="32dp"
+            android:labelFor="@id/edit_email"
+            android:text="@string/auth_email_hint" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:background="@drawable/bg_pixel_box"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/pixel_stroke"
+            android:paddingTop="@dimen/pixel_stroke"
+            android:paddingEnd="5dp"
+            android:paddingBottom="5dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/signup_Input"
-                android:id="@+id/input_email"
+            <EditText
+                android:id="@+id/edit_email"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="@string/auth_email_hint">
+                android:background="@null"
+                android:hint="@string/signup_email_id_hint"
+                android:imeOptions="actionDone"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:minHeight="45dp"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/navy"
+                android:textSize="16sp" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:imeOptions="actionDone"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"
-                    android:textColor="@color/navy" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <View
+                android:layout_width="@dimen/pixel_stroke"
+                android:layout_height="match_parent"
+                android:background="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_height="match_parent"
+                android:background="@color/mode_off"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
                 android:text="@string/auth_email_domain"
                 android:textColor="@color/navy"
-                android:textSize="16sp" />
+                android:textSize="14sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <Space
@@ -73,13 +79,12 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <com.google.android.material.button.MaterialButton
-            style="@style/ActionButton.Primary"
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_next"
+            style="@style/PixelButton.Red"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
-            android:text="@string/signup_next"
-            android:textSize="18sp" />
+            android:text="@string/signup_next" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -32,6 +32,7 @@ class PasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.signupProgress.setStep(STEP)
         setUpButtonListeners()
         observeSignUpState()
         observeVerificationCompletion()
@@ -47,9 +48,6 @@ class PasswordFragment : Fragment() {
         }
         binding.buttonVerificationComplete.setOnClickListener {
             viewModel.confirmEmailVerification()
-        }
-        binding.buttonPreviousNext.setOnClickListener {
-            viewModel.moveToBirthDate()
         }
     }
 
@@ -106,9 +104,9 @@ class PasswordFragment : Fragment() {
     private fun updateLoadingState() {
         val isBusy = viewModel.isSendingVerification.value == true ||
                 viewModel.isConfirmingVerification.value == true
-        binding.buttonVerificationComplete.isEnabled = !isBusy
-        binding.buttonVerifyEmail.isEnabled =
-            !isBusy && viewModel.isVerificationEmailSent.value != true
+        val isSent = viewModel.isVerificationEmailSent.value == true
+        binding.buttonVerificationComplete.isEnabled = !isBusy && isSent
+        binding.buttonVerifyEmail.isEnabled = !isBusy && !isSent
         binding.buttonPrevious.isEnabled = !isBusy
         binding.editPassword.isEnabled = !isBusy
         binding.editPasswordConfirm.isEnabled = !isBusy
@@ -128,5 +126,9 @@ class PasswordFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val STEP = 2
     }
 }
